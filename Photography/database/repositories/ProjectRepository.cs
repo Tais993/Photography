@@ -5,14 +5,14 @@ namespace PhotographyNET.database.repositories;
 
 public class ProjectRepository : AbstractRepository<Project>
 {
-    public ProjectRepository(NpgsqlConnection cnx) : base(cnx)
+    public ProjectRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {
     }
 
     public override Project? GetById(int id)
     {
         return QuerySingle("""
-                           SELECT id, name, location, date FROM public.project 
+                           SELECT id, name, location, event_date FROM public.project 
                            WHERE id = ($1)
                            """, MapProject, id);
     }
@@ -20,17 +20,17 @@ public class ProjectRepository : AbstractRepository<Project>
     public override List<Project> GetAll()
     {
         return QueryMultiple("""
-                             SELECT id, name, location, date FROM public.project
+                             SELECT id, name, location, event_date FROM public.project
                              """, MapProject);
     }
 
     public override Project Insert(Project image)
     {
         return QuerySingle("""
-                           INSERT INTO public.project(name, location, date) 
+                           INSERT INTO public.project(name, location, event_date) 
                            VALUES ($1, $2, $3)
                            RETURNING *
-                           """, MapProject, image.Name, image.Location, image.Date) ??
+                           """, MapProject, image.Name, image.Location, image.EventDate) ??
                throw new Exception("Insert failed");
     }
 
@@ -42,9 +42,9 @@ public class ProjectRepository : AbstractRepository<Project>
                 UPDATE public.project
                 SET name = $1,
                     location = $2,
-                    date = $3
+                    event_date = $3
                 WHERE id = $4
-                """, image.Name, image.Location, image.Date, image.Id);
+                """, image.Name, image.Location, image.EventDate, image.Id);
     }
 
 
@@ -53,7 +53,7 @@ public class ProjectRepository : AbstractRepository<Project>
         return QuerySingle("""
                            DELETE FROM public.project 
                            WHERE id = ($1)
-                           RETURNING id, name, location
+                           RETURNING id, name, location, event_date
                            """, MapProject, id);
     }
 
@@ -64,7 +64,7 @@ public class ProjectRepository : AbstractRepository<Project>
             (int)reader["id"],
             (string)reader["name"],
             (string)reader["location"],
-            (DateOnly)reader["date"]
+            (DateOnly)reader["event_date"]
         );
     }
 }
