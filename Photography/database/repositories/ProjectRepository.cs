@@ -12,7 +12,7 @@ public class ProjectRepository : AbstractRepository<Project>
     public override Project? GetById(int id)
     {
         return QuerySingle("""
-                           SELECT id, name, location FROM public.project 
+                           SELECT id, name, location, date FROM public.project 
                            WHERE id = ($1)
                            """, MapProject, id);
     }
@@ -20,7 +20,7 @@ public class ProjectRepository : AbstractRepository<Project>
     public override List<Project> GetAll()
     {
         return QueryMultiple("""
-                             SELECT id, name, location FROM public.project
+                             SELECT id, name, location, date FROM public.project
                              """, MapProject);
     }
 
