@@ -12,21 +12,29 @@ public abstract class AbstractRepository<T> where T : Entity
         this.dataSource = dataSource;
     }
 
-    public abstract T? GetById(int id);
-    public abstract List<T> GetAll();
-
-    public abstract T Insert(T image);
-    public abstract void Update(T image);
-
-    public abstract T? DeleteById(int id);
-
     protected T? QuerySingle(string sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
     {
-        var results = QueryMultiple(sql, resultConverter, parameterValues);
-        return results.Count > 0 ? results[0] : null;
+        return Query(sql, resultConverter);
     }
 
-    protected List<T> QueryMultiple(string sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
+    protected List<T> QueryMultiple(string sql, Func<NpgsqlDataReader, T> resultConverter,
+        params object[] parameterValues)
+    {
+        return Query(sql, reader =>
+        {
+            List<T> results = [];
+
+            while (reader.Read())
+            {
+                results.Add(resultConverter(reader));
+            }
+
+            return results;
+        });
+    }
+
+    protected TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
+        params object[] parameterValues)
     {
         NpgsqlConnection cnx = this.dataSource.OpenConnection();
 
@@ -39,17 +47,12 @@ public abstract class AbstractRepository<T> where T : Entity
 
         NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
 
-        List<T> results = [];
-
-        while (reader.Read())
-        {
-            results.Add(resultConverter(reader));
-        }
+        var tResult = resultConverter(reader);
 
         reader.CloseAsync();
         cnx.CloseAsync();
 
-        return results;
+        return tResult;
     }
 
     public void Execute(string sql, params object[] parameterValues)
