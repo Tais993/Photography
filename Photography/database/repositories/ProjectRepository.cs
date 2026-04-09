@@ -24,27 +24,27 @@ public class ProjectRepository : AbstractRepository<Project>
                              """, MapProject);
     }
 
-    public override Project Insert(Project image)
+    public override Project Insert(Project project)
     {
         return QuerySingle("""
                            INSERT INTO public.project(name, location, event_date) 
                            VALUES ($1, $2, $3)
                            RETURNING *
-                           """, MapProject, image.Name, image.Location, image.EventDate) ??
+                           """, MapProject, project.Name, project.Location, project.EventDate) ??
                throw new Exception("Insert failed");
     }
 
-    public override void Update(Project image)
+    public override void Update(Project project)
     {
-        if (image?.Id is null) throw new Exception("yeah i need actual stuff");
-        
+        if (project?.Id is null) throw new Exception("yeah i need actual stuff");
+
         Execute("""
                 UPDATE public.project
                 SET name = $1,
                     location = $2,
                     event_date = $3
                 WHERE id = $4
-                """, image.Name, image.Location, image.EventDate, image.Id);
+                """, project.Name, project.Location, project.EventDate, project.Id);
     }
 
 
