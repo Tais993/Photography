@@ -3,11 +3,11 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public abstract class AbstractDatabase<T> where T : Entity
+public abstract class AbstractRepository<T> where T : Entity
 {
     public NpgsqlConnection cnx;
 
-    protected AbstractDatabase(NpgsqlConnection cnx)
+    protected AbstractRepository(NpgsqlConnection cnx)
     {
         this.cnx = cnx;
 
@@ -22,13 +22,13 @@ public abstract class AbstractDatabase<T> where T : Entity
 
     public abstract T? DeleteById(int id);
 
-    protected T? QuerySingle(String sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
+    protected T? QuerySingle(string sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
     {
         var results = QueryMultiple(sql, resultConverter, parameterValues);
         return results.Count > 0 ? results[0] : null;
     }
 
-    protected List<T> QueryMultiple(String sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
+    protected List<T> QueryMultiple(string sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
     {
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
@@ -51,7 +51,7 @@ public abstract class AbstractDatabase<T> where T : Entity
         return results;
     }
 
-    public void Execute(String sql, params object[] parameterValues)
+    public void Execute(string sql, params object[] parameterValues)
     {
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
@@ -80,8 +80,8 @@ public abstract class AbstractDatabase<T> where T : Entity
         }
 
         var id = (int)npgsqlDataReader["id"];
-        var name = (String)npgsqlDataReader["name"];
-        var location = (String)npgsqlDataReader["location"];
+        var name = (string)npgsqlDataReader["name"];
+        var location = (string)npgsqlDataReader["location"];
 
         // var id = npgsqlDataReader.GetInt64(0);
         // var name = npgsqlDataReader.GetString(1);

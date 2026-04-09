@@ -3,9 +3,9 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public class ImageDatabase : AbstractDatabase<Image>
+public class ImageRepository : AbstractRepository<Image>
 {
-    public ImageDatabase(NpgsqlConnection cnx) : base(cnx)
+    public ImageRepository(NpgsqlConnection cnx) : base(cnx)
     {
     }
 
