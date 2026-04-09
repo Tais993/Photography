@@ -1,10 +1,10 @@
-﻿namespace PhotographyNET.services.interfaces;
+﻿using PhotographyNET.database.entities;
+
+namespace PhotographyNET.services.interfaces;
 
 public interface IProjectResolver
 {
+    public Project resolveProject(string directory);
 
-    public void resolveProject()
-    { 
-        Path.Exists("C:\\Users\\tijs\\OneDrive\\Desktop\\Backup important\\Pictures\\2025-03-0-Kalkar");
-    }
+    public void initialiseExistingFolder(string subdirectory);
 }

@@ -1,6 +1,8 @@
-﻿namespace PhotographyNET.services;
+﻿using PhotographyNET.services.interfaces;
 
-public class LightroomService
+namespace PhotographyNET.services;
+
+public class LightroomService : ILightroomService
 {
     
 }

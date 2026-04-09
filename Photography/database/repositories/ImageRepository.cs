@@ -5,7 +5,7 @@ namespace PhotographyNET.database.repositories;
 
 public class ImageRepository : AbstractRepository<Image>
 {
-    public ImageRepository(NpgsqlConnection cnx) : base(cnx)
+    public ImageRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {
     }
 

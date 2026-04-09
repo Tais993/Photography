@@ -1,6 +1,8 @@
-﻿namespace PhotographyNET.services;
+﻿using PhotographyNET.services.interfaces;
 
-public class FileSearchService
+namespace PhotographyNET.services;
+
+public class FileSearchService : IFileSearchService
 {
     
 }

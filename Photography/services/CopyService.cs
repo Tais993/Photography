@@ -1,6 +1,8 @@
-﻿namespace PhotographyNET.services;
+﻿using PhotographyNET.services.interfaces;
 
-public class CopyService
+namespace PhotographyNET.services;
+
+public class CopyService : ICopyService
 {
     
 }
