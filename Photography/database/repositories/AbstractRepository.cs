@@ -5,13 +5,11 @@ namespace PhotographyNET.database.repositories;
 
 public abstract class AbstractRepository<T> where T : Entity
 {
-    public NpgsqlConnection cnx;
+    public NpgsqlDataSource dataSource;
 
-    protected AbstractRepository(NpgsqlConnection cnx)
+    protected AbstractRepository(NpgsqlDataSource dataSource)
     {
-        this.cnx = cnx;
-
-        cnx.Open();
+        this.dataSource = dataSource;
     }
 
     public abstract T? GetById(int id);
@@ -30,6 +28,8 @@ public abstract class AbstractRepository<T> where T : Entity
 
     protected List<T> QueryMultiple(string sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
     {
+        NpgsqlConnection cnx = this.dataSource.OpenConnection();
+
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
         foreach (var parameterValue in parameterValues)
@@ -46,13 +46,17 @@ public abstract class AbstractRepository<T> where T : Entity
             results.Add(resultConverter(reader));
         }
 
-        reader.Close();
+        reader.CloseAsync();
+        cnx.CloseAsync();
 
         return results;
     }
 
     public void Execute(string sql, params object[] parameterValues)
     {
+        NpgsqlConnection cnx = this.dataSource.OpenConnection();
+
+
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
         foreach (var parameterValue in parameterValues)
@@ -61,33 +65,7 @@ public abstract class AbstractRepository<T> where T : Entity
         }
 
         npgsqlCommand.ExecuteNonQuery();
-    }
 
-
-    void temp()
-    {
-        NpgsqlCommand npgsqlCommand = new NpgsqlCommand("SELECT * FROM public.project WHERE id = ($1)", cnx);
-
-        npgsqlCommand.Prepare();
-        npgsqlCommand.Parameters.AddWithValue(1);
-        NpgsqlDataReader npgsqlDataReader = npgsqlCommand.ExecuteReader();
-
-
-        if (!npgsqlDataReader.Read())
-        {
-            Console.WriteLine("No rows found.");
-            return;
-        }
-
-        var id = (int)npgsqlDataReader["id"];
-        var name = (string)npgsqlDataReader["name"];
-        var location = (string)npgsqlDataReader["location"];
-
-        // var id = npgsqlDataReader.GetInt64(0);
-        // var name = npgsqlDataReader.GetString(1);
-        // var location = npgsqlDataReader.GetString(2);
-        // long? parent_project_id = npgsqlDataReader.IsDBNull(3) ? null : npgsqlDataReader.GetInt64(3);
-
-        Console.WriteLine("id: {0}, name: {1}, location: {2}", id, name, location);
+        cnx.CloseAsync();
     }
 }
