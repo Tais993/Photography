@@ -34,6 +34,8 @@ public class ImageDatabase : AbstractDatabase<Image>
 
     public List<Image> GetAllByProject(Project project)
     {
+        if (project?.Id is null) throw new Exception("yeah i need the actual project id");
+        
         var images = QueryMultiple("""
                                    SELECT id, project_id, file_name, file_type, file_path FROM public.image
                                    WHERE project_id = ($1)
@@ -47,15 +49,18 @@ public class ImageDatabase : AbstractDatabase<Image>
         return images;
     }
 
-    public override void Insert(Image Image)
+    public override Image Insert(Image image)
     {
-        Execute("""
-                INSERT INTO public.image(project_id, file_name, file_type, file_path) 
-                VALUES ($1, $2, $3, $4)
-                """, Image.ProjectId, Image.FileName, Image.FileType, Image.FilePath);
+        if (image?.Id is null) throw new Exception("yeah i need the actual image id");
+
+        return QuerySingle("""
+                           INSERT INTO public.image(project_id, file_name, file_type, file_path) 
+                           VALUES ($1, $2, $3, $4)
+                           RETURNING *
+                           """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath) ?? throw new Exception("Insert failed");
     }
 
-    public override void Update(Image Image)
+    public override void Update(Image image)
     {
         Execute("""
                 UPDATE public.image
@@ -64,7 +69,7 @@ public class ImageDatabase : AbstractDatabase<Image>
                     file_type = $3,
                     file_path = $4
                 WHERE id = $5
-                """, Image.ProjectId, Image.FileName, Image.FileType, Image.FilePath, Image.Id);
+                """, image.ProjectId, image.FileName, image.FileType, image.FilePath, image.Id);
     }
     
     

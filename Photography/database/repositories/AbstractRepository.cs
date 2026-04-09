@@ -17,8 +17,8 @@ public abstract class AbstractDatabase<T> where T : Entity
     public abstract T? GetById(int id);
     public abstract List<T> GetAll();
 
-    public abstract void Insert(T entity);
-    public abstract void Update(T entity);
+    public abstract T Insert(T image);
+    public abstract void Update(T image);
 
     public abstract T? DeleteById(int id);
 
