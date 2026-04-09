@@ -3,13 +3,13 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public class ProjectRepository : AbstractRepository<Project>
+public class ProjectRepository : AbstractRepository<Project>, IIdRepository<Project>
 {
     public ProjectRepository(NpgsqlDataSource dataSource) : base(dataSource)
     {
     }
 
-    public override Project? GetById(int id)
+    public Project? GetById(int id)
     {
         return QuerySingle("""
                            SELECT id, name, location, event_date FROM public.project 
@@ -17,14 +17,14 @@ public class ProjectRepository : AbstractRepository<Project>
                            """, MapProject, id);
     }
 
-    public override List<Project> GetAll()
+    public List<Project> GetAll()
     {
         return QueryMultiple("""
                              SELECT id, name, location, event_date FROM public.project
                              """, MapProject);
     }
 
-    public override Project Insert(Project project)
+    public Project Insert(Project project)
     {
         return QuerySingle("""
                            INSERT INTO public.project(name, location, event_date) 
@@ -34,7 +34,7 @@ public class ProjectRepository : AbstractRepository<Project>
                throw new Exception("Insert failed");
     }
 
-    public override void Update(Project project)
+    public void Update(Project project)
     {
         if (project?.Id is null) throw new Exception("yeah i need actual stuff");
 
@@ -48,7 +48,7 @@ public class ProjectRepository : AbstractRepository<Project>
     }
 
 
-    public override Project? DeleteById(int id)
+    public Project? DeleteById(int id)
     {
         return QuerySingle("""
                            DELETE FROM public.project 
@@ -64,7 +64,6 @@ public class ProjectRepository : AbstractRepository<Project>
             (int)reader["id"],
             (string)reader["name"],
             (string)reader["location"],
-            (DateOnly)reader["event_date"]
-        );
+            (DateOnly)reader["event_date"]);
     }
 }

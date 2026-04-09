@@ -1,7 +1,8 @@
 ﻿namespace PhotographyNET.database.entities;
 
-public class Image(int id, int projectId, Project project, string fileName, string fileType, string filePath) : Entity(id)
+public class Image(int id, int projectId, Project project, string fileName, string fileType, string filePath) : IIdEntity
 {
+    public int? Id { get; } = id;
     public int ProjectId { get; } = projectId;
     public Project? project { get; set; } = project;
     public string FileName { get; } = fileName;

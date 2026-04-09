@@ -3,7 +3,7 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public abstract class AbstractRepository<T> where T : Entity
+public abstract class AbstractRepository<T> where T : IEntity
 {
     public NpgsqlDataSource dataSource;
 

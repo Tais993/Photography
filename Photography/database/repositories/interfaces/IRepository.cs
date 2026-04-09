@@ -1,0 +1,12 @@
+﻿using PhotographyNET.database.entities;
+
+namespace PhotographyNET.database.repositories;
+
+public interface IRepository<T> where T : IEntity
+{
+    public List<T> GetAll();
+
+    public T Insert(T entity);
+    public void Update(T entity);
+
+}
