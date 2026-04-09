@@ -5,7 +5,7 @@ namespace PhotographyNET.commands;
 public class SearchCommand : CommandBase
 {
 
-    protected override string Name => "";
+    protected override string Name => "search";
     protected override string Description => "";
     
     private readonly Argument<string> _query = new("query")
