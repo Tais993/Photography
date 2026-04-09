@@ -6,11 +6,13 @@ namespace PhotographyNET.commands;
 public class InitialiseCommand : CommandBase
 {
 
-    private IProjectResolver projectResolver;
+    private readonly IProjectResolver _projectResolver;
+    private readonly ILogger<InitialiseCommand> _logger;
 
-    public InitialiseCommand(IProjectResolver projectResolver)
+    public InitialiseCommand(IProjectResolver projectResolver, ILogger<InitialiseCommand> logger)
     {
-        this.projectResolver = projectResolver;
+        _projectResolver = projectResolver;
+        _logger = logger;
     }
     
     
@@ -41,7 +43,7 @@ public class InitialiseCommand : CommandBase
         
         foreach (string subdirectory in subdirectories)
         {
-            projectResolver.initialiseExistingFolder(subdirectory);
+            _projectResolver.initialiseExistingFolder(subdirectory);
         }
         
         return 0;
