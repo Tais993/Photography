@@ -26,11 +26,16 @@ CommandRegistrationService.Register(builder.Services);
 
 
 string connectionString = builder.Configuration.GetConnectionString("Default");
-                          // ?? throw new InvalidOperationException("Missing connection string.");
+// ?? throw new InvalidOperationException("Missing connection string.");
 services.AddSingleton(new NpgsqlDataSourceBuilder(connectionString).Build());
+services.AddTransient<MigrationService>();
+
+// Repositories
 services.AddTransient<ImageRepository>();
 services.AddTransient<ProjectRepository>();
-services.AddTransient<MigrationService>();
+services.AddTransient<MetadataRepository>();
+services.AddTransient<ProjectMetadataRepository>();
+services.AddTransient<ProjectMetadataAggregateRepository>();
 
 
 var webApplication = builder.Build();
@@ -43,8 +48,6 @@ var rootCommand = CommandFactory.Commands(webApplication.Services);
 
 
 rootCommand.Parse(args).Invoke();
-
-
 
 
 // // Add services to the container.

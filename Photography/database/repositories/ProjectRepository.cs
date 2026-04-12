@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using PhotographyNET.database.entities;
+using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
@@ -9,7 +10,7 @@ public class ProjectRepository : AbstractRepository<Project>, IIdRepository<Proj
     {
     }
 
-    public Project? GetById(int id)
+    public Project? GetByKey(int id)
     {
         return QuerySingle("""
                            SELECT id, name, location, event_date FROM public.project 
@@ -48,13 +49,12 @@ public class ProjectRepository : AbstractRepository<Project>, IIdRepository<Proj
     }
 
 
-    public Project? DeleteById(int id)
+    public void DeleteByKey(int id)
     {
-        return QuerySingle("""
+        Execute("""
                            DELETE FROM public.project 
                            WHERE id = ($1)
-                           RETURNING id, name, location, event_date
-                           """, MapProject, id);
+                           """, id);
     }
 
 
