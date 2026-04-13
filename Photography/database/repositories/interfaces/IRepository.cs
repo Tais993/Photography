@@ -1,6 +1,6 @@
 ﻿using PhotographyNET.database.entities;
 
-namespace PhotographyNET.database.repositories;
+namespace PhotographyNET.database.repositories.interfaces;
 
 public interface IRepository<T, TKey> where T : IEntity
 {

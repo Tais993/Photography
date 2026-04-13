@@ -4,9 +4,9 @@ using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
-public abstract class AbstractIdRepository<T> : AbstractRepository<T>, IIdRepository<T> where T : IIdEntity
+public abstract class AbstractIdRepository<T> : AbstractRepository<T, int>, IIdRepository<T> where T : IIdEntity
 {
-    protected AbstractIdRepository(NpgsqlDataSource dataSource) : base(dataSource)
+    protected AbstractIdRepository(NpgsqlDataSource dataSource, ILogger<IRepository<T, int>> logger) : base(dataSource, logger)
     {
     }
 
@@ -19,10 +19,4 @@ public abstract class AbstractIdRepository<T> : AbstractRepository<T>, IIdReposi
     {
         DeleteByKey(id);
     }
-
-    public abstract List<T> GetAll();
-    public abstract T Insert(T entity);
-    public abstract void Update(T entity);
-    public abstract T? GetByKey(int key);
-    public abstract void DeleteByKey(int key);
 }

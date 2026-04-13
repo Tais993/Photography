@@ -1,16 +1,15 @@
 ﻿using Npgsql;
 using PhotographyNET.database.entities;
-using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
-public class ImageRepository :  AbstractRepository<Image>, IIdRepository<Image>
+public class ImageRepository :  AbstractIdRepository<Image>
 {
-    public ImageRepository(NpgsqlDataSource dataSource) : base(dataSource)
+    public ImageRepository(NpgsqlDataSource dataSource, ILogger<ImageRepository> logger) : base(dataSource, logger)
     {
     }
 
-    public Image? GetByKey(int id)
+    public override Image? GetByKey(int id)
     {
         return QuerySingle("""
                           SELECT id, project_id, file_name, file_type, file_path FROM public.image 
@@ -18,7 +17,7 @@ public class ImageRepository :  AbstractRepository<Image>, IIdRepository<Image>
                           """, MapImage, id);
     }
 
-    public List<Image> GetAll()
+    public override List<Image> GetAll()
     {
         return QueryMultiple("""
                            SELECT id, project_id, file_name, file_type, file_path FROM public.image 
@@ -36,21 +35,11 @@ public class ImageRepository :  AbstractRepository<Image>, IIdRepository<Image>
     public List<Image> GetAllByProject(Project project)
     {
         if (project?.Id is null) throw new Exception("yeah i need the actual project id");
-        
-        var images = QueryMultiple("""
-                                   SELECT id, project_id, file_name, file_type, file_path FROM public.image
-                                   WHERE project_id = ($1)
-                                   """, MapImage, project.Id);
 
-        foreach (var image in images)
-        {
-            image.project = project; 
-        }
-
-        return images;
+        return GetAllByProjectId((int)project.Id);
     }
 
-    public Image Insert(Image image)
+    public override Image Insert(Image image)
     {
         if (image?.Id is null) throw new Exception("yeah i need the actual image id");
 
@@ -61,7 +50,7 @@ public class ImageRepository :  AbstractRepository<Image>, IIdRepository<Image>
                            """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath) ?? throw new Exception("Insert failed");
     }
 
-    public void Update(Image image)
+    public override void Update(Image image)
     {
         Execute("""
                 UPDATE public.image
@@ -74,7 +63,7 @@ public class ImageRepository :  AbstractRepository<Image>, IIdRepository<Image>
     }
     
     
-    public void DeleteByKey(int id)
+    public override void DeleteByKey(int id)
     {
         Execute("""
                           DELETE FROM public.image 

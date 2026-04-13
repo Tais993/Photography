@@ -1,31 +1,35 @@
 ﻿using Npgsql;
 using PhotographyNET.database.entities;
-using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
-public class ProjectRepository : AbstractRepository<Project>, IIdRepository<Project>
+public class ProjectRepository : AbstractIdRepository<Project>
 {
-    public ProjectRepository(NpgsqlDataSource dataSource) : base(dataSource)
+
+    ILogger<ProjectRepository> _logger;
+
+    public ProjectRepository(NpgsqlDataSource dataSource, ILogger<ProjectRepository> logger) : base(dataSource, logger)
     {
+        this._logger = logger;
     }
 
-    public Project? GetByKey(int id)
+    public override Project? GetByKey(int id)
     {
+        _logger.LogInformation($"GetByKey, with params: {id}");
         return QuerySingle("""
                            SELECT id, name, location, event_date FROM public.project 
-                           WHERE id = ($1)
+                           WHERE id = $1
                            """, MapProject, id);
     }
 
-    public List<Project> GetAll()
+    public override List<Project> GetAll()
     {
         return QueryMultiple("""
                              SELECT id, name, location, event_date FROM public.project
                              """, MapProject);
     }
 
-    public Project Insert(Project project)
+    public override Project Insert(Project project)
     {
         return QuerySingle("""
                            INSERT INTO public.project(name, location, event_date) 
@@ -35,7 +39,7 @@ public class ProjectRepository : AbstractRepository<Project>, IIdRepository<Proj
                throw new Exception("Insert failed");
     }
 
-    public void Update(Project project)
+    public override void Update(Project project)
     {
         if (project?.Id is null) throw new Exception("yeah i need actual stuff");
 
@@ -49,7 +53,7 @@ public class ProjectRepository : AbstractRepository<Project>, IIdRepository<Proj
     }
 
 
-    public void DeleteByKey(int id)
+    public override void DeleteByKey(int id)
     {
         Execute("""
                            DELETE FROM public.project 
