@@ -36,7 +36,7 @@ public class InitialiseCommand : CommandBase
     
     
 
-    protected override int Run(ParseResult parseResult)
+    public override int Run(ParseResult parseResult)
     {
         string consoleDirectory = Directory.GetCurrentDirectory();
         string[] subdirectories = Directory.GetDirectories(consoleDirectory);

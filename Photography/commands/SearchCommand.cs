@@ -25,7 +25,7 @@ public class SearchCommand : CommandBase
         command.Options.Add(_exact);
     }
 
-    protected override int Run(ParseResult parseResult)
+    public override int Run(ParseResult parseResult)
     {
         throw new NotImplementedException();
     }

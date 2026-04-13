@@ -16,7 +16,7 @@ public abstract class CommandBase
     /// <param name="command"></param>
     protected virtual void Configure(Command command) { }
 
-    protected abstract int Run(ParseResult parseResult);
+    public abstract int Run(ParseResult parseResult);
 
     
     public virtual Command Build()
