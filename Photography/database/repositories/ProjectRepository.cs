@@ -3,47 +3,50 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public class ProjectRepository : AbstractIdRepository<Project>
+public class ProjectRepository
 {
+    private RepositoryHelper _db;
+    private ILogger<ProjectRepository> _logger;
 
-    ILogger<ProjectRepository> _logger;
-
-    public ProjectRepository(NpgsqlDataSource dataSource, ILogger<ProjectRepository> logger) : base(dataSource, logger)
+    public ProjectRepository(NpgsqlDataSource dataSource,
+        ILogger<ProjectRepository> logger,
+        RepositoryHelper db)
     {
         this._logger = logger;
+        this._db = db;
     }
 
-    public override Project? GetByKey(int id)
+    public Project? GetByKey(int id)
     {
         _logger.LogInformation($"GetByKey, with params: {id}");
-        return QuerySingle("""
+        return _db.Query("""
                            SELECT id, name, location, event_date FROM public.project 
                            WHERE id = $1
                            """, MapProject, id);
     }
 
-    public override List<Project> GetAll()
+    public List<Project> GetAll()
     {
-        return QueryMultiple("""
+        return _db.QueryMultiple("""
                              SELECT id, name, location, event_date FROM public.project
                              """, MapProject);
     }
 
-    public override Project Insert(Project project)
+    public Project Insert(Project project)
     {
-        return QuerySingle("""
-                           INSERT INTO public.project(name, location, event_date) 
-                           VALUES ($1, $2, $3)
-                           RETURNING *
-                           """, MapProject, project.Name, project.Location, project.EventDate) ??
+        return _db.Query("""
+                         INSERT INTO public.project(name, location, event_date) 
+                         VALUES ($1, $2, $3)
+                         RETURNING *
+                         """, MapProject, project.Name, project.Location, project.EventDate) ??
                throw new Exception("Insert failed");
     }
 
-    public override void Update(Project project)
+    public void Update(Project project)
     {
         if (project?.Id is null) throw new Exception("yeah i need actual stuff");
 
-        Execute("""
+        _db.Execute("""
                 UPDATE public.project
                 SET name = $1,
                     location = $2,
@@ -53,9 +56,9 @@ public class ProjectRepository : AbstractIdRepository<Project>
     }
 
 
-    public override void DeleteByKey(int id)
+    public void DeleteByKey(int id)
     {
-        Execute("""
+        _db.Execute("""
                            DELETE FROM public.project 
                            WHERE id = ($1)
                            """, id);

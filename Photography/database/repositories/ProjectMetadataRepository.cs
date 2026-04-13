@@ -1,19 +1,24 @@
 ﻿using Npgsql;
 using PhotographyNET.database.entities;
-using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
-public class ProjectMetadataRepository : AbstractRepository<ProjectMetadata, ProjectMetadataIds>,
-    IKeyRepository<ProjectMetadata, ProjectMetadataIds>
+public class ProjectMetadataRepository
 {
-    public ProjectMetadataRepository(NpgsqlDataSource dataSource, ILogger<ProjectMetadataRepository> logger) : base(dataSource, logger)
-     {
+    private RepositoryHelper _db;
+    private ILogger<ProjectMetadataRepository> _logger;
+
+    public ProjectMetadataRepository(NpgsqlDataSource dataSource,
+        ILogger<ProjectMetadataRepository> logger,
+        RepositoryHelper db)
+    {
+        this._logger = logger;
+        this._db = db;
     }
 
-    public override List<ProjectMetadata> GetAll()
+    public List<ProjectMetadata> GetAll()
     {
-        return QueryMultiple("""
+        return _db.QueryMultiple("""
                              SELECT
                                  project_id,
                                  metadata_id,
@@ -22,17 +27,17 @@ public class ProjectMetadataRepository : AbstractRepository<ProjectMetadata, Pro
                              """, MapProjectMetadata);
     }
 
-    public override ProjectMetadata Insert(ProjectMetadata entity)
+    public ProjectMetadata Insert(ProjectMetadata entity)
     {
-        return QuerySingle("""
+        return _db.Query("""
                            INSERT INTO public.project_metadata(project_id, metadata_id, metadata_value) 
                            VALUES ($1, $2, $3) 
                            """, MapProjectMetadata) ?? throw new InvalidOperationException();
     }
 
-    public override void Update(ProjectMetadata entity)
+    public void Update(ProjectMetadata entity)
     {
-        Execute("""
+        _db.Execute("""
                 UPDATE public.project_metadata
                 SET metadata_value = $1
                 WHERE project_id = $2
@@ -40,9 +45,9 @@ public class ProjectMetadataRepository : AbstractRepository<ProjectMetadata, Pro
                 """, entity.MetadataValue, entity.ProjectId, entity.MetadataId);
     }
 
-    public override ProjectMetadata? GetByKey(ProjectMetadataIds key)
+    public ProjectMetadata? GetByKey(ProjectMetadataIds key)
     {
-        return QuerySingle("""
+        return _db.Query("""
                            SELECT
                                project_id,
                                metadata_id,
@@ -53,10 +58,10 @@ public class ProjectMetadataRepository : AbstractRepository<ProjectMetadata, Pro
                            """, MapProjectMetadata, key.ProjectId, key.MetadataId);
     }
 
-    public override void DeleteByKey(ProjectMetadataIds key)
+    public void DeleteByKey(ProjectMetadataIds key)
     {
         {
-            Execute("""
+            _db.Execute("""
                                DELETE FROM project_metadata
                                       WHERE project_id = $1 
                                       AND metadata_id = $2
@@ -66,7 +71,7 @@ public class ProjectMetadataRepository : AbstractRepository<ProjectMetadata, Pro
 
     public List<ProjectMetadata> GetAllByProjectId(int projectId)
     {
-        return QueryMultiple("""
+        return _db.QueryMultiple("""
                              SELECT
                                  project_id,
                                  metadata_id,

@@ -1,27 +1,20 @@
 ﻿using Npgsql;
-using PhotographyNET.database.entities;
-using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
-public abstract class AbstractRepository<T, TKey> : IRepository<T, TKey> where T : IEntity
+public class RepositoryHelper
 {
     private readonly NpgsqlDataSource _dataSource;
-    private ILogger<IRepository<T, TKey>> _logger;
+    private ILogger<RepositoryHelper> _logger;
 
-    protected AbstractRepository(NpgsqlDataSource dataSource, ILogger<IRepository<T, TKey>> logger)
+    public RepositoryHelper(NpgsqlDataSource dataSource, ILogger<RepositoryHelper> logger)
     {
         this._dataSource = dataSource;
         this._logger = logger;
     }
-
-    protected T? QuerySingle(string sql, Func<NpgsqlDataReader, T> resultConverter, params object[] parameterValues)
-    {
-        _logger.LogInformation($"QueryMultiple, with params: {parameterValues}");
-        return Query(sql, resultConverter, parameterValues);
-    }
-
-    protected List<T> QueryMultiple(string sql, Func<NpgsqlDataReader, T> resultConverter,
+    
+    
+    public List<T> QueryMultiple<T>(string sql, Func<NpgsqlDataReader, T> resultConverter,
         params object[] parameterValues)
     {
         _logger.LogInformation($"QueryMultiple, with params: {parameterValues}");
@@ -32,14 +25,13 @@ public abstract class AbstractRepository<T, TKey> : IRepository<T, TKey> where T
             do
             {
                 results.Add(resultConverter(reader));
-
             } while (reader.Read());
 
             return results;
         }, parameterValues);
     }
 
-    protected TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
+    public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
         params object[] parameterValues)
     {
         _logger.LogInformation($"Executing {sql}");
@@ -87,10 +79,4 @@ public abstract class AbstractRepository<T, TKey> : IRepository<T, TKey> where T
 
         cnx.CloseAsync();
     }
-
-    public abstract List<T> GetAll();
-    public abstract T Insert(T entity);
-    public abstract void Update(T entity);
-    public abstract T? GetByKey(TKey key);
-    public abstract void DeleteByKey(TKey key);
 }

@@ -28,7 +28,7 @@ public class ProjectResolver : IProjectResolver
 
         _logger.LogInformation($"project info file found:  id: {id}");
 
-        return _repository.GetById(id) ?? throw new Exception($"no project found with given ID`{id}`");
+        return _repository.GetByKey(id) ?? throw new Exception($"no project found with given ID`{id}`");
     }
 
     public void initialiseExistingFolder(string subdirectory)

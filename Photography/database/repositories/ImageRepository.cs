@@ -3,33 +3,40 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public class ImageRepository :  AbstractIdRepository<Image>
+public class ImageRepository
 {
-    public ImageRepository(NpgsqlDataSource dataSource, ILogger<ImageRepository> logger) : base(dataSource, logger)
+    private RepositoryHelper _db;
+    private ILogger<ImageRepository> _logger;
+
+    public ImageRepository(NpgsqlDataSource dataSource,
+        ILogger<ImageRepository> logger,
+        RepositoryHelper db)
     {
+        this._logger = logger;
+        this._db = db;
     }
 
-    public override Image? GetByKey(int id)
+    public Image? GetByKey(int id)
     {
-        return QuerySingle("""
-                          SELECT id, project_id, file_name, file_type, file_path FROM public.image 
-                          WHERE id = ($1)
-                          """, MapImage, id);
+        return _db.Query("""
+                               SELECT id, project_id, file_name, file_type, file_path FROM public.image 
+                               WHERE id = ($1)
+                               """, MapImage, id);
     }
 
-    public override List<Image> GetAll()
+    public List<Image> GetAll()
     {
-        return QueryMultiple("""
-                           SELECT id, project_id, file_name, file_type, file_path FROM public.image 
-                           """, MapImage);
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, file_path FROM public.image 
+                                 """, MapImage);
     }
-    
+
     public List<Image> GetAllByProjectId(int projectId)
     {
-        return QueryMultiple("""
-                             SELECT id, project_id, file_name, file_type, file_path FROM public.image
-                             WHERE project_id = ($1)
-                             """, MapImage, projectId);
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, file_path FROM public.image
+                                 WHERE project_id = ($1)
+                                 """, MapImage, projectId);
     }
 
     public List<Image> GetAllByProject(Project project)
@@ -39,20 +46,21 @@ public class ImageRepository :  AbstractIdRepository<Image>
         return GetAllByProjectId((int)project.Id);
     }
 
-    public override Image Insert(Image image)
+    public Image Insert(Image image)
     {
         if (image?.Id is null) throw new Exception("yeah i need the actual image id");
 
-        return QuerySingle("""
+        return _db.Query("""
                            INSERT INTO public.image(project_id, file_name, file_type, file_path) 
                            VALUES ($1, $2, $3, $4)
                            RETURNING *
-                           """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath) ?? throw new Exception("Insert failed");
+                           """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath) ??
+               throw new Exception("Insert failed");
     }
 
-    public override void Update(Image image)
+    public void Update(Image image)
     {
-        Execute("""
+        _db.Execute("""
                 UPDATE public.image
                 SET project_id = $1,
                     file_name = $2,
@@ -61,16 +69,16 @@ public class ImageRepository :  AbstractIdRepository<Image>
                 WHERE id = $5
                 """, image.ProjectId, image.FileName, image.FileType, image.FilePath, image.Id);
     }
-    
-    
-    public override void DeleteByKey(int id)
+
+
+    public void DeleteByKey(int id)
     {
-        Execute("""
-                          DELETE FROM public.image 
-                          WHERE id = ($1)
-                          """, id);
+        _db.Execute("""
+                DELETE FROM public.image 
+                WHERE id = ($1)
+                """, id);
     }
-    
+
     private static Image MapImage(NpgsqlDataReader reader)
     {
         return new Image(

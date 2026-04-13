@@ -3,45 +3,52 @@ using PhotographyNET.database.entities;
 
 namespace PhotographyNET.database.repositories;
 
-public class MetadataRepository : AbstractIdRepository<Metadata>
+public class MetadataRepository
 {
-    public MetadataRepository(NpgsqlDataSource dataSource, ILogger<MetadataRepository> logger) : base(dataSource, logger)
+    private RepositoryHelper _db;
+    private ILogger<MetadataRepository> _logger;
+
+    public MetadataRepository(NpgsqlDataSource dataSource,
+        ILogger<MetadataRepository> logger,
+        RepositoryHelper db)
     {
+        this._logger = logger;
+        this._db = db;
     }
 
-    public override Metadata? GetByKey(int id)
+    public Metadata? GetByKey(int id)
     {
-        return QuerySingle("""
+        return _db.Query("""
                            SELECT id, metadata_key, metadata_type, display_name, description
                            FROM public.metadata
                            WHERE id = $1
                            """, MapMetadata, id);
     }
 
-    public override List<Metadata> GetAll()
+    public List<Metadata> GetAll()
     {
-        return QueryMultiple("""
+        return _db.QueryMultiple("""
                              SELECT id, metadata_key, metadata_type, display_name, description
                              FROM public.metadata
                              """, MapMetadata);
     }
 
-    public override Metadata Insert(Metadata entity)
+    public Metadata Insert(Metadata entity)
     {
-        return QuerySingle("""
-                           INSERT INTO public.metadata(metadata_key, metadata_type, display_name, description) 
-                           VALUES ($1, $2, $3, $4)
-                           RETURNING id, metadata_key, metadata_type, display_name, description
-                           """, MapMetadata, entity.MetadataKey, entity.MetadataType, entity.DisplayName,
+        return _db.Query("""
+                         INSERT INTO public.metadata(metadata_key, metadata_type, display_name, description) 
+                         VALUES ($1, $2, $3, $4)
+                         RETURNING id, metadata_key, metadata_type, display_name, description
+                         """, MapMetadata, entity.MetadataKey, entity.MetadataType, entity.DisplayName,
                    entity.Description)
                ?? throw new Exception("Insert failed");
     }
 
-    public override void Update(Metadata entity)
+    public void Update(Metadata entity)
     {
         if (entity?.Id is null) throw new Exception("yeah i need actual stuff");
 
-        Execute("""
+        _db.Execute("""
                 UPDATE public.metadata
                 SET metadata_key = $1,
                     metadata_type = $2,
@@ -51,9 +58,9 @@ public class MetadataRepository : AbstractIdRepository<Metadata>
                 """, entity.MetadataKey, entity.MetadataType, entity.DisplayName, entity.Description, entity.Id);
     }
 
-    public override void DeleteByKey(int id)
+    public void DeleteByKey(int id)
     {
-        Execute("""
+        _db.Execute("""
                            DELETE FROM public.metadata
                            WHERE id = $1
                            """, id);

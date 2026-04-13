@@ -1,25 +1,29 @@
 ﻿using Npgsql;
 using PhotographyNET.database.entities;
-using PhotographyNET.database.repositories.interfaces;
 
 namespace PhotographyNET.database.repositories;
 
-public class ProjectMetadataAggregateRepository :
-    AbstractRepository<ProjectMetadataAggregate, ProjectMetadataIds>,
-    IKeyRepository<ProjectMetadataAggregate, ProjectMetadataIds>
+public class ProjectMetadataAggregateRepository
 {
     private MetadataRepository _metadataRepository;
     private ProjectMetadataRepository _projectMetadataRepository;
 
+    
+    private RepositoryHelper _db;
+    private ILogger<ProjectMetadataAggregateRepository> _logger;
+
+    
     public ProjectMetadataAggregateRepository(MetadataRepository metadataRepository,
-        ProjectMetadataRepository projectMetadataRepository, NpgsqlDataSource dataSource, ILogger<ProjectMetadataAggregateRepository> logger)
-        : base(dataSource, logger)
+        ProjectMetadataRepository projectMetadataRepository, NpgsqlDataSource dataSource, 
+        ILogger<ProjectMetadataAggregateRepository> logger, RepositoryHelper db)
     {
         _metadataRepository = metadataRepository;
         _projectMetadataRepository = projectMetadataRepository;
+        this._logger = logger;
+        this._db = db;
     }
 
-    public override List<ProjectMetadataAggregate> GetAll()
+    public List<ProjectMetadataAggregate> GetAll()
     {
         List<ProjectMetadata> projectMetadatas = _projectMetadataRepository.GetAll();
         Dictionary<int, Metadata> metadatas = _metadataRepository.GetAll().ToDictionary(metadata => metadata.Id ?? throw new Exception("ada"), metadata => metadata);
@@ -34,27 +38,27 @@ public class ProjectMetadataAggregateRepository :
         return projectMetadataAggregates;
     }
 
-    public override ProjectMetadataAggregate Insert(ProjectMetadataAggregate entity)
+    public ProjectMetadataAggregate Insert(ProjectMetadataAggregate entity)
     {
         _projectMetadataRepository.Insert(entity.ToProjectMetadata());
         return entity;
     }
 
-    public override void Update(ProjectMetadataAggregate entity)
+    public void Update(ProjectMetadataAggregate entity)
     {
         _projectMetadataRepository.Update(entity.ToProjectMetadata());
     }
 
-    public override ProjectMetadataAggregate GetByKey(ProjectMetadataIds key)
+    public ProjectMetadataAggregate GetByKey(ProjectMetadataIds key)
     {
         ProjectMetadata projectMetadata = _projectMetadataRepository.GetByKey(key) ?? throw new Exception();
-        Metadata metadata = _metadataRepository.GetById(key.MetadataId) ?? throw new Exception();
+        Metadata metadata = _metadataRepository.GetByKey(key.MetadataId) ?? throw new Exception();
 
 
         return ToAggregate(metadata, projectMetadata);
     }
 
-    public override void DeleteByKey(ProjectMetadataIds key)
+    public void DeleteByKey(ProjectMetadataIds key)
     {
         _projectMetadataRepository.DeleteByKey(key);
     }

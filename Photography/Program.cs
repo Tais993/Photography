@@ -29,6 +29,7 @@ string connectionString = builder.Configuration.GetConnectionString("Default");
 // ?? throw new InvalidOperationException("Missing connection string.");
 services.AddSingleton(new NpgsqlDataSourceBuilder(connectionString).Build());
 services.AddTransient<MigrationService>();
+services.AddTransient<RepositoryHelper>();
 
 // Repositories
 services.AddTransient<ImageRepository>();
