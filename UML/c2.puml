@@ -1,0 +1,55 @@
+﻿@startuml C2_Container
+!include <C4/C4_Container>
+
+title C2 - Container Diagram - Picture Project Maintenance Tool
+
+Person(user, "Photographer", "Uses the system to manage picture projects")
+
+System_Boundary(system, "Picture Project Maintenance Tool") {
+    Container(cli, "CLI Application", "C# / .NET", "Current presentation layer. Handles command-line input and output")
+    Container(web, "Web Application", "Future website", "Future presentation layer for browser-based interaction")
+    Container(business, "Business Logic Application", "C# / .NET", "Coordinates workflows such as project resolving, searching, copying, and transfers")
+    Container(infra, "Infrastructure Layer", "C# / .NET", "Handles file system access and database access")
+    ContainerDb(database, "Project Database", "Relational database", "Stores projects, metadata, image information, and state")
+}
+
+
+System_Ext(fs, "File System", "Contains project folders, image files, and archive storage")
+System_Ext(lightroom, "Adobe Lightroom", "Used to edit prepared files")
+
+Rel(user, cli, "Uses")
+
+Rel(cli, business, "Sends commands to")
+Rel(web, business, "Sends requests to")
+
+Rel(business, infra, "Uses")
+Rel(infra, database, "Reads/writes", "SQL")
+Rel(infra, fs, "Reads/writes files and folders")
+Rel(business, lightroom, "Prepares files for use in")
+
+@enduml
+
+
+@startuml C2_Container
+!include <C4/C4_Container>
+
+title C2 - Container Diagram - Picture Project Maintenance Tool
+
+Person(user, "Photographer", "Uses the system to manage picture projects")
+
+System_Boundary(system, "Picture Project Maintenance Tool") {
+    Container(application, "Application", "C# / .NET", "Recognises projects, searches files, copies photos to editing folders, and supports project transfer workflows")
+    ContainerDb(database, "Project Database", "Relational database", "Stores projects, metadata, image information, and state")
+}
+
+
+System_Ext(fs, "File System", "Contains project folders, image files, and archive storage")
+System_Ext(lightroom, "Adobe Lightroom", "Used to edit prepared files")
+
+Rel(user, application, "Uses")
+
+Rel(application, database, "Reads/writes", "SQL")
+Rel(application, fs, "Reads/writes files and folders")
+Rel_R(application, lightroom, "Prepares files for use in")
+
+@enduml

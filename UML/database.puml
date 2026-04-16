@@ -1,0 +1,54 @@
+﻿@startuml
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+
+package "PhotographyNET.database.repositories\nCode diagram for Repository component" {
+
+    class RepositoryHelper {
+        - _dataSource : NpgsqlDataSource
+        --
+        + RepositoryHelper(dataSource : NpgsqlDataSource, logger : ILogger<RepositoryHelper>)
+        + QueryMultiple<T>(sql : string, resultConverter : Func<NpgsqlDataReader, T>, parameterValues : object[]) : List<T>
+        + Query<TResult>(sql : string, resultConverter : Func<NpgsqlDataReader, TResult>, parameterValues : object[]) : TResult
+        + Execute(sql : string, parameterValues : object[]) : void
+    }
+
+    class ImageRepository {
+        - _db : RepositoryHelper
+        --
+        + GetAll() : List<Image>
+        + GetAllByProjectId(projectId : int) : List<Image>
+        + Insert(image : Image) : Image
+        + Update(image : Image) : void
+        + DeleteByKey(id : int) : void
+    }
+
+    class ProjectRepository {
+        - _db : RepositoryHelper
+        --
+        + GetByKey(id : int) : Project?
+        + GetAll() : List<Project>
+        + Insert(project : Project) : Project
+        + Update(project : Project) : void
+        + DeleteByKey(id : int) : void
+    }
+
+    class Image
+    class Project
+
+    class NpgsqlDataSource
+}
+
+ImageRepository --> RepositoryHelper : uses
+ProjectRepository --> RepositoryHelper : uses
+
+ImageRepository --> Image : manages
+ImageRepository --> Project : queries by project
+ProjectRepository --> Project : manages
+
+RepositoryHelper --> NpgsqlDataSource : opens connection
+
+@enduml

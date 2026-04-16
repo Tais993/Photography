@@ -1,0 +1,41 @@
+﻿@startuml
+
+interface Interface {
+    + Build() : System.CommandLine.Command
+    + Run(parseResult : System.CommandLine.ParseResult) : int
+}
+
+abstract class CommandBase {
+    {abstract} + Name : String
+    {abstract} + Description : String
+    + Aliases : IEnumerable<String>
+
+    + Configure(command : System.CommandLine.Command) : void
+    {abstract} + Run(parseResult : System.CommandLine.ParseResult) : int
+    + Build() : System.CommandLine.Command
+}
+
+class SearchCommand {
+    + Name : String
+    + Description : String
+    - _query : Argument<String>
+    - _exact : Option<String>
+
+    + Configure(command : System.CommandLine.Command) : void
+    + Run(parseResult : System.CommandLine.ParseResult) : int
+}
+
+class InitialiseCommand {
+    + Name : String
+    + Description : String
+    - _mainFolder : Option<String>
+
+    + Configure(command : System.CommandLine.Command) : void
+    + Run(parseResult : System.CommandLine.ParseResult) : int
+}
+
+Interface <|.. CommandBase
+CommandBase <|-- SearchCommand
+CommandBase <|-- InitialiseCommand
+
+@enduml

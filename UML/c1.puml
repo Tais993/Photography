@@ -1,0 +1,16 @@
+﻿@startuml C1_Context
+!include <C4/C4_Context>
+
+title C1 - System Context - Picture project maintenance tool
+
+Person(user, "Photographer", "Manages photography projects")
+
+System(system, "Picture Project Maintenance Tool", "Recognises projects, searches files, copies photos to editing folders, and supports project transfer workflows")
+
+System_Ext(fs, "File System", "Contains project folders, image files, and archive locations")
+System_Ext(lightroom, "Adobe Lightroom", "Used for image editing after preparation by the tool")
+
+Rel(user, system, "Uses")
+Rel(system, fs, "Reads, validates, copies, and moves files/folders")
+Rel(system, lightroom, "Prepares files for editing in")
+@enduml
