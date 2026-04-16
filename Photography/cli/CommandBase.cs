@@ -1,13 +1,13 @@
 ﻿using System.CommandLine;
 
-namespace PhotographyNET.commands;
+namespace PhotographyNET.cli;
 
-public abstract class CommandBase
+public abstract class CommandBase : ICommand
 {
     protected abstract string Name { get; }
     protected abstract string Description { get; }
 
-    protected virtual IEnumerable<string> Aliases => [];
+    protected IEnumerable<string> Aliases => [];
     
     /// <summary>
     /// This method can be used for configuring anything outside of the name, description and aliases.
@@ -19,7 +19,7 @@ public abstract class CommandBase
     public abstract int Run(ParseResult parseResult);
 
     
-    public virtual Command Build()
+    public Command Build()
     {
         Command command = new Command(Name, Description);
 

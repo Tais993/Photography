@@ -1,6 +1,6 @@
 ﻿using System.CommandLine;
 
-namespace PhotographyNET.commands;
+namespace PhotographyNET.cli;
 
 public class SearchCommand : CommandBase
 {

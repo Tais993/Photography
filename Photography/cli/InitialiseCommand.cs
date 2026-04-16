@@ -1,7 +1,7 @@
 ﻿using System.CommandLine;
 using PhotographyNET.services.interfaces;
 
-namespace PhotographyNET.commands;
+namespace PhotographyNET.cli;
 
 public class InitialiseCommand : CommandBase
 {

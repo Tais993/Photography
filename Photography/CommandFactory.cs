@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using PhotographyNET.commands;
+using PhotographyNET.cli;
 
 namespace PhotographyNET;
 

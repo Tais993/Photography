@@ -1,4 +1,4 @@
-﻿using PhotographyNET.commands;
+﻿using PhotographyNET.cli;
 
 namespace PhotographyNET;
 
