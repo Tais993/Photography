@@ -1,0 +1,40 @@
+﻿@startuml C3_BusinessLogic
+!include <C4/C4_Component>
+
+title C3 - Component Diagram - Business Logic Application
+
+LAYOUT_LEFT_RIGHT()
+
+Person(user, "Photographer")
+
+Container_Boundary(presentation, "Presentation Layer") {
+    Container(cli, "CLI Application", "C# / .NET", "Current presentation layer")
+    Container(web, "Web Application", "Future website", "Future presentation layer")
+}
+
+
+Container_Boundary(infra, "Infrastructure Layer") {
+    System_Ext(fs, "Local File System", "Project folders and image files")
+    ContainerDb(database, "Project Database", "Relational database")
+}
+
+Container_Boundary(business, "Business Logic Application") {
+    Component(anchor, " ", "", "")
+    Component(projectResolver, "Project Resolver Service", "C#", "Recognises projects and subprojects based on naming and structure")
+    Component(fileSearch, "Image Search Service", "C#", "Finds images belonging to a project using stored metadata")
+    Component(fileCopy, "File Copy Service", "C#", "Determines which files must be copied and coordinates copy operations")
+    Component(projectTransfer, "Project Transfer Service", "C#", "Coordinates full project copy and move workflows")
+    Component(projectValidation, "Project Validation Service", "C#", "Validates project structure and image locations")
+}
+
+Rel(user, cli, "Uses")
+Rel(user, web, "Will use")
+
+Rel(cli, anchor, "entry")
+Rel(web, anchor, "entry")
+
+Rel(anchor, fs, "entry")
+Rel(anchor, database, "entry")
+
+@enduml
+

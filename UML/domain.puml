@@ -1,0 +1,37 @@
+﻿@startuml
+hide methods
+skinparam classAttributeIconSize 0
+
+class Project {
+  Id
+  Name
+  Date
+  Path
+}
+
+class Subproject {
+  Id
+  Name
+  Date
+  Path
+}
+
+class Image {
+  Id
+  Filename
+  Extension
+  FilePath
+  FileType
+}
+
+class Metadata {
+  Name
+  Value
+  Description
+}
+
+Project "1" -- "0..*" Image : contains
+Project "1" -- "0..*" Metadata : has
+Project "1" -- "0..*" Subproject : contains
+
+@enduml

@@ -1,0 +1,45 @@
+﻿@startuml C3_Infrastructure
+!include <C4/C4_Component>
+
+title C3 - Infrastructure and Persistence View
+
+LAYOUT_LEFT_RIGHT()
+
+System_Ext(fs, "Local File System", "Project folders and image files")
+System_Ext(storage, "External Storage Drives", "Archive storage")
+ContainerDb(database, "Project Database", "Relational database")
+
+Container_Boundary(business, "Business Logic Application") {
+    Component(banchor, " ", "", "")
+    Component(fileSearch, "Image Search Service", "C#")
+    Component(fileCopy, "File Copy Service", "C#")
+    Component(projectValidation, "Project Validation Service", "C#")
+    Component(projectResolver, "Project Resolver Service", "C#")
+    Component(projectTransfer, "Project Transfer Service", "C#")
+}
+
+Container_Boundary(infra, "Infrastructure Components") {
+    Component(projectRepo, "Project Repository", "C#", "Reads and writes project data")
+    Component(imageRepo, "Image Repository", "C#", "Reads image and metadata data")
+    Component(fileSystemService, "File System Service", "C#", "Handles scanning, copy, move, and verification")
+}
+
+Rel(projectResolver, projectRepo, "Retrieves project data")
+Rel(projectResolver, fileSystemService, "Retrieves files or directories")
+
+Rel(fileSearch, imageRepo, "Uses")
+Rel(fileCopy, fileSystemService, "Uses")
+
+Rel(projectTransfer, projectRepo, "Uses")
+Rel(projectTransfer, fileSystemService, "Uses")
+
+Rel(projectValidation, projectRepo, "Uses")
+Rel(projectValidation, imageRepo, "Uses")
+Rel(projectValidation, fileSystemService, "Uses")
+
+Rel(projectRepo, database, "Reads/writes")
+Rel(imageRepo, database, "Reads")
+Rel(fileSystemService, fs, "Reads/writes")
+Rel(fileSystemService, storage, "Reads/writes")
+
+@enduml

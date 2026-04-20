@@ -1,0 +1,50 @@
+﻿@startuml
+left to right direction
+hide methods
+hide stereotypes
+skinparam linetype ortho
+skinparam nodesep 90
+skinparam ranksep 120
+
+entity "project" as project {
+  * project_id        : int <<PK>>
+  --
+  * project_name      : varchar(255)
+  * project_location  : varchar(255)
+  * event_date        : date
+  --
+  *  parent_project_id : int <<FK>>
+}
+
+entity "image" as image {
+  * image_id          : int <<PK>>
+  --
+  * file_name         : varchar(255)
+  * file_type         : char(255)
+  * file_path         : char(260)
+  --
+  * project_id        : int <<FK>>
+}
+
+entity "metadata" as metadata {
+  * metadata_id       : int <<PK>>
+  --
+  * metadata_key      : varchar(255)
+  * metadata_type     : varchar(255)
+  * display_name      : varchar(255)
+  * description       : varchar(255)
+}
+
+entity "project_metadata" as project_metadata {
+  * project_id        : int <<PK, FK>>
+  * metadata_id       : int <<PK, FK>>
+  --
+  *  metadata_value    : varchar(255)
+}
+
+project ||--o{ project
+project ||--o{ project_metadata
+project ||--o{ image
+metadata ||--o{ project_metadata
+
+@enduml
