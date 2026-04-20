@@ -2,16 +2,23 @@
 
 public class ProjectMetadata : IEntity
 {
-    public ProjectMetadata(int projectId, int metadataId, string metadataValue)
+    public ProjectMetadata(int projectId, int metadataId, string metadataValue, string metadataKey,
+        string metadataType, string displayName, string description)
     {
         ProjectId = projectId;
         MetadataId = metadataId;
-        ProjectMetadataIds = new ProjectMetadataIds(projectId, metadataId);
         MetadataValue = metadataValue;
+        MetadataKey = metadataKey;
+        MetadataType = metadataType;
+        DisplayName = displayName;
+        Description = description;
     }
 
     public int ProjectId { get; }
     public int MetadataId { get; }
-    public ProjectMetadataIds ProjectMetadataIds { get; }
-    public string MetadataValue { get; }
+    public string MetadataValue { get; set; }
+    public string MetadataKey { get; }
+    public string MetadataType { get; }
+    public string DisplayName { get; }
+    public string Description { get; }
 }

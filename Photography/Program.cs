@@ -36,7 +36,6 @@ services.AddTransient<ImageRepository>();
 services.AddTransient<ProjectRepository>();
 services.AddTransient<MetadataRepository>();
 services.AddTransient<ProjectMetadataRepository>();
-services.AddTransient<ProjectMetadataAggregateRepository>();
 
 
 var webApplication = builder.Build();
