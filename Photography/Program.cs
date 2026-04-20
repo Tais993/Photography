@@ -19,7 +19,7 @@ IServiceCollection services = builder.Services;
 services.AddTransient<ICopyService, CopyService>();
 services.AddTransient<IFileSearchService, FileSearchService>();
 services.AddTransient<ILightroomService, LightroomService>();
-services.AddTransient<IProjectResolver, ProjectResolver>();
+services.AddTransient<IProjectResolver, ProjectService>();
 
 // Commands
 CommandRegistrationService.Register(builder.Services);

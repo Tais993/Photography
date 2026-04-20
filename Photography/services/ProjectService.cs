@@ -5,15 +5,15 @@ using PhotographyNET.services.interfaces;
 
 namespace PhotographyNET.services;
 
-public class ProjectResolver : IProjectResolver
+public class ProjectService : IProjectResolver
 {
     public static readonly Regex PROJECT_NAME_REGEX = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
 
     private readonly ProjectRepository _repository;
-    private readonly ILogger<ProjectResolver> _logger;
+    private readonly ILogger<ProjectService> _logger;
 
 
-    public ProjectResolver(ProjectRepository repository, ILogger<ProjectResolver> logger)
+    public ProjectService(ProjectRepository repository, ILogger<ProjectService> logger)
     {
         _repository = repository;
         _logger = logger;
@@ -66,7 +66,6 @@ public class ProjectResolver : IProjectResolver
 
                 _logger.LogInformation($"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
 
-
                 File.WriteAllText(projectInfoLocation, project.Id + "");
 
                 _logger.LogInformation($"File should be written to {projectInfoLocation}");
@@ -75,7 +74,12 @@ public class ProjectResolver : IProjectResolver
         }
     }
 
-    public void initializeImages()
+    /// <summary>
+    /// This method expects a project's subfolder already, and
+    /// </summary>
+    /// <param name="projectDirectory">a subfolder from within a project that contains images</param>
+    public void initializeImages(string projectDirectory)
     {
+
     }
 }
