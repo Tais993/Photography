@@ -1,0 +1,35 @@
+﻿@startuml C3_BusinessLogic
+!include <C4/C4_Component>
+
+title C3 - Component Diagram - Application
+
+LAYOUT_LEFT_RIGHT()
+
+Person(user, "Photographer")
+
+Container_Boundary(presentation, "Presentation Layer") {
+    Container(cli, "CLI Application", "C# / .NET", "Current presentation layer")
+    Container(web, "Web Application", "Future website", "Future presentation layer")
+}
+
+Container_Boundary(business, "Business Logic Application") {
+    Component(anchor, "Services", "", "")
+}
+
+Container_Boundary(infra, "Infrastructure Components") {
+    Component(repositories, "Repositories", "C#", "Reads and writes database data")
+    Component(fs, "File System Service", "C#", "Handles scanning, copy, move, and verification")
+}
+
+
+Rel(user, cli, "Uses")
+Rel(user, web, "Will use")
+
+Rel(cli, anchor, "entry")
+Rel(web, anchor, "entry")
+
+Rel(anchor, fs, "entry")
+Rel(anchor, repositories, "entry")
+
+@enduml
+

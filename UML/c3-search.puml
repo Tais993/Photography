@@ -1,0 +1,34 @@
+﻿@startuml C3_BusinessLogic
+!include <C4/C4_Component>
+
+title C3 - Component Diagram - Search Command
+
+LAYOUT_LEFT_RIGHT()
+
+Person(user, "Photographer")
+
+Container_Boundary(presentation, "Presentation Layer") {
+    Container_Boundary(CLI, "CLI") {
+        Container(search, "Search command", "C# / .NET", "Command which searches for specific files/images")
+    }
+}
+
+Container_Boundary(business, "Business Logic Application") {
+    Component(fileSystemService, "FileSearchService", "", "")
+}
+
+Container_Boundary(infra, "Infrastructure Components") {
+    Component(repository, "Image Repository", "C#", "Reads and writes database data")
+    Component(fs, "File System Service", "C#", "Handles scanning, copy, move, and verification")
+}
+
+
+Rel(user, search, "Uses")
+
+Rel(search, fileSystemService, "entry")
+
+Rel(fileSystemService, fs, "Looks up file on drive")
+Rel(fileSystemService, repository, "Checks database for file")
+
+@enduml
+
