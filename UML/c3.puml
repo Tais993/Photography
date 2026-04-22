@@ -1,107 +1,35 @@
-﻿@startuml C3_Component
+﻿@startuml C3_BusinessLogic
 !include <C4/C4_Component>
 
-title C3 - Component Diagram - CLI Application
+title C3 - Component Diagram - Application
+
+LAYOUT_LEFT_RIGHT()
 
 Person(user, "Photographer")
 
-System_Ext(fs, "Local File System", "Project folders and image files")
-System_Ext(storage, "External Storage Drives", "Archive storage")
-ContainerDb(database, "Project Database", "Relational database")
-
-Container_Boundary(cli, "CLI Application") {
-    Component(commands, "Command Layer", "System.CommandLine", "Parses CLI commands and starts workflows")
-
-    Component(projectResolver, "Project Recognition Service", "C#", "Recognises projects and subprojects based on folder names and structure")
-    Component(validationService, "Validation Service", "C#", "Validates folder structure, required files, duplicates, and transfer conditions")
-    Component(searchService, "Search Service", "C#", "Searches files within a selected project")
-    Component(copyService, "Copy Service", "C#", "Copies selected files to the editing folder and handles RAW/JPG pairing")
-    'Component(transferService, "Transfer Service", "C#", "Performs full project copy and move operations")
-
-    Container_Boundary(repo, "Repositories") {
-        Component(fileSystemService, "File System Service", "C#", "Handles directory scanning, file lookup, copy, move, and verification")
-
-        Component(projectRepo, "Project Repository", "C#", "Reads and writes project data")
-        Component(imageRepo, "Image Repository", "C#", "Reads image data")
-        }
+Container_Boundary(presentation, "Presentation Layer") {
+    Container(cli, "CLI Application", "C# / .NET", "Current presentation layer")
+    Container(web, "Web Application", "Future website", "Future presentation layer")
 }
-
-
-
-Rel(user, commands, "Uses")
-Rel(commands, projectResolver, "Calls")
-Rel(commands, searchService, "Calls")
-Rel(commands, copyService, "Calls")
-'Rel(commands, transferService, "Calls")'
-
-Rel(projectResolver, validationService, "Validation folder structure")
-Rel(projectResolver, fileSystemService, "Requests files and folders")
-Rel(projectResolver, projectRepo, "Requests project data")
-
-Rel(searchService, fileSystemService, "Uses")
-Rel(searchService, imageRepo, "Uses")
-
-Rel(copyService, validationService, "Uses")
-Rel(copyService, fileSystemService, "Uses")
-Rel(copyService, imageRepo, "Uses")
-
-Rel(validationService, fileSystemService, "Retrieves files and directories")
-Rel(validationService, projectRepo, "Retrievies project locations")
-Rel(validationService, imageRepo, "Retrieves images")
-
-'Rel(transferService, validationService, "Uses")
-'Rel(transferService, fileSystemService, "Uses")
-'Rel(transferService, projectRepo, "Uses")
-
-Rel(projectRepo, database, "Reads/writes")
-Rel(imageRepo, database, "Reads")
-Rel(metadataRepo, database, "Reads/writes")
-
-Rel(fileSystemService, fs, "Reads/writes")
-Rel(fileSystemService, storage, "Copies/moves files")
-
-@enduml
-
-@startuml C3_Component
-!include <C4/C4_Component>
-
-title C3 - Component Diagram - Business Logic Layer
-
-Person(user, "Photographer")
-
-System_Ext(fs, "Local File System", "Project folders and image files")
-System_Ext(storage, "External Storage Drives", "Archive storage")
-ContainerDb(database, "Project Database", "Relational database")
-
-
-Container(cli, "CLI Application", "C# / .NET", "Current presentation layer")
-Container(web, "Web Application", "Future website", "Future presentation layer")
 
 Container_Boundary(business, "Business Logic Application") {
-    Component(projectResolver, "Project Resolver Service", "C#", "Recognises projects and subprojects based on naming and structure")
-    Component(fileSearch, "File Search Service", "C#", "Searches files within a selected project")
-    Component(fileCopy, "File Copy Service", "C#", "Determines which files must be copied and coordinates copy operations")
-    Component(projectTransfer, "Project Transfer Service", "C#", "Coordinates full project copy and move workflows")
+    Component(anchor, "Services", "", "")
 }
 
-Rel(cli, projectResolver, "Invokes")
-Rel(cli, fileSearch, "Invokes")
-Rel(cli, fileCopy, "Invokes")
-Rel(cli, projectTransfer, "Invokes")
+Container_Boundary(infra, "Infrastructure Components") {
+    Component(repositories, "Repositories", "C#", "Reads and writes database data")
+    Component(fs, "File System Service", "C#", "Handles scanning, copy, move, and verification")
+}
 
-Rel(web, projectResolver, "Invokes")
-Rel(web, fileSearch, "Invokes")
-Rel(web, fileCopy, "Invokes")
-Rel(web, projectTransfer, "Invokes")
 
-Rel(projectResolver, fs, "Uses")
-Rel(fileSearch, fs, "Uses")
-Rel(fileCopy, fs, "Uses")
-Rel(projectTransfer, fs, "Uses")
+Rel(user, cli, "Uses")
+Rel(user, web, "Will use")
 
-Rel(projectResolver, database, "Uses")
-Rel(fileSearch, database, "Uses")
-Rel(fileCopy, database, "Uses")
-Rel(projectTransfer, database, "Uses")
+Rel(cli, anchor, "entry")
+Rel(web, anchor, "entry")
+
+Rel(anchor, fs, "entry")
+Rel(anchor, repositories, "entry")
 
 @enduml
+
