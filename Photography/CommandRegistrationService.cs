@@ -1,6 +1,7 @@
-﻿using PhotographyNET.cli;
+﻿using Cli.Commands;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace PhotographyNET;
+namespace Cli;
 
 public class CommandRegistrationService
 {
