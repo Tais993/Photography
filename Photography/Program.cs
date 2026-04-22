@@ -1,95 +1,25 @@
-using Npgsql;
-using PhotographyNET;
-using PhotographyNET.database;
-using PhotographyNET.database.repositories;
-using PhotographyNET.services;
-using PhotographyNET.services.interfaces;
+﻿using Application;
+using Cli;
+using Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
-var builder = WebApplication.CreateBuilder(
-        new WebApplicationOptions
-        {
-            Args = args,
-            ContentRootPath = AppContext.BaseDirectory,
-        })
-    ;
+var builder = Host.CreateApplicationBuilder(
+                new HostApplicationBuilderSettings
+                {
+                        Args = args,
+                        ContentRootPath = AppContext.BaseDirectory,
+                })
+        ;
 
-IServiceCollection services = builder.Services;
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddCli();
 
-// Services
-services.AddTransient<ICopyService, CopyService>();
-services.AddTransient<IFileSearchService, FileSearchService>();
-services.AddTransient<ILightroomService, LightroomService>();
-services.AddTransient<IProjectResolver, ProjectService>();
+using var app = builder.Build();
 
-// Commands
-CommandRegistrationService.Register(builder.Services);
+using var scope = app.Services.CreateScope();
+var provider = scope.ServiceProvider;
 
-
-string connectionString = builder.Configuration.GetConnectionString("Default");
-// ?? throw new InvalidOperationException("Missing connection string.");
-services.AddSingleton(new NpgsqlDataSourceBuilder(connectionString).Build());
-services.AddTransient<MigrationService>();
-services.AddTransient<RepositoryHelper>();
-
-// Repositories
-services.AddTransient<ImageRepository>();
-services.AddTransient<ProjectRepository>();
-services.AddTransient<MetadataRepository>();
-services.AddTransient<ProjectMetadataRepository>();
-
-
-var webApplication = builder.Build();
-
-var provider = webApplication.Services.CreateScope().ServiceProvider;
-
-
-provider.GetRequiredService<MigrationService>().Migrate();
-var rootCommand = CommandFactory.Commands(webApplication.Services);
-
-
+var rootCommand = CommandFactory.Commands(provider);
 rootCommand.Parse(args).Invoke();
-
-
-// // Add services to the container.
-// // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-// builder.Services.AddOpenApi();
-//
-// var app = builder.Build();
-//
-// // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     app.MapOpenApi();
-// }
-//
-// app.UseHttpsRedirection();
-//
-// var summaries = new[]
-// {
-//     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-// };
-//
-// app.MapGet("/weatherforecast", () =>
-//     {
-//         var forecast = Enumerable.Range(1, 5).Select(index =>
-//                 new WeatherForecast
-//                 (
-//                     DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-//                     Random.Shared.Next(-20, 55),
-//                     summaries[Random.Shared.Next(summaries.Length)]
-//                 ))
-//             .ToArray();
-//         return forecast;
-//     })
-//     .WithName("GetWeatherForecast");
-//
-// app.Run();
-//
-//
-// namespace PhotographyNET
-// {
-//     record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-//     {
-//         public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-//     }
-// }
