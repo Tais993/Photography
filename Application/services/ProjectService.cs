@@ -9,7 +9,8 @@ namespace Application.services;
 
 public class ProjectService : IProjectResolver
 {
-    public static readonly Regex PROJECT_NAME_REGEX = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
+    public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
+    public const string ProjectInfoFile = "project.info";
 
     private readonly IProjectRepository _repository;
     private readonly ILogger<ProjectService> _logger;
@@ -26,7 +27,7 @@ public class ProjectService : IProjectResolver
 
     public Project resolveProject(string directory)
     {
-        var projectInfoLocation = _files.Combine(directory, "project.info");
+        var projectInfoLocation = _files.Combine(directory, ProjectInfoFile);
 
         if (!_files.Exists(projectInfoLocation))
         {
@@ -55,12 +56,12 @@ public class ProjectService : IProjectResolver
         }
         else
         {
-            var match = PROJECT_NAME_REGEX.Match(pathEnd);
+            var match = ProjectNameRegex.Match(pathEnd);
 
             if (match.Success)
             {
 
-                string projectInfoLocation = _files.Combine(subdirectory, "project.info");
+                string projectInfoLocation = _files.Combine(subdirectory, ProjectInfoFile);
 
 
                 if (_files.Exists(projectInfoLocation))

@@ -189,7 +189,7 @@ public class ProjectServiceTest
         _projectService.initialiseExistingFolder(projectDirectory);
 
         // Assert
-        _files.Verify(f => f.Combine(projectDirectory, "project.info"), Times.Once);
+        _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
         _files.Verify(f => f.Exists(projectInfoDirectory), Times.Once);
 
         _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
@@ -237,7 +237,7 @@ public class ProjectServiceTest
         _projectService.initialiseExistingFolder(projectDirectory);
 
         // Assert
-        _files.Verify(f => f.Combine(projectDirectory, "project.info"), Times.Once);
+        _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
         _files.Verify(f => f.Exists(projectInfoDirectory), Times.Once);
 
         _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
@@ -284,7 +284,7 @@ public class ProjectServiceTest
         _projectService.initialiseExistingFolder(projectDirectory);
 
         // Assert
-        _files.Verify(f => f.Combine(projectDirectory, "project.info"), Times.Once);
+        _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
         _files.Verify(f => f.Exists(projectInfoDirectory), Times.Once);
 
         _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
@@ -306,7 +306,7 @@ public class ProjectServiceTest
         string folderName = "2024-07-04-Merijn";
 
         // Act
-        var match = ProjectService.PROJECT_NAME_REGEX.Match(folderName);
+        var match = ProjectService.ProjectNameRegex.Match(folderName);
 
         // Assert
         Assert.That(match.Success, Is.True);
@@ -323,7 +323,7 @@ public class ProjectServiceTest
         string folderName = "invalid-folder-name";
 
         // Act
-        var match = ProjectService.PROJECT_NAME_REGEX.Match(folderName);
+        var match = ProjectService.ProjectNameRegex.Match(folderName);
 
         // Assert
         Assert.That(match.Success, Is.False);
