@@ -31,14 +31,14 @@ public class ProjectService : IProjectResolver
 
         if (!_files.Exists(projectInfoLocation))
         {
-            throw new Exception("Project not initialized");
+            throw new InvalidOperationException($"No {ProjectInfoFile} found");
         }
 
         int id = int.Parse(_files.ReadAllText(projectInfoLocation));
 
         _logger.LogInformation($"project info file found:  id: {id}");
 
-        return _repository.GetByKey(id) ?? throw new Exception($"no project found with given ID`{id}`");
+        return _repository.GetByKey(id);
     }
 
     public void initialiseExistingFolder(string subdirectory)

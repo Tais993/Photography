@@ -39,7 +39,7 @@ public class ProjectMetadataRepository
         return _db.Query("""
                          INSERT INTO public.project_metadata(project_id, metadata_id, metadata_value) 
                          VALUES ($1, $2, $3) 
-                         """, MapProjectMetadata) ?? throw new InvalidOperationException();
+                         """, MapProjectMetadata);
     }
 
     public void Update(ProjectMetadata entity)

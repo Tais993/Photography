@@ -54,7 +54,10 @@ public class RepositoryHelper
 
         NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
 
-        reader.Read();
+        if (reader.Read())
+        {
+            throw new InvalidOperationException("Query returned no results");
+        }
 
         var tResult = resultConverter(reader);
 

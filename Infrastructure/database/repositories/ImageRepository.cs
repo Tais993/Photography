@@ -17,7 +17,7 @@ public class ImageRepository
         this._db = db;
     }
 
-    public Image? GetByKey(int id)
+    public Image GetByKey(int id)
     {
         return _db.Query("""
                                SELECT id, project_id, file_name, file_type, file_path FROM public.image 
@@ -42,21 +42,20 @@ public class ImageRepository
 
     public List<Image> GetAllByProject(Project project)
     {
-        if (project?.Id is null) throw new Exception("yeah i need the actual project id");
+        if (project?.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
 
         return GetAllByProjectId((int)project.Id);
     }
 
     public Image Insert(Image image)
     {
-        if (image?.Id is null) throw new Exception("yeah i need the actual image id");
+        if (image?.Id is null) throw new ArgumentException("Image must have an ID", nameof(image));
 
         return _db.Query("""
-                           INSERT INTO public.image(project_id, file_name, file_type, file_path) 
-                           VALUES ($1, $2, $3, $4)
-                           RETURNING *
-                           """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath) ??
-               throw new Exception("Insert failed");
+                         INSERT INTO public.image(project_id, file_name, file_type, file_path) 
+                         VALUES ($1, $2, $3, $4)
+                         RETURNING *
+                         """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath);
     }
 
     public void Update(Image image)

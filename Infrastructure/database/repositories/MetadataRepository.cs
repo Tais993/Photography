@@ -41,13 +41,12 @@ public class MetadataRepository
                          VALUES ($1, $2, $3, $4)
                          RETURNING id, metadata_key, metadata_type, display_name, description
                          """, MapMetadata, entity.MetadataKey, entity.MetadataType, entity.DisplayName,
-                   entity.Description)
-               ?? throw new Exception("Insert failed");
+            entity.Description);
     }
 
     public void Update(Metadata entity)
     {
-        if (entity?.Id is null) throw new Exception("yeah i need actual stuff");
+        if (entity?.Id is null) throw new ArgumentException("Metadata must have an ID", nameof(entity));
 
         _db.Execute("""
                 UPDATE public.metadata

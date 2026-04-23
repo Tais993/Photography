@@ -17,7 +17,7 @@ public class ProjectRepository : IProjectRepository
         this._db = db;
     }
 
-    public Project? GetByKey(int id)
+    public Project GetByKey(int id)
     {
         _logger.LogInformation($"GetByKey, with params: {id}");
         return _db.Query("""
@@ -39,13 +39,12 @@ public class ProjectRepository : IProjectRepository
                          INSERT INTO public.project(name, location, event_date) 
                          VALUES ($1, $2, $3)
                          RETURNING *
-                         """, MapProject, project.Name, project.Location, project.EventDate) ??
-               throw new Exception("Insert failed");
+                         """, MapProject, project.Name, project.Location, project.EventDate);
     }
 
     public void Update(Project project)
     {
-        if (project?.Id is null) throw new Exception("yeah i need actual stuff");
+        if (project?.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
 
         _db.Execute("""
                 UPDATE public.project
@@ -68,6 +67,8 @@ public class ProjectRepository : IProjectRepository
 
     private static Project MapProject(NpgsqlDataReader reader)
     {
+        if (!reader.HasRows) return null!;
+
         return new Project(
             (int)reader["id"],
             (string)reader["name"],
