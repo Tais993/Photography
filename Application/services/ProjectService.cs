@@ -2,6 +2,7 @@
 using Application.services.interfaces;
 using Domain.entities;
 using Infrastructure.database.repositories;
+using Infrastructure.filesystem;
 using Microsoft.Extensions.Logging;
 
 namespace Application.services;
@@ -12,20 +13,22 @@ public class ProjectService : IProjectResolver
 
     private readonly ProjectRepository _repository;
     private readonly ILogger<ProjectService> _logger;
+    private readonly IFiles _files;
 
 
-    public ProjectService(ProjectRepository repository, ILogger<ProjectService> logger)
+    public ProjectService(ProjectRepository repository, IFiles files, ILogger<ProjectService> logger)
     {
         _repository = repository;
+        _files = files;
         _logger = logger;
     }
 
 
     public Project resolveProject(string directory)
     {
-        var projectInfoLocation = Path.Combine(directory, "project.info");
+        var projectInfoLocation = _files.PathCombine(directory, "project.info");
 
-        int id = int.Parse(File.ReadAllText(projectInfoLocation));
+        int id = int.Parse(_files.ReadFile(projectInfoLocation));
 
         _logger.LogInformation($"project info file found:  id: {id}");
 
@@ -50,13 +53,15 @@ public class ProjectService : IProjectResolver
 
             if (match.Success)
             {
-                var projectInfoLocation = Path.Combine(subdirectory, "project.info");
-                if (Path.Exists(projectInfoLocation))
+
+                string projectInfoLocation = _files.PathCombine(subdirectory, "project.info");
+
+
+                if (_files.PathExists(projectInfoLocation))
                 {
-                    _logger.LogInformation($"Project info file found:  name: {File.ReadAllText(projectInfoLocation)}");
+                    _logger.LogInformation($"Project info file found:  name: {_files.ReadFile(projectInfoLocation)}");
                     return;
                 }
-
 
 
                 var dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
@@ -67,7 +72,7 @@ public class ProjectService : IProjectResolver
 
                 _logger.LogInformation($"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
 
-                File.WriteAllText(projectInfoLocation, project.Id + "");
+                _files.WriteFile(project.Id + "", projectInfoLocation);
 
                 _logger.LogInformation($"File should be written to {projectInfoLocation}");
 

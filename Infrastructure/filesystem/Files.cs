@@ -1,20 +1,32 @@
 ﻿namespace Infrastructure.filesystem;
 
-public class Files
+public class Files : IFiles
 {
-    public void ReadFile(params string[] paths)
+
+    public string PathCombine(params string[] paths)
     {
+        return Path.Combine(paths);
+    }
+
+    public string ReadFile(params string[] paths)
+    {
+        return File.ReadAllText(PathCombine(paths));
     }
 
     public void WriteFile(string text, params string[] paths)
     {
+        File.WriteAllText(PathCombine(paths), text);
     }
 
-    public bool FileExists(params string[] paths)
+    public bool PathExists(params string[] paths)
     {
+        var projectInfoLocation = PathCombine(paths);
+
+        return Path.Exists(projectInfoLocation);
     }
 
-    public void ListFolder()
+    public string[] ListFolder(params string[] paths)
     {
+        return Directory.GetDirectories(PathCombine(paths));
     }
 }
