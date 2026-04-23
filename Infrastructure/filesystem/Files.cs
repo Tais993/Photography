@@ -18,6 +18,18 @@ public class Files : IFiles
         File.WriteAllText(path, text);
     }
 
+    public string GetFileName(string path)
+    {
+        return Path.GetFileName(path);
+    }
+
+    public string GetPathEnd(string path)
+    {
+        return Path.GetFileName(
+            path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+        );
+    }
+
     public bool Exists(string path)
     {
         return Path.Exists(path);
