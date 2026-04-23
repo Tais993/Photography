@@ -303,7 +303,7 @@ public class ProjectServiceTest
     public void ProjectNameRegex_MatchesValidProjectFolder()
     {
         // Arrange
-        string folderName = "202-07-04-Merijn";
+        string folderName = "2024-07-04-Merijn";
 
         // Act
         var match = ProjectService.PROJECT_NAME_REGEX.Match(folderName);
