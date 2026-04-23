@@ -1,5 +1,6 @@
 ﻿using Infrastructure.database;
 using Infrastructure.database.repositories;
+using Infrastructure.filesystem;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -21,6 +22,9 @@ public static class DependencyInjection
         services.AddTransient<ProjectRepository>();
         services.AddTransient<MetadataRepository>();
         services.AddTransient<ProjectMetadataRepository>();
+
+
+        services.AddTransient<IFiles, Files>();
         return services;
     }
 }
