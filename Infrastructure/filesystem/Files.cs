@@ -3,30 +3,28 @@
 public class Files : IFiles
 {
 
-    public string PathCombine(params string[] paths)
+    public string Combine(params string[] paths)
     {
         return Path.Combine(paths);
     }
 
-    public string ReadFile(params string[] paths)
+    public string ReadAllText(string path)
     {
-        return File.ReadAllText(PathCombine(paths));
+        return File.ReadAllText(path);
     }
 
-    public void WriteFile(string text, params string[] paths)
+    public void WriteAllText(string text, string path)
     {
-        File.WriteAllText(PathCombine(paths), text);
+        File.WriteAllText(path, text);
     }
 
-    public bool PathExists(params string[] paths)
+    public bool Exists(string path)
     {
-        var projectInfoLocation = PathCombine(paths);
-
-        return Path.Exists(projectInfoLocation);
+        return Path.Exists(path);
     }
 
-    public string[] ListFolder(params string[] paths)
+    public string[] GetDirectories(string path)
     {
-        return Directory.GetDirectories(PathCombine(paths));
+        return Directory.GetDirectories(path);
     }
 }

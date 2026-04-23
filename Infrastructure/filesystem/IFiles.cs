@@ -3,9 +3,9 @@
 public interface IFiles
 {
 
-    string PathCombine(params string[] paths);
-    string ReadFile(params string[] paths);
-    void WriteFile(string text, params string[] paths);
-    bool PathExists(params string[] paths);
-    string[] ListFolder(params string[] paths);
+    string Combine(params string[] paths);
+    string ReadAllText(string path);
+    void WriteAllText(string text, string path);
+    bool Exists(string path);
+    string[] GetDirectories(string path);
 }

@@ -26,9 +26,9 @@ public class ProjectService : IProjectResolver
 
     public Project resolveProject(string directory)
     {
-        var projectInfoLocation = _files.PathCombine(directory, "project.info");
+        var projectInfoLocation = _files.Combine(directory, "project.info");
 
-        int id = int.Parse(_files.ReadFile(projectInfoLocation));
+        int id = int.Parse(_files.ReadAllText(projectInfoLocation));
 
         _logger.LogInformation($"project info file found:  id: {id}");
 
@@ -54,12 +54,12 @@ public class ProjectService : IProjectResolver
             if (match.Success)
             {
 
-                string projectInfoLocation = _files.PathCombine(subdirectory, "project.info");
+                string projectInfoLocation = _files.Combine(subdirectory, "project.info");
 
 
-                if (_files.PathExists(projectInfoLocation))
+                if (_files.Exists(projectInfoLocation))
                 {
-                    _logger.LogInformation($"Project info file found:  name: {_files.ReadFile(projectInfoLocation)}");
+                    _logger.LogInformation($"Project info file found:  name: {_files.ReadAllText(projectInfoLocation)}");
                     return;
                 }
 
@@ -72,7 +72,7 @@ public class ProjectService : IProjectResolver
 
                 _logger.LogInformation($"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
 
-                _files.WriteFile(project.Id + "", projectInfoLocation);
+                _files.WriteAllText(project.Id + "", projectInfoLocation);
 
                 _logger.LogInformation($"File should be written to {projectInfoLocation}");
 
