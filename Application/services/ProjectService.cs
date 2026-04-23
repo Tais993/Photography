@@ -11,12 +11,12 @@ public class ProjectService : IProjectResolver
 {
     public static readonly Regex PROJECT_NAME_REGEX = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
 
-    private readonly ProjectRepository _repository;
+    private readonly IProjectRepository _repository;
     private readonly ILogger<ProjectService> _logger;
     private readonly IFiles _files;
 
 
-    public ProjectService(ProjectRepository repository, IFiles files, ILogger<ProjectService> logger)
+    public ProjectService(IProjectRepository repository, IFiles files, ILogger<ProjectService> logger)
     {
         _repository = repository;
         _files = files;
@@ -28,6 +28,11 @@ public class ProjectService : IProjectResolver
     {
         var projectInfoLocation = _files.Combine(directory, "project.info");
 
+        if (!_files.Exists(projectInfoLocation))
+        {
+            throw new Exception("Project not initialized");
+        }
+
         int id = int.Parse(_files.ReadAllText(projectInfoLocation));
 
         _logger.LogInformation($"project info file found:  id: {id}");
@@ -37,11 +42,12 @@ public class ProjectService : IProjectResolver
 
     public void initialiseExistingFolder(string subdirectory)
     {
-        var folderName = Path.GetFileName(subdirectory);
-        _logger.LogInformation($"folder name: {folderName}");
+        var pathEnd = _files.GetPathEnd(subdirectory);
+
+        _logger.LogInformation("folder name: {FolderName}", pathEnd);
 
 
-        if (subdirectory.StartsWith("."))
+        if (pathEnd.StartsWith("."))
         {
             _logger.LogInformation("it is a collection folder");
             // This is a collection folder for example all concerts photographed at De Pul
@@ -49,7 +55,7 @@ public class ProjectService : IProjectResolver
         }
         else
         {
-            var match = PROJECT_NAME_REGEX.Match(folderName);
+            var match = PROJECT_NAME_REGEX.Match(pathEnd);
 
             if (match.Success)
             {
@@ -76,6 +82,10 @@ public class ProjectService : IProjectResolver
 
                 _logger.LogInformation($"File should be written to {projectInfoLocation}");
 
+            }
+            else
+            {
+                // What to do?
             }
         }
     }

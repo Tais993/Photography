@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Infrastructure.database.repositories;
 
-public class ProjectRepository
+public class ProjectRepository : IProjectRepository
 {
     private RepositoryHelper _db;
     private ILogger<ProjectRepository> _logger;
