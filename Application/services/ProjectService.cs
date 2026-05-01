@@ -7,6 +7,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.services;
 
+/// <summary>
+/// The project services handles with everything project related.
+/// Initializing and resolving the most predominant functions.
+/// </summary>
 public class ProjectService : IProjectResolver
 {
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
@@ -25,6 +29,12 @@ public class ProjectService : IProjectResolver
     }
 
 
+    /// <summary>
+    /// Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
     public Project resolveProject(string directory)
     {
         var projectInfoLocation = _files.Combine(directory, ProjectInfoFile);
@@ -41,6 +51,16 @@ public class ProjectService : IProjectResolver
         return _repository.GetByKey(id);
     }
 
+    /// <summary>
+    /// Initialises the given projects directory into the database,
+    /// additionally this adds a file to the filesystem to remember the projects ID.
+    /// Any images from within the project will also be loaded in with its metadata saved into the database.
+    ///
+    /// Any collection folders are ignored for now, additionally if a subfolder was given its ignored as its not recognized as a project folder.
+    ///
+    /// In future versions this method will run recursively, including for any sub/collection folders.
+    /// </summary>
+    /// <param name="subdirectory"></param>
     public void initialiseExistingFolder(string subdirectory)
     {
         var pathEnd = _files.GetPathEnd(subdirectory);
@@ -52,7 +72,7 @@ public class ProjectService : IProjectResolver
         {
             _logger.LogInformation("it is a collection folder");
             // This is a collection folder for example all concerts photographed at De Pul
-            // For now this has no additional functionality and we will keep this empty
+            // For now this has no additional functionality and we will ignore it
         }
         else
         {
@@ -60,13 +80,13 @@ public class ProjectService : IProjectResolver
 
             if (match.Success)
             {
-
                 string projectInfoLocation = _files.Combine(subdirectory, ProjectInfoFile);
 
 
                 if (_files.Exists(projectInfoLocation))
                 {
-                    _logger.LogInformation($"Project info file found:  name: {_files.ReadAllText(projectInfoLocation)}");
+                    _logger.LogInformation(
+                        $"Project info file found:  name: {_files.ReadAllText(projectInfoLocation)}");
                     return;
                 }
 
@@ -77,12 +97,12 @@ public class ProjectService : IProjectResolver
 
                 project = _repository.Insert(project);
 
-                _logger.LogInformation($"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
+                _logger.LogInformation(
+                    $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
 
                 _files.WriteAllText(project.Id + "", projectInfoLocation);
 
                 _logger.LogInformation($"File should be written to {projectInfoLocation}");
-
             }
             else
             {
