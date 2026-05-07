@@ -19,7 +19,7 @@ public static class DependencyInjection
 
 // Repositories
         services.AddTransient<ImageRepository>();
-        services.AddTransient<ProjectRepository>();
+        services.AddTransient<IProjectRepository, ProjectRepository>();
         services.AddTransient<MetadataRepository>();
         services.AddTransient<ProjectMetadataRepository>();
 
