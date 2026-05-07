@@ -18,7 +18,7 @@ public class RepositoryHelper
     public List<T> QueryMultiple<T>(string sql, Func<NpgsqlDataReader, T> resultConverter,
         params object[] parameterValues)
     {
-        _logger.LogInformation($"QueryMultiple, with params: {parameterValues}");
+        _logger.LogDebug($"QueryMultiple, with params: {parameterValues}");
         return Query(sql, reader =>
         {
             List<T> results = [];
@@ -35,11 +35,11 @@ public class RepositoryHelper
     public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
         params object[] parameterValues)
     {
-        _logger.LogInformation($"Executing {sql}");
+        _logger.LogDebug($"Executing {sql}");
 
         foreach (var parameterValue in parameterValues)
         {
-            _logger.LogInformation($"Param: {parameterValue}");
+            _logger.LogDebug($"Param: {parameterValue}");
         }
 
 
@@ -54,7 +54,7 @@ public class RepositoryHelper
 
         NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
 
-        if (reader.Read())
+        if (!reader.Read())
         {
             throw new InvalidOperationException("Query returned no results");
         }
