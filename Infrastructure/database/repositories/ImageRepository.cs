@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Infrastructure.database.repositories;
 
-public class ImageRepository
+public class ImageRepository : IImageRepository
 {
     private RepositoryHelper _db;
     private ILogger<ImageRepository> _logger;
