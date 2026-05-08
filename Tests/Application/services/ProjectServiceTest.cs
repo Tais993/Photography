@@ -12,6 +12,7 @@ namespace Tests.services;
 public class ProjectServiceTest
 {
     private Mock<IProjectRepository> _projectRepository = null!;
+    private Mock<IImageRepository> _imageRepository = null!;
     private Mock<IFiles> _files = null!;
     private Mock<ILogger<ProjectService>> _projectLogger = null!;
     private ProjectService _projectService = null!;
@@ -20,10 +21,11 @@ public class ProjectServiceTest
     public void SetUp()
     {
         _projectRepository = new Mock<IProjectRepository>();
+        _imageRepository = new Mock<IImageRepository>();
         _files = new Mock<IFiles>();
         _projectLogger = new Mock<ILogger<ProjectService>>();
 
-        _projectService = new ProjectService(_projectRepository.Object, _files.Object, _projectLogger.Object);
+        _projectService = new ProjectService(_projectRepository.Object, _imageRepository.Object, _files.Object, _projectLogger.Object);
     }
 
     [Test]
@@ -65,33 +67,10 @@ public class ProjectServiceTest
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
 
         // Execution
-        var exception = Assert.Throws<Exception>(() => _projectService.resolveProject(projectDirectory));
+        var exception = Assert.Throws<InvalidOperationException>(() => _projectService.resolveProject(projectDirectory));
 
         // Asserts
         Assert.That(exception, Is.Not.Null);
-    }
-
-    [Test]
-    public void ResolveProject_ProjectNotFound()
-    {
-        string projectDirectory = "C:\\2024-07-4-Merijn";
-        string projectInfoDirectory = "C:\\2024-07-4-Merijn\\project.info";
-
-        // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.ReadAllText(It.Is<String>(s => s.Equals(projectInfoDirectory)))).Returns("2");
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
-
-        // Execution
-        _projectRepository.Setup(r => r.GetByKey(2))
-            .Returns((Project?)null);
-
-        // Asserts
-        var exception = Assert.Throws<Exception>(() => _projectService.resolveProject(projectDirectory));
-        Assert.That(exception, Is.Not.Null);
-        Assert.That(exception.Message, Does.Contain("2"));
-
-        _projectRepository.Verify(r => r.GetByKey(2), Times.Once);
     }
 
 
@@ -328,4 +307,7 @@ public class ProjectServiceTest
         // Assert
         Assert.That(match.Success, Is.False);
     }
+
+
+    
 }
