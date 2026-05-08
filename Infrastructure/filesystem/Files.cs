@@ -12,6 +12,11 @@ public class Files : IFiles
         return Path.GetFileName(path);
     }
 
+    public string GetFileExtension(string path)
+    {
+        return Path.GetExtension(path);
+    }
+
     public string GetPathEnd(string path)
     {
         return Path.GetFileName(
@@ -36,7 +41,7 @@ public class Files : IFiles
 
     public void WriteAllText(string text, string path)
     {
-        File.WriteAllText(text, path);
+        File.WriteAllText(path, text);
     }
 
     public string ReadAllText(string path)

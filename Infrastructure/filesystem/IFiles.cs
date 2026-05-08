@@ -10,14 +10,22 @@ public interface IFiles
     string Combine(params string[] paths);
 
     /// <summary>
-    /// Gets the filename from any given path
+    /// Gets the filename from any given path, including the extension
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
     string GetFileName(string path);
 
     /// <summary>
+    /// Gets the extention of the given file's path
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public string GetFileExtension(string path);
+
+    /// <summary>
     /// Gets the final directory from any given path (if a filename is the last mentioned item, that will be returned instead)
+    /// If the given path included a filename at the end, the file namne including the extension will be returned.
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
