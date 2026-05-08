@@ -16,14 +16,16 @@ public class ProjectService : IProjectResolver
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
     public const string ProjectInfoFile = "project.info";
 
-    private readonly IProjectRepository _repository;
+    private readonly IProjectRepository _projectRepository;
+    private readonly IImageRepository _imageRepository;
     private readonly ILogger<ProjectService> _logger;
     private readonly IFiles _files;
 
 
-    public ProjectService(IProjectRepository repository, IFiles files, ILogger<ProjectService> logger)
+    public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files, ILogger<ProjectService> logger)
     {
-        _repository = repository;
+        _projectRepository = projectRepository;
+        _imageRepository = imageRepository;
         _files = files;
         _logger = logger;
     }
@@ -48,7 +50,7 @@ public class ProjectService : IProjectResolver
 
         _logger.LogInformation($"project info file found:  id: {id}");
 
-        return _repository.GetByKey(id);
+        return _projectRepository.GetByKey(id);
     }
 
     /// <summary>
@@ -71,6 +73,11 @@ public class ProjectService : IProjectResolver
         if (pathEnd.StartsWith("."))
         {
             _logger.LogInformation("it is a collection folder");
+            foreach (string directory in _files.GetDirectories(subdirectory))
+            {
+                initialiseExistingFolder(directory);
+            }
+
             // This is a collection folder for example all concerts photographed at De Pul
             // For now this has no additional functionality and we will ignore it
         }
@@ -90,19 +97,26 @@ public class ProjectService : IProjectResolver
                     return;
                 }
 
+                var project = ToProject(subdirectory, match);
 
-                var dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
-                    int.Parse(match.Groups[3].Value));
-                Project project = new Project(null, match.Groups[4].Value, subdirectory, dateOnly);
-
-                project = _repository.Insert(project);
-
-                _logger.LogInformation(
-                    $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
-
+                project = _projectRepository.Insert(project);
                 _files.WriteAllText(project.Id + "", projectInfoLocation);
 
-                _logger.LogInformation($"File should be written to {projectInfoLocation}");
+
+
+                _logger.LogDebug(
+                    $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
+                _logger.LogDebug($"File should be written to {projectInfoLocation}");
+
+
+
+                _logger.LogDebug($"Going through all images now");
+                foreach (string directory in _files.GetDirectories(subdirectory))
+                {
+                    InitializeImages(directory, project.Id.Value);
+                }
+                _logger.LogDebug($"All images initialized");
+                _logger.LogInformation($"Successfully initialized project and all images");
             }
             else
             {
@@ -111,12 +125,29 @@ public class ProjectService : IProjectResolver
         }
     }
 
-    /// <summary>
-    /// This method expects a project's subfolder already, and
-    /// </summary>
-    /// <param name="projectDirectory">a subfolder from within a project that contains images</param>
-    public void initializeImages(string projectDirectory)
+    private static Project ToProject(string subdirectory, Match match)
     {
+        var dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
+            int.Parse(match.Groups[3].Value));
+        Project project = new Project(null, match.Groups[4].Value, subdirectory, dateOnly);
+        return project;
+    }
 
+    /// <summary>
+    /// This method expects a project's subfolder already, and this also
+    /// </summary>
+    /// <param name="projectSubDirectory">a subfolder from within a project that contains images</param>
+    /// <param name="projectId"></param>
+    public void InitializeImages(string projectSubDirectory, int projectId)
+    {
+        foreach (var filePath in _files.GetFiles(projectSubDirectory))
+        {
+            var fileName = _files.GetFileName(filePath);
+            var fileExtension = _files.GetFileExtension(filePath);
+
+            Image image = new Image(projectId, fileName,  fileExtension, filePath);
+
+            _imageRepository.Insert(image);
+        }
     }
 }
