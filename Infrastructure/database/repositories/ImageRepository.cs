@@ -20,7 +20,7 @@ public class ImageRepository
     public Image GetByKey(int id)
     {
         return _db.Query("""
-                               SELECT id, project_id, file_name, file_type, file_path FROM public.image 
+                               SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
                                WHERE id = ($1)
                                """, MapImage, id);
     }
@@ -28,14 +28,14 @@ public class ImageRepository
     public List<Image> GetAll()
     {
         return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, file_path FROM public.image 
+                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
                                  """, MapImage);
     }
 
     public List<Image> GetAllByProjectId(int projectId)
     {
         return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, file_path FROM public.image
+                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
                                  WHERE project_id = ($1)
                                  """, MapImage, projectId);
     }
@@ -49,13 +49,11 @@ public class ImageRepository
 
     public Image Insert(Image image)
     {
-        if (image?.Id is null) throw new ArgumentException("Image must have an ID", nameof(image));
-
         return _db.Query("""
-                         INSERT INTO public.image(project_id, file_name, file_type, file_path) 
+                         INSERT INTO public.image(project_id, file_name, file_type, relational_file_path) 
                          VALUES ($1, $2, $3, $4)
                          RETURNING *
-                         """, MapImage, image.ProjectId, image.FileName, image.FileType, image.FilePath);
+                         """, MapImage, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath);
     }
 
     public void Update(Image image)
@@ -65,9 +63,9 @@ public class ImageRepository
                 SET project_id = $1,
                     file_name = $2,
                     file_type = $3,
-                    file_path = $4
+                    relational_file_path = $4
                 WHERE id = $5
-                """, image.ProjectId, image.FileName, image.FileType, image.FilePath, image.Id);
+                """, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath, image.Id);
     }
 
 
@@ -87,7 +85,7 @@ public class ImageRepository
             null,
             (string)reader["file_name"],
             (string)reader["file_type"],
-            (string)reader["file_path"]
+            (string)reader["relational_file_path"]
         );
     }
 }
