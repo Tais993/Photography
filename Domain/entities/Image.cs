@@ -1,11 +1,33 @@
 ﻿namespace Domain.entities;
 
-public class Image(int id, int projectId, Project project, string fileName, string fileType, string filePath) : IIdEntity
+public class Image : IIdEntity
 {
-    public int? Id { get; } = id;
-    public int ProjectId { get; } = projectId;
-    public Project? project { get; set; } = project;
-    public string FileName { get; } = fileName;
-    public string FileType { get; } = fileType;
-    public string FilePath { get; } = filePath;
+    public int? Id { get; }
+    public int ProjectId { get; }
+    public Project? Project { get; set; }
+    public string FileName { get; }
+    public string FileType { get; }
+    public string RelationalFilePath { get; }
+
+    public Image(int? id, int projectId, Project? project, string fileName, string fileType, string relationalFilePath)
+    {
+        this.Id = id;
+        this.ProjectId = projectId;
+        this.Project = project;
+        this.FileName = fileName;
+        this.FileType = fileType;
+        this.RelationalFilePath = relationalFilePath;
+    }
+
+    public Image(int projectId, string fileName, string fileType, string relationalFilePath)
+    {
+        this.ProjectId = projectId;
+        this.FileName = fileName;
+        this.FileType = fileType;
+        this.RelationalFilePath = relationalFilePath;
+    }
+
+
+
+
 }
