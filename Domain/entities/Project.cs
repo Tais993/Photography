@@ -1,5 +1,6 @@
 ﻿namespace Domain.entities;
 
+// TODO parent project id
 public class Project(int? id, string name, string location, DateOnly eventDate) : IIdEntity
 {
     public int? Id { get; } = id;

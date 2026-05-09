@@ -14,6 +14,7 @@ namespace Application.services;
 public class ProjectService : IProjectResolver
 {
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
+    public static readonly Regex SubProjectNameRegex = new Regex("\\.([^.]*)");
     public const string ProjectInfoFile = "project.info";
 
     private readonly IProjectRepository _projectRepository;
@@ -22,7 +23,8 @@ public class ProjectService : IProjectResolver
     private readonly IFiles _files;
 
 
-    public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files, ILogger<ProjectService> logger)
+    public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files,
+        ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
@@ -72,57 +74,69 @@ public class ProjectService : IProjectResolver
 
         if (pathEnd.StartsWith("."))
         {
-            _logger.LogInformation("it is a collection folder");
-            foreach (string directory in _files.GetDirectories(subdirectory))
-            {
-                initialiseExistingFolder(directory);
-            }
-
-            // This is a collection folder for example all concerts photographed at De Pul
-            // For now this has no additional functionality and we will ignore it
+            initialiseCollectionFolder(subdirectory);
         }
-        else
+        else if (ProjectNameRegex.Match(pathEnd) is { Success: true } match)
         {
-            var match = ProjectNameRegex.Match(pathEnd);
+            initialiseProjectFolder(subdirectory, match);
+        }
+    }
 
-            if (match.Success)
+    private void initialiseProjectFolder(string subdirectory, Match match, Project? parentProject)
+    {
+        string projectInfoLocation = _files.Combine(subdirectory, ProjectInfoFile);
+
+
+        if (_files.Exists(projectInfoLocation))
+        {
+            _logger.LogInformation(
+                $"Project info file found:  name: {_files.ReadAllText(projectInfoLocation)}");
+            return;
+        }
+
+        var project = ToProject(subdirectory, match);
+        // TODO parent project id
+
+        project = _projectRepository.Insert(project);
+        _files.WriteAllText(project.Id + "", projectInfoLocation);
+
+
+        _logger.LogDebug(
+            $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
+        _logger.LogDebug($"File should be written to {projectInfoLocation}");
+
+
+        _logger.LogDebug($"Going through all directories now");
+
+
+        foreach (string directory in _files.GetDirectories(subdirectory))
+        {
+            string pathEnd = _files.GetPathEnd(directory);
+
+            if (SubProjectNameRegex.Match(pathEnd) is { Success: true } subProjectMatch)
             {
-                string projectInfoLocation = _files.Combine(subdirectory, ProjectInfoFile);
-
-
-                if (_files.Exists(projectInfoLocation))
-                {
-                    _logger.LogInformation(
-                        $"Project info file found:  name: {_files.ReadAllText(projectInfoLocation)}");
-                    return;
-                }
-
-                var project = ToProject(subdirectory, match);
-
-                project = _projectRepository.Insert(project);
-                _files.WriteAllText(project.Id + "", projectInfoLocation);
-
-
-
-                _logger.LogDebug(
-                    $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
-                _logger.LogDebug($"File should be written to {projectInfoLocation}");
-
-
-
-                _logger.LogDebug($"Going through all images now");
-                foreach (string directory in _files.GetDirectories(subdirectory))
-                {
-                    InitializeImages(directory, project.Id.Value);
-                }
-                _logger.LogDebug($"All images initialized");
-                _logger.LogInformation($"Successfully initialized project and all images");
+                initialiseProjectFolder(subdirectory, subProjectMatch, parentProject);
             }
             else
             {
-                // What to do?
+                InitializeImages(directory, project.Id.Value);
             }
         }
+
+        _logger.LogDebug($"All directories initialized");
+        _logger.LogInformation($"Successfully initialized project and all images");
+    }
+
+    private void initialiseCollectionFolder(string subdirectory)
+    {
+        _logger.LogInformation("it is a collection folder");
+        foreach (string directory in _files.GetDirectories(subdirectory))
+        {
+            initialiseExistingFolder(directory);
+        }
+
+        // This is a collection folder for example all concerts photographed at De Pul
+        // For now this has no additional functionality and we will ignore it
     }
 
     private static Project ToProject(string subdirectory, Match match)
@@ -145,7 +159,7 @@ public class ProjectService : IProjectResolver
             var fileName = _files.GetFileName(filePath);
             var fileExtension = _files.GetFileExtension(filePath);
 
-            Image image = new Image(projectId, fileName,  fileExtension, filePath);
+            Image image = new Image(projectId, fileName, fileExtension, filePath);
 
             _imageRepository.Insert(image);
         }
