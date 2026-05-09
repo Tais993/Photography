@@ -12,8 +12,10 @@ public class FilesTest
     private const string FileName = "test.txt";
     private const string FilePath = "C:\\Users\\Tijs\\test.txt";
 
-    private const string DirectoryEnd = "test";
-    private const string DirectoryPath = "C:\\Users\\Tijs\\test\\";
+    private const string DirectoryEnd = "Tijs";
+    private const string DirectoryPath = "C:\\Users\\Tijs\\";
+    
+    private const string SecondDirectoryPath = "C:\\Users\\";
 
     [SetUp]
     public void SetUp()
@@ -65,5 +67,13 @@ public class FilesTest
         string pathEnd = _files.GetPathEnd(DirectoryPath);
 
         Assert.That(pathEnd, Is.EqualTo(DirectoryEnd));
+    }
+
+    [Test]
+    public void GetRelativePath_File_Correctly()
+    {
+        string relativePath = _files.GetRelativePath(SecondDirectoryPath, FilePath);
+        
+        Assert.That(relativePath, Is.EqualTo("Tijs\\test.txt"));
     }
 }

@@ -32,6 +32,14 @@ public interface IFiles
     string GetPathEnd(string path);
 
     /// <summary>
+    /// Creates
+    /// </summary>
+    /// <param name="relativeTo"></param>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public string GetRelativePath(string relativeTo, string path);
+    
+    /// <summary>
     /// Verifies whenever any given path exists on the drive, both directories and specific files work.
     /// </summary>
     /// <param name="path"></param>
