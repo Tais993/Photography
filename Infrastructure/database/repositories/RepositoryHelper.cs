@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Npgsql;
 
 namespace Infrastructure.database.repositories;
@@ -11,7 +12,7 @@ public class RepositoryHelper
     public RepositoryHelper(NpgsqlDataSource dataSource, ILogger<RepositoryHelper> logger)
     {
         _dataSource = dataSource;
-        _logger = logger;
+        _logger = NullLogger<RepositoryHelper>.Instance;
     }
 
 

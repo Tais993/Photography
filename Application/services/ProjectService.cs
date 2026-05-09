@@ -11,7 +11,7 @@ namespace Application.services;
 /// The project services handles with everything project related.
 /// Initializing and resolving the most predominant functions.
 /// </summary>
-public class ProjectService : IProjectService
+public class ProjectService : IProjectResolver
 {
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
     public static readonly Regex SubProjectNameRegex = new Regex("\\.([^.]*)");
@@ -33,71 +33,26 @@ public class ProjectService : IProjectService
     }
 
 
-
-    public int ResolveProjectId(string directory)
+    /// <summary>
+    /// Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public Project resolveProject(string directory)
     {
-        string projectInfoPath = _files.Combine(directory, ProjectInfoFile);
+        var projectInfoLocation = _files.Combine(directory, ProjectInfoFile);
 
-        if (!_files.Exists(projectInfoPath))
+        if (!_files.Exists(projectInfoLocation))
         {
-            return 0;
+            throw new InvalidOperationException($"No {ProjectInfoFile} found");
         }
 
-        int id = int.Parse(_files.ReadAllText(projectInfoPath));
+        int id = int.Parse(_files.ReadAllText(projectInfoLocation));
 
-        _logger.LogInformation("project info file found:  id: {Id}", id);
+        _logger.LogInformation($"project info file found:  id: {id}");
 
-        return id;
-    }
-
-    public int ResolveProjectId(string directory, int possibleEmptyProjectId)
-    {
-        if (possibleEmptyProjectId == 0)
-        {
-            return ResolveProjectId(Directory.GetCurrentDirectory());
-        }
-
-        return possibleEmptyProjectId;
-    }
-
-    public Project? ResolveProject(string directory)
-    {
-        return _projectRepository.GetById(ResolveProjectId(directory));
-    }
-
-    public Project? ResolveProject(string directory, int possibleEmptyProjectId)
-    {
-        if (possibleEmptyProjectId == 0)
-        {
-            return ResolveProject(Directory.GetCurrentDirectory());
-        }
-
-        return _projectRepository.GetById(possibleEmptyProjectId);
-    }
-
-    public Image GetImageById(int imageId)
-    {
-        return _imageRepository.GetById(imageId);
-    }
-
-    public int GetProjectImageCount(int projectId)
-    {
-        return _imageRepository.GetProjectImageCount(projectId);
-    }
-
-    public int GetProjectCount()
-    {
-        return _projectRepository.GetProjectCount();
-    }
-
-    public Project GetProjectById(int projectId)
-    {
-        return _projectRepository.GetById(projectId);
-    }
-
-    public List<Project> GetAllProjects()
-    {
-        return _projectRepository.GetAll();
+        return _projectRepository.GetByKey(id);
     }
 
     /// <summary>
@@ -110,7 +65,7 @@ public class ProjectService : IProjectService
     /// In future versions this method will run recursively, including for any sub/collection folders.
     /// </summary>
     /// <param name="subdirectory"></param>
-    public void InitialiseExistingFolder(string subdirectory)
+    public void initialiseExistingFolder(string subdirectory)
     {
         var pathEnd = _files.GetPathEnd(subdirectory);
 
@@ -119,19 +74,18 @@ public class ProjectService : IProjectService
 
         if (pathEnd.StartsWith("."))
         {
-            InitialiseCollectionFolder(subdirectory);
+            initialiseCollectionFolder(subdirectory);
         }
         else if (ProjectNameRegex.Match(pathEnd) is { Success: true } match)
         {
-            InitialiseProjectFolder(subdirectory, match, null);
+            initialiseProjectFolder(subdirectory, match);
         }
     }
 
-    private void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject)
+    private void initialiseProjectFolder(string subdirectory, Match match, Project? parentProject)
     {
-        string projectInfoLocation = _files.Combine(projectDirectory, ProjectInfoFile);
+        string projectInfoLocation = _files.Combine(subdirectory, ProjectInfoFile);
 
-        _logger.LogInformation("Project info location: {1}", projectInfoLocation);
 
         if (_files.Exists(projectInfoLocation))
         {
@@ -140,21 +94,10 @@ public class ProjectService : IProjectService
             return;
         }
 
-        Project project;
-
-        if (parentProject is null)
-        {
-            project = ToProject(projectDirectory, match);
-        }
-        else
-        {
-            project = ToSubProject(projectDirectory, match, parentProject);
-        }
-        
-        _logger.LogDebug($"Project: {project}", project.ToString());
+        var project = ToProject(subdirectory, match);
+        // TODO parent project id
 
         project = _projectRepository.Insert(project);
-        _logger.LogDebug($"Project AFTER INSERT: {project}", project.ToString());
         _files.WriteAllText(project.Id + "", projectInfoLocation);
 
 
@@ -166,20 +109,17 @@ public class ProjectService : IProjectService
         _logger.LogDebug($"Going through all directories now");
 
 
-        foreach (string subDirectory in _files.GetDirectories(projectDirectory))
+        foreach (string directory in _files.GetDirectories(subdirectory))
         {
-            string pathEnd = _files.GetPathEnd(subDirectory);
+            string pathEnd = _files.GetPathEnd(directory);
 
             if (SubProjectNameRegex.Match(pathEnd) is { Success: true } subProjectMatch)
             {
-                _logger.LogDebug($"SubProject: {subDirectory}");
-                _logger.LogDebug($"ParentProject: {project}");
-                InitialiseProjectFolder(subDirectory, subProjectMatch, project);
+                initialiseProjectFolder(subdirectory, subProjectMatch, parentProject);
             }
             else
             {
-                _logger.LogDebug($"Image Folder: {subDirectory}");
-                InitializeImages(subDirectory, project.Id.Value);
+                InitializeImages(directory, project.Id.Value);
             }
         }
 
@@ -187,13 +127,12 @@ public class ProjectService : IProjectService
         _logger.LogInformation($"Successfully initialized project and all images");
     }
 
-    private void InitialiseCollectionFolder(string subdirectory)
+    private void initialiseCollectionFolder(string subdirectory)
     {
         _logger.LogInformation("it is a collection folder");
-
         foreach (string directory in _files.GetDirectories(subdirectory))
         {
-            InitialiseExistingFolder(directory);
+            initialiseExistingFolder(directory);
         }
 
         // This is a collection folder for example all concerts photographed at De Pul
@@ -202,15 +141,10 @@ public class ProjectService : IProjectService
 
     private static Project ToProject(string subdirectory, Match match)
     {
-        DateOnly dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
+        var dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
             int.Parse(match.Groups[3].Value));
         Project project = new Project(null, match.Groups[4].Value, subdirectory, dateOnly);
         return project;
-    }
-
-    private static Project ToSubProject(string directory, Match match, Project parentProject)
-    {
-        return new Project(null, match.Groups[1].Value, directory, parentProject.EventDate, parentProject.Id);
     }
 
     /// <summary>
@@ -220,13 +154,12 @@ public class ProjectService : IProjectService
     /// <param name="projectId"></param>
     public void InitializeImages(string projectSubDirectory, int projectId)
     {
-        foreach (string filePath in _files.GetFiles(projectSubDirectory))
+        foreach (var filePath in _files.GetFiles(projectSubDirectory))
         {
-            string fileName = _files.GetFileName(filePath);
-            string fileExtension = _files.GetFileExtension(filePath);
-            string relativeFilePath = _files.GetRelativePath(projectSubDirectory, filePath);
+            var fileName = _files.GetFileName(filePath);
+            var fileExtension = _files.GetFileExtension(filePath);
 
-            Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
+            Image image = new Image(projectId, fileName, fileExtension, filePath);
 
             _imageRepository.Insert(image);
         }
