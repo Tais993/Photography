@@ -1,14 +1,32 @@
 ﻿namespace Domain.entities;
 
-public class Project(int? id, string name, string path, DateOnly eventDate) : IEntity
+public class Project : IEntity
 {
-    public DateOnly EventDate = eventDate;
-    public int? Id { get; } = id;
-    public string Name { get; set; } = name;
-    public string Path { get; } = path;
+    public Project(int? id, string name, string path, DateOnly eventDate, int? parentProjectId)
+    {
+        EventDate = eventDate;
+        Id = id;
+        Name = name;
+        Path = path;
+        ParentProjectId = parentProjectId;
+    }
+
+    public Project(int? id, string name, string path, DateOnly eventDate)
+    {
+        EventDate = eventDate;
+        Id = id;
+        Name = name;
+        Path = path;
+    }
+
+    public int? Id { get; }
+    public string Name { get; set; }
+    public string Path { get; }
+    public DateOnly EventDate;
+    public int? ParentProjectId { get; }
 
     public override string ToString()
     {
-        return $"Id: {Id}, Name: {Name}, Path: {Path}, EventDate: {EventDate}";
+        return $"Id: {Id}, Name: {Name}, Path: {Path}, EventDate: {EventDate},  ParentProjectId: {ParentProjectId}";
     }
 }
