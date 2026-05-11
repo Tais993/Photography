@@ -62,10 +62,10 @@ public class ProjectService : IProjectResolver
     ///
     /// In future versions this method will run recursively, including for any sub/collection folders.
     /// </summary>
-    /// <param name="subdirectory"></param>
-    public void initialiseExistingFolder(string subdirectory)
+    /// <param name="projectDirectory"></param>
+    public void initialiseExistingFolder(string projectDirectory)
     {
-        var pathEnd = _files.GetPathEnd(subdirectory);
+        var pathEnd = _files.GetPathEnd(projectDirectory);
 
         _logger.LogInformation("folder name: {FolderName}", pathEnd);
 
@@ -73,7 +73,7 @@ public class ProjectService : IProjectResolver
         if (pathEnd.StartsWith("."))
         {
             _logger.LogInformation("it is a collection folder");
-            foreach (string directory in _files.GetDirectories(subdirectory))
+            foreach (string directory in _files.GetDirectories(projectDirectory))
             {
                 initialiseExistingFolder(directory);
             }
@@ -87,7 +87,7 @@ public class ProjectService : IProjectResolver
 
             if (match.Success)
             {
-                string projectInfoLocation = _files.Combine(subdirectory, ProjectInfoFile);
+                string projectInfoLocation = _files.Combine(projectDirectory, ProjectInfoFile);
 
 
                 if (_files.Exists(projectInfoLocation))
@@ -97,7 +97,7 @@ public class ProjectService : IProjectResolver
                     return;
                 }
 
-                var project = ToProject(subdirectory, match);
+                var project = ToProject(projectDirectory, match);
 
                 project = _projectRepository.Insert(project);
                 _files.WriteAllText(project.Id + "", projectInfoLocation);
@@ -111,9 +111,9 @@ public class ProjectService : IProjectResolver
 
 
                 _logger.LogDebug($"Going through all images now");
-                foreach (string directory in _files.GetDirectories(subdirectory))
+                foreach (string subDirectory in _files.GetDirectories(projectDirectory))
                 {
-                    InitializeImages(directory, project.Id.Value);
+                    InitializeImages(projectDirectory, subDirectory, project.Id.Value);
                 }
                 _logger.LogDebug($"All images initialized");
                 _logger.LogInformation($"Successfully initialized project and all images");
@@ -136,16 +136,18 @@ public class ProjectService : IProjectResolver
     /// <summary>
     /// This method expects a project's subfolder already, and this also
     /// </summary>
+    /// <param name="projectDirectory">the project directory</param>
     /// <param name="projectSubDirectory">a subfolder from within a project that contains images</param>
     /// <param name="projectId"></param>
-    public void InitializeImages(string projectSubDirectory, int projectId)
+    public void InitializeImages(string projectDirectory, string projectSubDirectory, int projectId)
     {
         foreach (var filePath in _files.GetFiles(projectSubDirectory))
         {
             var fileName = _files.GetFileName(filePath);
             var fileExtension = _files.GetFileExtension(filePath);
-
-            Image image = new Image(projectId, fileName,  fileExtension, filePath);
+            var relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
+            
+            Image image = new Image(projectId, fileName,  fileExtension, relativeFilePath);
 
             _imageRepository.Insert(image);
         }
