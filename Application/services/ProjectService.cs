@@ -139,7 +139,7 @@ public class ProjectService : IProjectResolver
     /// <param name="projectDirectory">the project directory</param>
     /// <param name="projectSubDirectory">a subfolder from within a project that contains images</param>
     /// <param name="projectId"></param>
-    public void InitializeImages(string projectDirectory, string projectSubDirectory, int projectId)
+    private void InitializeImages(string projectDirectory, string projectSubDirectory, int projectId)
     {
         foreach (var filePath in _files.GetFiles(projectSubDirectory))
         {
