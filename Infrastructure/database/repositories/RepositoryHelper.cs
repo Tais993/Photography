@@ -43,16 +43,16 @@ public class RepositoryHelper
         }
 
 
-        NpgsqlConnection cnx = this._dataSource.OpenConnection();
+        using NpgsqlConnection cnx = this._dataSource.OpenConnection();
 
-        NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
+        using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
         foreach (var parameterValue in parameterValues)
         {
             npgsqlCommand.Parameters.AddWithValue(parameterValue);
         }
 
-        NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
+        using NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
 
         if (!reader.Read())
         {
@@ -60,9 +60,6 @@ public class RepositoryHelper
         }
 
         var tResult = resultConverter(reader);
-
-        reader.CloseAsync();
-        cnx.CloseAsync();
 
         return tResult;
     }
