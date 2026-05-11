@@ -28,7 +28,7 @@
 
     <ItemGroup>
       <Folder Include="Application\" />
-      <Folder Include="filesystem\" />
+      <Folder Include="Infrastructure\" />
     </ItemGroup>
 
 </Project>
