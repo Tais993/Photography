@@ -26,7 +26,7 @@ public class Files : IFiles
 
     public string GetRelativePath(string relativeTo, string path)
     {
-        return  Path.GetRelativePath(relativeTo, path);
+        return Path.GetRelativePath(relativeTo, path);
     }
 
     public bool Exists(string path)
