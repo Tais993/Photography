@@ -20,9 +20,42 @@ public class ImageRepository : IImageRepository
     public Image GetByKey(int id)
     {
         return _db.Query("""
-                               SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
-                               WHERE id = ($1)
-                               """, MapImage, id);
+                         SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
+                         WHERE id = ($1)
+                         """, MapImage, id);
+    }
+
+    public List<Image> GetImagesByFileName(int projectId, string fileName)
+    {
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
+                                 WHERE project_id = $1 AND file_name = $2
+                                 """, MapImage, projectId, fileName);
+    }
+    
+    public List<Image> GetImagesByFileName(string fileName)
+    {
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
+                                 WHERE file_name = $2
+                                 """, MapImage, fileName);
+    }
+
+    public List<Image> GetImagesByPhotoNumber(int fileNumber)
+    {
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
+                                 WHERE file_name ~* ('(^|[^0-9])' || $2 || '([^0-9]|$)')
+                                 """, MapImage, fileNumber);
+    }
+    
+    public List<Image> GetImagesByPhotoNumber(int projectId, int fileNumber)
+    {
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
+                                 WHERE project_id = $1
+                                 AND file_name ~* ('(^|[^0-9])' || $2 || '([^0-9]|$)')
+                                 """, MapImage, projectId, fileNumber);
     }
 
     public List<Image> GetAll()
@@ -59,22 +92,22 @@ public class ImageRepository : IImageRepository
     public void Update(Image image)
     {
         _db.Execute("""
-                UPDATE public.image
-                SET project_id = $1,
-                    file_name = $2,
-                    file_type = $3,
-                    relational_file_path = $4
-                WHERE id = $5
-                """, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath, image.Id);
+                    UPDATE public.image
+                    SET project_id = $1,
+                        file_name = $2,
+                        file_type = $3,
+                        relational_file_path = $4
+                    WHERE id = $5
+                    """, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath, image.Id);
     }
 
 
     public void DeleteByKey(int id)
     {
         _db.Execute("""
-                DELETE FROM public.image 
-                WHERE id = ($1)
-                """, id);
+                    DELETE FROM public.image 
+                    WHERE id = ($1)
+                    """, id);
     }
 
     private static Image MapImage(NpgsqlDataReader reader)
