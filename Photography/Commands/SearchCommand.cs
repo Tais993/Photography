@@ -1,18 +1,29 @@
 ﻿using System.CommandLine;
+using Application.services.interfaces;
+using Domain.entities;
 
 namespace Cli.Commands;
 
 public class SearchCommand : CommandBase
 {
+    private readonly IFileSearchService _fileSearchService;
+
+    public SearchCommand(IFileSearchService fileSearchService)
+    {
+        this._fileSearchService = fileSearchService;
+    }
 
     protected override string Name => "search";
     protected override string Description => "";
     
-    private readonly Argument<string> _query = new("query")
+    private static readonly string _queryName = "query";
+    private readonly Argument<string> _query = new(_queryName)
     {
         Description =  "Photo number or filename fragment"
     };
-    private readonly Option<bool> _exact = new("--exact")
+    
+    private static readonly string _exactName = "exact";
+    private readonly Option<bool> _exact = new("exact")
     {
         Description = "Use exact matching only"
     };
@@ -27,6 +38,28 @@ public class SearchCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        throw new NotImplementedException();
+        string fileName = parseResult.GetValue<String>(_queryName);
+
+
+        List<Image> images = SearchByNameOrNumber(fileName);
+
+        foreach (var image in images)
+        {
+            Console.WriteLine($"File name: `{image.FileName}` Path: `{image.RelationalFilePath}`");
+        }
+
+        return 0;
+    }
+
+    private List<Image> SearchByNameOrNumber(string fileName)
+    {
+        if (int.TryParse(fileName, out var fileNumber))
+        {
+            return _fileSearchService.searchImagesByNumber(fileNumber);
+        }
+        else
+        {
+            return _fileSearchService.searchImagesByName(fileName);
+        }
     }
 }

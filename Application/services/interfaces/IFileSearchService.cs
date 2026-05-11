@@ -1,7 +1,9 @@
-﻿namespace Application.services.interfaces;
+﻿using Domain.entities;
+
+namespace Application.services.interfaces;
 
 public interface IFileSearchService
 {
-    public void searchImagesByName(string name);
-    public void searchImagesByNumber(int number);
+    public List<Image> searchImagesByName(string name);
+    public List<Image> searchImagesByNumber(int number);
 }
