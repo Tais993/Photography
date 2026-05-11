@@ -41,7 +41,7 @@ public class ImageRepository : IImageRepository
                                  """, MapImage, fileName);
     }
 
-    public List<Image> GetImagesByPhotoNumber(int fileNumber)
+    public List<Image> GetImagesByPhotoNumber(string fileNumber)
     {
         return _db.QueryMultiple("""
                                  SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
@@ -49,7 +49,7 @@ public class ImageRepository : IImageRepository
                                  """, MapImage, fileNumber);
     }
     
-    public List<Image> GetImagesByPhotoNumber(int projectId, int fileNumber)
+    public List<Image> GetImagesByPhotoNumber(int projectId, string fileNumber)
     {
         return _db.QueryMultiple("""
                                  SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image

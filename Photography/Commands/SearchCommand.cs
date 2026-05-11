@@ -41,7 +41,7 @@ public class SearchCommand : CommandBase
         string fileName = parseResult.GetValue<String>(_queryName);
 
 
-        List<Image> images = SearchByNameOrNumber(fileName);
+        List<Image> images = _fileSearchService.searchImagesByNameOrNumber(fileName);
 
         foreach (var image in images)
         {
@@ -49,17 +49,5 @@ public class SearchCommand : CommandBase
         }
 
         return 0;
-    }
-
-    private List<Image> SearchByNameOrNumber(string fileName)
-    {
-        if (int.TryParse(fileName, out var fileNumber))
-        {
-            return _fileSearchService.searchImagesByNumber(fileNumber);
-        }
-        else
-        {
-            return _fileSearchService.searchImagesByName(fileName);
-        }
     }
 }

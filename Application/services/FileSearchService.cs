@@ -13,12 +13,24 @@ public class FileSearchService : IFileSearchService
         _imagesRepository = imagesRepository;
     }
 
+    public List<Image> searchImagesByNameOrNumber(string name)
+    {
+        if (int.TryParse(name, out _))
+        {
+            return searchImagesByNumber(name);
+        }
+        else
+        {
+            return searchImagesByName(name);
+        }
+    }
+
     public List<Image> searchImagesByName(string name)
     {
         return _imagesRepository.GetImagesByFileName(name);
     }
 
-    public List<Image> searchImagesByNumber(int number)
+    public List<Image> searchImagesByNumber(string number)
     {
         return _imagesRepository.GetImagesByPhotoNumber(number);
     }

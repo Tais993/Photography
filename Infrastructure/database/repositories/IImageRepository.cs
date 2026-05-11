@@ -7,8 +7,8 @@ public interface IImageRepository
     public Image GetByKey(int id);
     public List<Image> GetImagesByFileName(int projectId, string fileName);
     public List<Image> GetImagesByFileName(string fileName);
-    public List<Image> GetImagesByPhotoNumber(int projectId, int fileNumber);
-    public List<Image> GetImagesByPhotoNumber(int fileNumber);
+    public List<Image> GetImagesByPhotoNumber(int projectId, string fileNumber);
+    public List<Image> GetImagesByPhotoNumber(string fileNumber);
     public List<Image> GetAll();
     public List<Image> GetAllByProjectId(int projectId);
     public List<Image> GetAllByProject(Project project);
