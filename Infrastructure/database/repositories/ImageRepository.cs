@@ -37,7 +37,7 @@ public class ImageRepository : IImageRepository
     {
         return _db.QueryMultiple("""
                                  SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE file_name = $2
+                                 WHERE file_name = $1
                                  """, MapImage, fileName);
     }
 
@@ -45,7 +45,7 @@ public class ImageRepository : IImageRepository
     {
         return _db.QueryMultiple("""
                                  SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE file_name ~* ('(^|[^0-9])' || $2 || '([^0-9]|$)')
+                                 WHERE file_name ~* ('(^|[^0-9])' || $1 || '([^0-9]|$)')
                                  """, MapImage, fileNumber);
     }
     
