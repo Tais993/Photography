@@ -143,8 +143,8 @@ public class ProjectService : IProjectResolver
     {
         foreach (var filePath in _files.GetFiles(projectSubDirectory))
         {
-            var fileName = _files.GetFileName(filePath);
             var fileExtension = _files.GetFileExtension(filePath);
+            var fileName = _files.GetFileName(filePath).Replace(fileExtension, "");
             var relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
             
             Image image = new Image(projectId, fileName,  fileExtension, relativeFilePath);
