@@ -1,4 +1,5 @@
 ﻿using Application.services.interfaces;
+using Domain.entities;
 using Infrastructure.database.repositories;
 
 namespace Application.services;
@@ -12,13 +13,13 @@ public class FileSearchService : IFileSearchService
         _imagesRepository = imagesRepository;
     }
 
-    public void searchImagesByName(string name)
+    public List<Image> searchImagesByName(string name)
     {
-        throw new NotImplementedException();
+        return _imagesRepository.GetImagesByFileName(name);
     }
 
-    public void searchImagesByNumber(int number)
+    public List<Image> searchImagesByNumber(int number)
     {
-        throw new NotImplementedException();
+        return _imagesRepository.GetImagesByPhotoNumber(number);
     }
 }
