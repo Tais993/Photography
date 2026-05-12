@@ -19,7 +19,7 @@ public class IFileSearchServiceTest
 
         _fileSearchService = new FileSearchService(_imageRepository.Object);
     }
-    
+
     [Test]
     public void searchImagesByNameOrNumber_CorrectlyIdentifyName()
     {
@@ -28,23 +28,23 @@ public class IFileSearchServiceTest
         ).Returns([]);
 
         // Executions
-        _fileSearchService.searchImagesByNameOrNumber("DSC_0350");
-        
+        _fileSearchService.SearchImagesByNameOrNumber("DSC_0350");
+
         // Asserts
         _imageRepository.Verify(
             repo => repo.GetImagesByFileName(It.IsAny<string>()), Times.Once);
     }
-    
+
     [Test]
     public void searchImagesByNameOrNumber_CorrectlyIdentifyNumber()
     {
         // Mocks
         _imageRepository.Setup(repo => repo.GetImagesByPhotoNumber(It.IsAny<string>())
-            ).Returns([]);
-        
+        ).Returns([]);
+
         // Executions
-        _fileSearchService.searchImagesByNameOrNumber("0350");
-        
+        _fileSearchService.SearchImagesByNameOrNumber("0350");
+
         // Asserts
         _imageRepository.Verify(
             repo => repo.GetImagesByPhotoNumber(It.IsAny<string>()), Times.Once);

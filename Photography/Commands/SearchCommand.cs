@@ -43,7 +43,7 @@ public class SearchCommand : CommandBase
         string fileName = parseResult.GetValue<String>(_queryName);
 
 
-        List<Image> images = _fileSearchService.searchImagesByNameOrNumber(fileName);
+        List<Image> images = _fileSearchService.SearchImagesByNameOrNumber(fileName);
 
         foreach (var image in images)
         {
