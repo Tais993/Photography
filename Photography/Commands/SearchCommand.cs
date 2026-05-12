@@ -7,10 +7,12 @@ namespace Cli.Commands;
 public class SearchCommand : CommandBase
 {
     private readonly IFileSearchService _fileSearchService;
-
-    public SearchCommand(IFileSearchService fileSearchService)
+    private readonly IProjectResolver _projectResolver;
+    
+    public SearchCommand(IFileSearchService fileSearchService, IProjectResolver projectResolver)
     {
         this._fileSearchService = fileSearchService;
+        this._projectResolver = projectResolver;
     }
 
     protected override string Name => "search";

@@ -7,10 +7,6 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.services;
 
-/// <summary>
-/// The project services handles with everything project related.
-/// Initializing and resolving the most predominant functions.
-/// </summary>
 public class ProjectService : IProjectResolver
 {
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
@@ -22,7 +18,8 @@ public class ProjectService : IProjectResolver
     private readonly IFiles _files;
 
 
-    public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files, ILogger<ProjectService> logger)
+    public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files,
+        ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
@@ -31,13 +28,7 @@ public class ProjectService : IProjectResolver
     }
 
 
-    /// <summary>
-    /// Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
-    /// </summary>
-    /// <param name="directory"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public Project resolveProject(string directory)
+    public int ResolveProjectId(string directory)
     {
         var projectInfoLocation = _files.Combine(directory, ProjectInfoFile);
 
@@ -50,20 +41,16 @@ public class ProjectService : IProjectResolver
 
         _logger.LogInformation($"project info file found:  id: {id}");
 
-        return _projectRepository.GetByKey(id);
+        return id;
     }
 
-    /// <summary>
-    /// Initialises the given projects directory into the database,
-    /// additionally this adds a file to the filesystem to remember the projects ID.
-    /// Any images from within the project will also be loaded in with its metadata saved into the database.
-    ///
-    /// Any collection folders are ignored for now, additionally if a subfolder was given its ignored as its not recognized as a project folder.
-    ///
-    /// In future versions this method will run recursively, including for any sub/collection folders.
-    /// </summary>
-    /// <param name="projectDirectory"></param>
-    public void initialiseExistingFolder(string projectDirectory)
+    public Project ResolveProject(string directory)
+    {
+        return _projectRepository.GetByKey(ResolveProjectId(directory));
+    }
+
+
+    public void InitialiseExistingFolder(string projectDirectory)
     {
         var pathEnd = _files.GetPathEnd(projectDirectory);
 
@@ -75,7 +62,7 @@ public class ProjectService : IProjectResolver
             _logger.LogInformation("it is a collection folder");
             foreach (string directory in _files.GetDirectories(projectDirectory))
             {
-                initialiseExistingFolder(directory);
+                InitialiseExistingFolder(directory);
             }
 
             // This is a collection folder for example all concerts photographed at De Pul
@@ -103,11 +90,9 @@ public class ProjectService : IProjectResolver
                 _files.WriteAllText(project.Id + "", projectInfoLocation);
 
 
-
                 _logger.LogDebug(
                     $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
                 _logger.LogDebug($"File should be written to {projectInfoLocation}");
-
 
 
                 _logger.LogDebug($"Going through all images now");
@@ -115,6 +100,7 @@ public class ProjectService : IProjectResolver
                 {
                     InitializeImages(projectDirectory, subDirectory, project.Id.Value);
                 }
+
                 _logger.LogDebug($"All images initialized");
                 _logger.LogInformation($"Successfully initialized project and all images");
             }
@@ -146,8 +132,8 @@ public class ProjectService : IProjectResolver
             var fileExtension = _files.GetFileExtension(filePath);
             var fileName = _files.GetFileName(filePath).Replace(fileExtension, "");
             var relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
-            
-            Image image = new Image(projectId, fileName,  fileExtension, relativeFilePath);
+
+            Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
 
             _imageRepository.Insert(image);
         }

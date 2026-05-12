@@ -2,19 +2,37 @@
 
 namespace Application.services.interfaces;
 
+/// <summary>
+/// The project services handles with everything project related.
+/// Initializing and resolving the most predominant functions.
+/// </summary>
 public interface IProjectResolver
 {
     /// <summary>
-    /// Based on the given directory, and projects at that directory are searched for and returned.
+    /// Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
     /// </summary>
-    /// <param name="directory">The directory for which to look </param>
+    /// <param name="directory"></param>
     /// <returns></returns>
-    public Project resolveProject(string directory);
+    /// <exception cref="InvalidOperationException"></exception>
+    public int ResolveProjectId(string directory);
 
     /// <summary>
-    /// Based on the given directory, looks for any projects and or its subprojects to load their info into the database.
-    /// The images will also be stored in the database for searching, an uninitialized project has no use or functionalities.
+    /// Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public Project ResolveProject(string directory);
+
+    /// <summary>
+    /// Initialises the given projects directory into the database,
+    /// additionally this adds a file to the filesystem to remember the projects ID.
+    /// Any images from within the project will also be loaded in with its metadata saved into the database.
+    ///
+    /// Any collection folders are ignored for now, additionally if a subfolder was given its ignored as its not recognized as a project folder.
+    ///
+    /// In future versions this method will run recursively, including for any sub/collection folders.
     /// </summary>
     /// <param name="projectDirectory"></param>
-    public void initialiseExistingFolder(string projectDirectory);
+    public void InitialiseExistingFolder(string projectDirectory);
 }
