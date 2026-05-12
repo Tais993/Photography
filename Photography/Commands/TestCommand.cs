@@ -24,7 +24,7 @@ public class TestCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        var project = projectResolver.resolveProject(Directory.GetCurrentDirectory());
+        var project = projectResolver.ResolveProject(Directory.GetCurrentDirectory());
 
 
         Console.WriteLine(project);

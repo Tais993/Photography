@@ -25,7 +25,8 @@ public class ProjectServiceTest
         _files = new Mock<IFiles>();
         _projectLogger = new Mock<ILogger<ProjectService>>();
 
-        _projectService = new ProjectService(_projectRepository.Object, _imageRepository.Object, _files.Object, _projectLogger.Object);
+        _projectService = new ProjectService(_projectRepository.Object, _imageRepository.Object, _files.Object,
+            _projectLogger.Object);
     }
 
     [Test]
@@ -50,7 +51,7 @@ public class ProjectServiceTest
             .Returns(expectedProject);
 
         // Execution
-        var result = _projectService.resolveProject(projectDirectory);
+        var result = _projectService.ResolveProject(projectDirectory);
 
         // Asserts
         Assert.That(result, Is.EqualTo(expectedProject));
@@ -67,7 +68,8 @@ public class ProjectServiceTest
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
 
         // Execution
-        var exception = Assert.Throws<InvalidOperationException>(() => _projectService.resolveProject(projectDirectory));
+        var exception =
+            Assert.Throws<InvalidOperationException>(() => _projectService.ResolveProject(projectDirectory));
 
         // Asserts
         Assert.That(exception, Is.Not.Null);
@@ -83,7 +85,7 @@ public class ProjectServiceTest
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns(".2024-07-04-Merijn");
 
         // Execution
-        _projectService.initialiseExistingFolder(projectDirectory);
+        _projectService.InitialiseExistingFolder(projectDirectory);
 
         // Asserts
         _files.Verify(f => f.Combine(It.IsAny<string[]>()), Times.Never);
@@ -102,7 +104,7 @@ public class ProjectServiceTest
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-0a74-Merijn");
 
         // Execution
-        _projectService.initialiseExistingFolder(projectDirectory);
+        _projectService.InitialiseExistingFolder(projectDirectory);
 
         // Asserts
         _files.Verify(f => f.Combine(It.IsAny<string[]>()), Times.Never);
@@ -124,7 +126,7 @@ public class ProjectServiceTest
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
 
         // Execution
-        _projectService.initialiseExistingFolder(projectDirectory);
+        _projectService.InitialiseExistingFolder(projectDirectory);
 
         // Asserts
         _files.Verify(f => f.Combine(It.IsAny<string[]>()), Times.Once);
@@ -154,7 +156,8 @@ public class ProjectServiceTest
         _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-07-04-Merijn");
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-        _files.Setup(f => f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
+        _files.Setup(f =>
+            f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
             projectId,
@@ -165,7 +168,7 @@ public class ProjectServiceTest
 
 
         // Execution
-        _projectService.initialiseExistingFolder(projectDirectory);
+        _projectService.InitialiseExistingFolder(projectDirectory);
 
         // Assert
         _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
@@ -202,7 +205,8 @@ public class ProjectServiceTest
         _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-7-4-Merijn");
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-        _files.Setup(f => f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
+        _files.Setup(f =>
+            f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
             projectId,
@@ -213,7 +217,7 @@ public class ProjectServiceTest
 
 
         // Execution
-        _projectService.initialiseExistingFolder(projectDirectory);
+        _projectService.InitialiseExistingFolder(projectDirectory);
 
         // Assert
         _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
@@ -249,7 +253,8 @@ public class ProjectServiceTest
         _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-07-04-Merijn gymnasium");
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-        _files.Setup(f => f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
+        _files.Setup(f =>
+            f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
             projectId,
@@ -260,7 +265,7 @@ public class ProjectServiceTest
 
 
         // Execution
-        _projectService.initialiseExistingFolder(projectDirectory);
+        _projectService.InitialiseExistingFolder(projectDirectory);
 
         // Assert
         _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
@@ -275,7 +280,6 @@ public class ProjectServiceTest
 
         _files.Verify(f => f.WriteAllText("2", projectInfoDirectory), Times.Once);
     }
-
 
 
     [Test]
@@ -307,7 +311,4 @@ public class ProjectServiceTest
         // Assert
         Assert.That(match.Success, Is.False);
     }
-
-
-    
 }
