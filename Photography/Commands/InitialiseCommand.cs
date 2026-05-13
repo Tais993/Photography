@@ -6,12 +6,12 @@ namespace Cli.Commands;
 
 public class InitialiseCommand : CommandBase
 {
-    private readonly IProjectResolver _projectResolver;
+    private readonly IProjectService _projectService;
     private readonly ILogger<InitialiseCommand> _logger;
 
-    public InitialiseCommand(IProjectResolver projectResolver, ILogger<InitialiseCommand> logger)
+    public InitialiseCommand(IProjectService projectService, ILogger<InitialiseCommand> logger)
     {
-        _projectResolver = projectResolver;
+        _projectService = projectService;
         _logger = logger;
     }
 
@@ -40,7 +40,7 @@ public class InitialiseCommand : CommandBase
 
         foreach (string subdirectory in subdirectories)
         {
-            _projectResolver.InitialiseExistingFolder(subdirectory);
+            _projectService.InitialiseExistingFolder(subdirectory);
         }
 
         return 0;

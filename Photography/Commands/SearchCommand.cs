@@ -1,49 +1,85 @@
 ﻿using System.CommandLine;
 using Application.services.interfaces;
 using Domain.entities;
+using Infrastructure.database.repositories;
 
 namespace Cli.Commands;
 
 public class SearchCommand : CommandBase
 {
+    private static readonly string _queryName = "query";
+
+    private static readonly string _projectName = "-project";
+
+    private static readonly string _globalName = "-global";
     private readonly IFileSearchService _fileSearchService;
-    private readonly IProjectResolver _projectResolver;
-    
-    public SearchCommand(IFileSearchService fileSearchService, IProjectResolver projectResolver)
+
+    private readonly Option<bool> _global = new(_globalName)
     {
-        this._fileSearchService = fileSearchService;
-        this._projectResolver = projectResolver;
+        Description = "Look for an image globally outside of the current projects context",
+        Aliases = { "-g" }
+    };
+
+    private readonly Option<int> _project = new(_projectName)
+    {
+        Description = "Looks for the image within the given project its ID",
+        Aliases = { "-p" }
+    };
+
+    private readonly IProjectRepository _projectRepository;
+    private readonly IProjectService _projectService;
+
+    private readonly Argument<string> _query = new(_queryName)
+    {
+        Description = "Photo number or filename"
+    };
+
+    public SearchCommand(IFileSearchService fileSearchService, IProjectService projectService,
+        IProjectRepository projectRepository)
+    {
+        _fileSearchService = fileSearchService;
+        _projectService = projectService;
+        _projectRepository = projectRepository;
     }
 
     protected override string Name => "search";
     protected override string Description => "";
-    
-    private static readonly string _queryName = "query";
-    private readonly Argument<string> _query = new(_queryName)
-    {
-        Description =  "Photo number or filename fragment"
-    };
-    
-    private static readonly string _exactName = "exact";
-    private readonly Option<bool> _exact = new("exact")
-    {
-        Description = "Use exact matching only"
-    };
+
+    // private static readonly string _exactName = "exact";
+    // private readonly Option<bool> _exact = new("exact")
+    // {
+    //     Description = "Use exact matching only"
+    // };
 
     protected override void Configure(Command command)
     {
         base.Configure(command);
-        
+
         command.Arguments.Add(_query);
-        command.Options.Add(_exact);
+        command.Options.Add(_project);
+        command.Options.Add(_global);
+        // command.Options.Add(_exact);
     }
 
     public override int Run(ParseResult parseResult)
     {
-        string fileName = parseResult.GetValue<String>(_queryName);
+        var fileName = parseResult.GetValue<string>(_queryName);
+        var shouldByGlobal = parseResult.GetValue<bool>(_globalName);
+
+        List<Image> images;
+
+        var projectId = ResolveProjectId(parseResult.GetValue(_project));
 
 
-        List<Image> images = _fileSearchService.SearchImagesByNameOrNumber(fileName);
+        if (projectId == 0 || shouldByGlobal)
+        {
+            images = _fileSearchService.SearchImagesByNameOrNumber(fileName);
+        }
+        else
+        {
+            images = _fileSearchService.SearchImagesByNameOrNumber(projectId, fileName);
+        }
+
 
         foreach (var image in images)
         {
@@ -51,5 +87,15 @@ public class SearchCommand : CommandBase
         }
 
         return 0;
+    }
+
+    private int ResolveProjectId(int projectId)
+    {
+        if (projectId == 0)
+        {
+            return _projectService.ResolveProjectId(Directory.GetCurrentDirectory());
+        }
+
+        return projectId;
     }
 }

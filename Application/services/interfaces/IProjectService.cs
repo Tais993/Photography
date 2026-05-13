@@ -6,10 +6,11 @@ namespace Application.services.interfaces;
 /// The project services handles with everything project related.
 /// Initializing and resolving the most predominant functions.
 /// </summary>
-public interface IProjectResolver
+public interface IProjectService
 {
     /// <summary>
     /// Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
+    /// If none is found, it'll return "0".
     /// </summary>
     /// <param name="directory"></param>
     /// <returns></returns>
