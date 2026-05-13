@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.services;
 
-public class ProjectService : IProjectResolver
+public class ProjectService : IProjectService
 {
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
     public const string ProjectInfoFile = "project.info";
@@ -34,7 +34,7 @@ public class ProjectService : IProjectResolver
 
         if (!_files.Exists(projectInfoLocation))
         {
-            throw new InvalidOperationException($"No {ProjectInfoFile} found");
+            return 0;
         }
 
         int id = int.Parse(_files.ReadAllText(projectInfoLocation));

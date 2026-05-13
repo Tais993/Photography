@@ -11,7 +11,7 @@ public static class DependencyInjection
         services.AddTransient<ICopyService, CopyService>();
         services.AddTransient<IFileSearchService, FileSearchService>();
         services.AddTransient<ILightroomService, LightroomService>();
-        services.AddTransient<IProjectResolver, ProjectService>();
+        services.AddTransient<IProjectService, ProjectService>();
 
         return services;
     }
