@@ -1,6 +1,6 @@
 ﻿using Infrastructure.filesystem;
 
-namespace Tests.filesystem;
+namespace Tests.Infrastructure.filesystem;
 
 [TestFixture]
 [TestOf(typeof(Files))]
@@ -10,12 +10,12 @@ public class FilesTest
 
     private const string FileExtension = ".txt";
     private const string FileName = "test.txt";
-    private const string FilePath = "C:\\Users\\Tijs\\test.txt";
+    private const string FilePath = @"C:\Users\Tijs\test.txt";
 
     private const string DirectoryEnd = "Tijs";
-    private const string DirectoryPath = "C:\\Users\\Tijs\\";
-    
-    private const string SecondDirectoryPath = "C:\\Users\\";
+    private const string DirectoryPath = @"C:\Users\Tijs\";
+
+    private const string SecondDirectoryPath = @"C:\Users\";
 
     [SetUp]
     public void SetUp()
@@ -26,15 +26,13 @@ public class FilesTest
     [Test]
     public void CombinesPaths_Correctly()
     {
-        string firstPath = "C:\\Users";
-        string secondPath = "Tijs\\test.txt";
-
-        string expectedPath = FilePath;
+        const string firstPath = "C:\\Users";
+        const string secondPath = "Tijs\\test.txt";
 
         string combinedPaths = _files.Combine(firstPath, secondPath);
 
 
-        Assert.That(combinedPaths, Is.EqualTo(expectedPath));
+        Assert.That(combinedPaths, Is.EqualTo(FilePath));
     }
 
     [Test]
@@ -73,7 +71,7 @@ public class FilesTest
     public void GetRelativePath_File_Correctly()
     {
         string relativePath = _files.GetRelativePath(SecondDirectoryPath, FilePath);
-        
+
         Assert.That(relativePath, Is.EqualTo("Tijs\\test.txt"));
     }
 }

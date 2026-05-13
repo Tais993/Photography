@@ -23,12 +23,9 @@ public class MigrationService
         var migrationPath = Path.Combine(AppContext.BaseDirectory, "database", "migrations");
         _logger.LogInformation("Migration path: {MigrationPath}", migrationPath);
 
-        var evolve = new Evolve(connection, msg =>
+        var evolve = new Evolve(connection, (msg) => { _logger.LogInformation(msg); })
         {
-            _logger.LogInformation(msg);
-        })
-        {
-            Locations = new[] { migrationPath },
+            Locations = [migrationPath]
         };
 
         evolve.Migrate();

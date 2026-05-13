@@ -7,7 +7,7 @@ namespace Tests.Application.services.interfaces;
 
 [TestFixture]
 [TestOf(typeof(IFileSearchService))]
-public class IFileSearchServiceTest
+public class FileSearchServiceTest
 {
     private Mock<IImageRepository> _imageRepository = null!;
     private FileSearchService _fileSearchService = null!;

@@ -6,32 +6,32 @@ namespace Infrastructure.database.repositories;
 
 public class MetadataRepository
 {
-    private RepositoryHelper _db;
-    private ILogger<MetadataRepository> _logger;
+    private readonly RepositoryHelper _db;
+    private readonly ILogger<MetadataRepository> _logger;
 
     public MetadataRepository(NpgsqlDataSource dataSource,
         ILogger<MetadataRepository> logger,
         RepositoryHelper db)
     {
-        this._logger = logger;
-        this._db = db;
+        _logger = logger;
+        _db = db;
     }
 
     public Metadata? GetByKey(int id)
     {
         return _db.Query("""
-                           SELECT id, metadata_key, metadata_type, display_name, description
-                           FROM public.metadata
-                           WHERE id = $1
-                           """, MapMetadata, id);
+                         SELECT id, metadata_key, metadata_type, display_name, description
+                         FROM public.metadata
+                         WHERE id = $1
+                         """, MapMetadata, id);
     }
 
     public List<Metadata> GetAll()
     {
         return _db.QueryMultiple("""
-                             SELECT id, metadata_key, metadata_type, display_name, description
-                             FROM public.metadata
-                             """, MapMetadata);
+                                 SELECT id, metadata_key, metadata_type, display_name, description
+                                 FROM public.metadata
+                                 """, MapMetadata);
     }
 
     public Metadata Insert(Metadata entity)
@@ -46,24 +46,24 @@ public class MetadataRepository
 
     public void Update(Metadata entity)
     {
-        if (entity?.Id is null) throw new ArgumentException("Metadata must have an ID", nameof(entity));
+        if (entity.Id is null) throw new ArgumentException("Metadata must have an ID", nameof(entity));
 
         _db.Execute("""
-                UPDATE public.metadata
-                SET metadata_key = $1,
-                    metadata_type = $2,
-                    display_name = $3,
-                    description = $4
-                WHERE id = $5
-                """, entity.MetadataKey, entity.MetadataType, entity.DisplayName, entity.Description, entity.Id);
+                    UPDATE public.metadata
+                    SET metadata_key = $1,
+                        metadata_type = $2,
+                        display_name = $3,
+                        description = $4
+                    WHERE id = $5
+                    """, entity.MetadataKey, entity.MetadataType, entity.DisplayName, entity.Description, entity.Id);
     }
 
     public void DeleteByKey(int id)
     {
         _db.Execute("""
-                           DELETE FROM public.metadata
-                           WHERE id = $1
-                           """, id);
+                    DELETE FROM public.metadata
+                    WHERE id = $1
+                    """, id);
     }
 
     private static Metadata MapMetadata(NpgsqlDataReader reader)

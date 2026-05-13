@@ -5,7 +5,7 @@ using Infrastructure.filesystem;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.services;
+namespace Tests.Application.services;
 
 [TestFixture]
 [TestOf(typeof(ProjectService))]
@@ -32,8 +32,8 @@ public class ProjectServiceTest
     [Test]
     public void ResolveProject_ProjectExists()
     {
-        string projectDirectory = "C:\\2024-07-4-Merijn";
-        string projectInfoDirectory = "C:\\2024-07-4-Merijn";
+        const string projectDirectory = "C:\\2024-07-4-Merijn";
+        const string projectInfoDirectory = "C:\\2024-07-4-Merijn";
 
         Project expectedProject = new Project(
             2,
@@ -60,26 +60,25 @@ public class ProjectServiceTest
     [Test]
     public void ResolveProject_ProjectNotInitialized()
     {
-        string projectDirectory = "C:\\2024-07-4-Merijn";
-        string projectInfoDirectory = "C:\\2024-07-4-Merijn";
+        const string projectDirectory = "C:\\2024-07-4-Merijn";
+        const string projectInfoDirectory = "C:\\2024-07-4-Merijn";
 
         // Mocks
         _files.Setup(f => f.Combine(It.IsAny<string>())).Returns(projectInfoDirectory);
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
 
         // Execution
-        var exception =
-            Assert.Throws<InvalidOperationException>(() => _projectService.ResolveProject(projectDirectory));
+        int id = _projectService.ResolveProjectId(projectDirectory);
 
         // Asserts
-        Assert.That(exception, Is.Not.Null);
+        Assert.That(id, Is.EqualTo(0));
     }
 
 
     [Test]
     public void InitialiseProject_IgnoresCategoryFolders()
     {
-        string projectDirectory = "C:\\.2024-07-4-Merijn";
+        const string projectDirectory = "C:\\.2024-07-4-Merijn";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns(".2024-07-04-Merijn");
@@ -98,7 +97,7 @@ public class ProjectServiceTest
     [Test]
     public void InitialiseProject_IgnoresIncorrectFolderNames()
     {
-        string projectDirectory = "C:\\2024-0a74-Merijn";
+        const string projectDirectory = "C:\\2024-0a74-Merijn";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-0a74-Merijn");
@@ -117,8 +116,8 @@ public class ProjectServiceTest
     [Test]
     public void InitialiseProject_IgnoresAlreadyInitialisedProject()
     {
-        string projectDirectory = "C:\\2024-07-04-Merijn";
-        string projectInfoDirectory = "C:\\2024-07-04-Merijn\\project.info";
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+        const string projectInfoDirectory = @"C:\2024-07-04-Merijn\project.info";
 
         // Mocks
         _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
@@ -139,10 +138,10 @@ public class ProjectServiceTest
     [Test]
     public void InitialiseProject_SuccessfullySavesData()
     {
-        string projectDirectory = "C:\\2024-07-04-Merijn";
-        string projectInfoDirectory = "C:\\2024-07-04-Merijn\\project.info";
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+        const string projectInfoDirectory = @"C:\2024-07-04-Merijn\project.info";
 
-        int projectId = 2;
+        const int projectId = 2;
 
 
         Project expectedProject = new Project(
@@ -188,10 +187,10 @@ public class ProjectServiceTest
     [Test]
     public void InitialiseProject_SuccessfullySavesData_SingleDigitMonthAndDay()
     {
-        string projectDirectory = "C:\\2024-7-4-Merijn";
-        string projectInfoDirectory = "C:\\2024-7-4-Merijn\\project.info";
+        const string projectDirectory = @"C:\2024-7-4-Merijn";
+        const string projectInfoDirectory = @"C:\2024-7-4-Merijn\project.info";
 
-        int projectId = 2;
+        const int projectId = 2;
 
 
         Project expectedProject = new Project(
@@ -236,10 +235,10 @@ public class ProjectServiceTest
     [Test]
     public void InitialiseProject_SuccessfullySavesData_SpacesInProjectName()
     {
-        string projectDirectory = "C:\\2024-07-04-Merijn gymnasium";
-        string projectInfoDirectory = "C:\\2024-07-04-Merijn gymnasium\\project.info";
+        const string projectDirectory = @"C:\2024-07-04-Merijn gymnasium";
+        const string projectInfoDirectory = @"C:\2024-07-04-Merijn gymnasium\project.info";
 
-        int projectId = 2;
+        const int projectId = 2;
 
 
         Project expectedProject = new Project(
@@ -286,24 +285,27 @@ public class ProjectServiceTest
     public void ProjectNameRegex_MatchesValidProjectFolder()
     {
         // Arrange
-        string folderName = "2024-07-04-Merijn";
+        const string folderName = "2024-07-04-Merijn";
 
         // Act
         var match = ProjectService.ProjectNameRegex.Match(folderName);
 
-        // Assert
-        Assert.That(match.Success, Is.True);
-        Assert.That(match.Groups[1].Value, Is.EqualTo("2024"));
-        Assert.That(match.Groups[2].Value, Is.EqualTo("07"));
-        Assert.That(match.Groups[3].Value, Is.EqualTo("04"));
-        Assert.That(match.Groups[4].Value, Is.EqualTo("Merijn"));
+        Assert.Multiple(() =>
+        {
+            // Assert
+            Assert.That(match.Success, Is.True);
+            Assert.That(match.Groups[1].Value, Is.EqualTo("2024"));
+            Assert.That(match.Groups[2].Value, Is.EqualTo("07"));
+            Assert.That(match.Groups[3].Value, Is.EqualTo("04"));
+            Assert.That(match.Groups[4].Value, Is.EqualTo("Merijn"));
+        });
     }
 
     [Test]
     public void ProjectNameRegex_DoesNotMatchInvalidProjectFolder()
     {
         // Arrange
-        string folderName = "invalid-folder-name";
+        const string folderName = "invalid-folder-name";
 
         // Act
         var match = ProjectService.ProjectNameRegex.Match(folderName);

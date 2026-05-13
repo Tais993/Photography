@@ -11,23 +11,19 @@ public class Image : IIdEntity
 
     public Image(int? id, int projectId, Project? project, string fileName, string fileType, string relationalFilePath)
     {
-        this.Id = id;
-        this.ProjectId = projectId;
-        this.Project = project;
-        this.FileName = fileName;
-        this.FileType = fileType;
-        this.RelationalFilePath = relationalFilePath;
+        Id = id;
+        ProjectId = projectId;
+        Project = project;
+        FileName = fileName;
+        FileType = fileType;
+        RelationalFilePath = relationalFilePath;
     }
 
     public Image(int projectId, string fileName, string fileType, string relationalFilePath)
     {
-        this.ProjectId = projectId;
-        this.FileName = fileName;
-        this.FileType = fileType;
-        this.RelationalFilePath = relationalFilePath;
+        ProjectId = projectId;
+        FileName = fileName;
+        FileType = fileType;
+        RelationalFilePath = relationalFilePath;
     }
-
-
-
-
 }

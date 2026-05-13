@@ -9,7 +9,7 @@ var builder = Host.CreateApplicationBuilder(
         new HostApplicationBuilderSettings
         {
             Args = args,
-            ContentRootPath = AppContext.BaseDirectory,
+            ContentRootPath = AppContext.BaseDirectory
         })
     ;
 

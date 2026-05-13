@@ -4,9 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cli;
 
-public class CommandFactory
+public static class CommandFactory
 {
-
     public static RootCommand Commands(IServiceProvider provider)
     {
         RootCommand rootCommand = new RootCommand("Photography projects tool!!")
