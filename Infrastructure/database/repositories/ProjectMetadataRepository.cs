@@ -6,21 +6,21 @@ namespace Infrastructure.database.repositories;
 
 public class ProjectMetadataRepository
 {
-    private RepositoryHelper _db;
-    private ILogger<ProjectMetadataRepository> _logger;
+    private readonly RepositoryHelper _db;
+    private readonly ILogger<ProjectMetadataRepository> _logger;
 
     public ProjectMetadataRepository(NpgsqlDataSource dataSource,
         ILogger<ProjectMetadataRepository> logger,
         RepositoryHelper db)
     {
-        this._logger = logger;
-        this._db = db;
+        _logger = logger;
+        _db = db;
     }
 
     // PRobably shouldn't use this method
     private List<ProjectMetadata> GetAll()
     {
-        return _db.QueryMultiple(""""
+        return _db.QueryMultiple("""
                                  SELECT
                                  project_id,
                                  metadata_id,
@@ -31,7 +31,7 @@ public class ProjectMetadataRepository
                                  description
                                  FROM public.project_metadata pm
                                  JOIN public.metadata m on m.id = pm.metadata_id
-                                 """", MapProjectMetadata);
+                                 """, MapProjectMetadata);
     }
 
     public ProjectMetadata Insert(ProjectMetadata entity)

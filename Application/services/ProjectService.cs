@@ -7,9 +7,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.services;
 
-public class ProjectService : IProjectService
+public partial class ProjectService : IProjectService
 {
-    public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
+    public static readonly Regex ProjectNameRegex = GeneratedProjectNameRegex();
     public const string ProjectInfoFile = "project.info";
 
     private readonly IProjectRepository _projectRepository;
@@ -39,7 +39,7 @@ public class ProjectService : IProjectService
 
         int id = int.Parse(_files.ReadAllText(projectInfoLocation));
 
-        _logger.LogInformation($"project info file found:  id: {id}");
+        _logger.LogInformation("project info file found:  id: {Id}", id);
 
         return id;
     }
@@ -57,7 +57,7 @@ public class ProjectService : IProjectService
         _logger.LogInformation("folder name: {FolderName}", pathEnd);
 
 
-        if (pathEnd.StartsWith("."))
+        if (pathEnd.StartsWith('.'))
         {
             _logger.LogInformation("it is a collection folder");
             foreach (string directory in _files.GetDirectories(projectDirectory))
@@ -80,7 +80,7 @@ public class ProjectService : IProjectService
                 if (_files.Exists(projectInfoLocation))
                 {
                     _logger.LogInformation(
-                        $"Project info file found:  name: {_files.ReadAllText(projectInfoLocation)}");
+                        "Project info file found:  name: {ReadAllText}", _files.ReadAllText(projectInfoLocation));
                     return;
                 }
 
@@ -91,18 +91,19 @@ public class ProjectService : IProjectService
 
 
                 _logger.LogDebug(
-                    $"Project id: {project.Id}, name: {project.Name}, event_date: {project.EventDate}");
-                _logger.LogDebug($"File should be written to {projectInfoLocation}");
+                    "Project id: {ProjectId}, name: {ProjectName}, event_date: {ProjectEventDate}", project.Id,
+                    project.Name, project.EventDate);
+                _logger.LogDebug("File should be written to {ProjectInfoLocation}", projectInfoLocation);
 
 
-                _logger.LogDebug($"Going through all images now");
+                _logger.LogDebug("Going through all images now");
                 foreach (string subDirectory in _files.GetDirectories(projectDirectory))
                 {
                     InitializeImages(projectDirectory, subDirectory, project.Id.Value);
                 }
 
-                _logger.LogDebug($"All images initialized");
-                _logger.LogInformation($"Successfully initialized project and all images");
+                _logger.LogDebug("All images initialized");
+                _logger.LogInformation("Successfully initialized project and all images");
             }
             else
             {
@@ -138,4 +139,7 @@ public class ProjectService : IProjectService
             _imageRepository.Insert(image);
         }
     }
+
+    [GeneratedRegex(@"(\d\d\d\d)-(\d{1,2})-(\d{1,2})-([^.]*)")]
+    private static partial Regex GeneratedProjectNameRegex();
 }

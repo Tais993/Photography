@@ -6,19 +6,19 @@ namespace Infrastructure.database.repositories;
 public class RepositoryHelper
 {
     private readonly NpgsqlDataSource _dataSource;
-    private ILogger<RepositoryHelper> _logger;
+    private readonly ILogger<RepositoryHelper> _logger;
 
     public RepositoryHelper(NpgsqlDataSource dataSource, ILogger<RepositoryHelper> logger)
     {
-        this._dataSource = dataSource;
-        this._logger = logger;
+        _dataSource = dataSource;
+        _logger = logger;
     }
-    
-    
+
+
     public List<T> QueryMultiple<T>(string sql, Func<NpgsqlDataReader, T> resultConverter,
         params object[] parameterValues)
     {
-        _logger.LogDebug($"QueryMultiple, with params: {parameterValues}");
+        _logger.LogDebug("QueryMultiple, with params: {ParameterValues}", (object?)parameterValues);
         return Query(sql, reader =>
         {
             List<T> results = [];
@@ -35,15 +35,15 @@ public class RepositoryHelper
     public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
         params object[] parameterValues)
     {
-        _logger.LogDebug($"Executing {sql}");
+        _logger.LogDebug("Executing {Sql}", sql);
 
         foreach (var parameterValue in parameterValues)
         {
-            _logger.LogDebug($"Param: {parameterValue}");
+            _logger.LogDebug("Param: {ParameterValue}", parameterValue);
         }
 
 
-        using NpgsqlConnection cnx = this._dataSource.OpenConnection();
+        using NpgsqlConnection cnx = _dataSource.OpenConnection();
 
         using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
@@ -66,7 +66,7 @@ public class RepositoryHelper
 
     public void Execute(string sql, params object[] parameterValues)
     {
-        NpgsqlConnection cnx = this._dataSource.OpenConnection();
+        NpgsqlConnection cnx = _dataSource.OpenConnection();
 
 
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);

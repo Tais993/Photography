@@ -6,15 +6,15 @@ namespace Infrastructure.database.repositories;
 
 public class ImageRepository : IImageRepository
 {
-    private RepositoryHelper _db;
-    private ILogger<ImageRepository> _logger;
+    private readonly RepositoryHelper _db;
+    private readonly ILogger<ImageRepository> _logger;
 
     public ImageRepository(NpgsqlDataSource dataSource,
         ILogger<ImageRepository> logger,
         RepositoryHelper db)
     {
-        this._logger = logger;
-        this._db = db;
+        _logger = logger;
+        _db = db;
     }
 
     public Image GetByKey(int id)
@@ -32,7 +32,7 @@ public class ImageRepository : IImageRepository
                                  WHERE project_id = $1 AND file_name = $2
                                  """, MapImage, projectId, fileName);
     }
-    
+
     public List<Image> GetImagesByFileName(string fileName)
     {
         return _db.QueryMultiple("""
@@ -48,7 +48,7 @@ public class ImageRepository : IImageRepository
                                  WHERE file_name ~* ('(^|[^0-9])' || $1 || '([^0-9]|$)')
                                  """, MapImage, fileNumber);
     }
-    
+
     public List<Image> GetImagesByPhotoNumber(int projectId, string fileNumber)
     {
         return _db.QueryMultiple("""
@@ -75,7 +75,7 @@ public class ImageRepository : IImageRepository
 
     public List<Image> GetAllByProject(Project project)
     {
-        if (project?.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
+        if (project.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
 
         return GetAllByProjectId((int)project.Id);
     }

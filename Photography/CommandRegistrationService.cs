@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Cli;
 
-public class CommandRegistrationService
+public static class CommandRegistrationService
 {
     public static void Register(IServiceCollection services)
     {

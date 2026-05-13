@@ -6,31 +6,31 @@ namespace Infrastructure.database.repositories;
 
 public class ProjectRepository : IProjectRepository
 {
-    private RepositoryHelper _db;
-    private ILogger<ProjectRepository> _logger;
+    private readonly RepositoryHelper _db;
+    private readonly ILogger<ProjectRepository> _logger;
 
     public ProjectRepository(NpgsqlDataSource dataSource,
         ILogger<ProjectRepository> logger,
         RepositoryHelper db)
     {
-        this._logger = logger;
-        this._db = db;
+        _logger = logger;
+        _db = db;
     }
 
     public Project GetByKey(int id)
     {
-        _logger.LogInformation($"GetByKey, with params: {id}");
+        _logger.LogInformation("GetByKey, with params: {Id}", id);
         return _db.Query("""
-                           SELECT id, name, location, event_date FROM public.project 
-                           WHERE id = $1
-                           """, MapProject, id);
+                         SELECT id, name, location, event_date FROM public.project 
+                         WHERE id = $1
+                         """, MapProject, id);
     }
 
     public List<Project> GetAll()
     {
         return _db.QueryMultiple("""
-                             SELECT id, name, location, event_date FROM public.project
-                             """, MapProject);
+                                 SELECT id, name, location, event_date FROM public.project
+                                 """, MapProject);
     }
 
     public Project Insert(Project project)
@@ -44,24 +44,24 @@ public class ProjectRepository : IProjectRepository
 
     public void Update(Project project)
     {
-        if (project?.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
+        if (project.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
 
         _db.Execute("""
-                UPDATE public.project
-                SET name = $1,
-                    location = $2,
-                    event_date = $3
-                WHERE id = $4
-                """, project.Name, project.Location, project.EventDate, project.Id);
+                    UPDATE public.project
+                    SET name = $1,
+                        location = $2,
+                        event_date = $3
+                    WHERE id = $4
+                    """, project.Name, project.Location, project.EventDate, project.Id);
     }
 
 
     public void DeleteByKey(int id)
     {
         _db.Execute("""
-                           DELETE FROM public.project 
-                           WHERE id = ($1)
-                           """, id);
+                    DELETE FROM public.project 
+                    WHERE id = ($1)
+                    """, id);
     }
 
 
