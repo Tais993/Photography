@@ -7,20 +7,19 @@ namespace Cli.Commands;
 
 public class SearchCommand : CommandBase
 {
-    private static readonly string _queryName = "query";
+    private const string QueryName = "query";
+    private const string ProjectName = "-project";
+    private const string GlobalName = "-global";
 
-    private static readonly string _projectName = "-project";
-
-    private static readonly string _globalName = "-global";
     private readonly IFileSearchService _fileSearchService;
 
-    private readonly Option<bool> _global = new(_globalName)
+    private readonly Option<bool> _global = new(GlobalName)
     {
         Description = "Look for an image globally outside of the current projects context",
         Aliases = { "-g" }
     };
 
-    private readonly Option<int> _project = new(_projectName)
+    private readonly Option<int> _project = new(ProjectName)
     {
         Description = "Looks for the image within the given project its ID",
         Aliases = { "-p" }
@@ -29,7 +28,7 @@ public class SearchCommand : CommandBase
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectService _projectService;
 
-    private readonly Argument<string> _query = new(_queryName)
+    private readonly Argument<string> _query = new(QueryName)
     {
         Description = "Photo number or filename"
     };
@@ -45,12 +44,6 @@ public class SearchCommand : CommandBase
     protected override string Name => "search";
     protected override string Description => "";
 
-    // private static readonly string _exactName = "exact";
-    // private readonly Option<bool> _exact = new("exact")
-    // {
-    //     Description = "Use exact matching only"
-    // };
-
     protected override void Configure(Command command)
     {
         base.Configure(command);
@@ -58,13 +51,12 @@ public class SearchCommand : CommandBase
         command.Arguments.Add(_query);
         command.Options.Add(_project);
         command.Options.Add(_global);
-        // command.Options.Add(_exact);
     }
 
     public override int Run(ParseResult parseResult)
     {
-        var fileName = parseResult.GetValue<string>(_queryName);
-        var shouldByGlobal = parseResult.GetValue<bool>(_globalName);
+        var fileName = parseResult.GetValue<string>(QueryName);
+        var shouldByGlobal = parseResult.GetValue<bool>(GlobalName);
 
         List<Image> images;
 
