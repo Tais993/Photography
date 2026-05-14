@@ -17,7 +17,7 @@ public class ImageRepository : IImageRepository
         _db = db;
     }
 
-    public Image GetByKey(int id)
+    public Image GetById(int id)
     {
         return _db.Query("""
                          SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
@@ -102,7 +102,7 @@ public class ImageRepository : IImageRepository
     }
 
 
-    public void DeleteByKey(int id)
+    public void DeleteById(int id)
     {
         _db.Execute("""
                     DELETE FROM public.image 

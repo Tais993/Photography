@@ -47,7 +47,7 @@ public class ProjectServiceTest
         _files.Setup(f => f.ReadAllText(It.IsAny<string>())).Returns("2");
         _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
 
-        _projectRepository.Setup(r => r.GetByKey(2))
+        _projectRepository.Setup(r => r.GetById(2))
             .Returns(expectedProject);
 
         // Execution

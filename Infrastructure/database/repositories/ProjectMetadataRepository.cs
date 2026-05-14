@@ -52,7 +52,7 @@ public class ProjectMetadataRepository
                     """, entity.MetadataValue, entity.ProjectId, entity.MetadataId);
     }
 
-    public ProjectMetadata? GetByKey(int projectId, int metadataId)
+    public ProjectMetadata? GetById(int projectId, int metadataId)
     {
         return _db.Query("""
                          SELECT

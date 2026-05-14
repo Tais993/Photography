@@ -46,7 +46,7 @@ public partial class ProjectService : IProjectService
 
     public Project ResolveProject(string directory)
     {
-        return _projectRepository.GetByKey(ResolveProjectId(directory));
+        return _projectRepository.GetById(ResolveProjectId(directory));
     }
 
 
