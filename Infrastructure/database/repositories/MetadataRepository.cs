@@ -17,7 +17,7 @@ public class MetadataRepository
         _db = db;
     }
 
-    public Metadata? GetByKey(int id)
+    public Metadata? GetById(int id)
     {
         return _db.Query("""
                          SELECT id, metadata_key, metadata_type, display_name, description
@@ -58,7 +58,7 @@ public class MetadataRepository
                     """, entity.MetadataKey, entity.MetadataType, entity.DisplayName, entity.Description, entity.Id);
     }
 
-    public void DeleteByKey(int id)
+    public void DeleteById(int id)
     {
         _db.Execute("""
                     DELETE FROM public.metadata

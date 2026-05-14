@@ -17,7 +17,7 @@ public class ProjectRepository : IProjectRepository
         _db = db;
     }
 
-    public Project GetByKey(int id)
+    public Project GetById(int id)
     {
         _logger.LogInformation("GetByKey, with params: {Id}", id);
         return _db.Query("""
@@ -56,7 +56,7 @@ public class ProjectRepository : IProjectRepository
     }
 
 
-    public void DeleteByKey(int id)
+    public void DeleteById(int id)
     {
         _db.Execute("""
                     DELETE FROM public.project 

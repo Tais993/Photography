@@ -4,7 +4,7 @@ namespace Infrastructure.database.repositories;
 
 public interface IImageRepository
 {
-    public Image GetByKey(int id);
+    public Image GetById(int id);
     public List<Image> GetImagesByFileName(int projectId, string fileName);
     public List<Image> GetImagesByFileName(string fileName);
     public List<Image> GetImagesByPhotoNumber(int projectId, string fileNumber);
@@ -14,5 +14,5 @@ public interface IImageRepository
     public List<Image> GetAllByProject(Project project);
     public Image Insert(Image image);
     public void Update(Image image);
-    public void DeleteByKey(int id);
+    public void DeleteById(int id);
 }
