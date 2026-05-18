@@ -14,6 +14,26 @@ public class ProjectMetadata : IEntity
         Description = description;
     }
 
+    public ProjectMetadata(int projectId, Metadata metadata, string metadataValue)
+    {
+        if (metadata.Id == null) throw new ArgumentNullException("metadata", "metadata id cannot be null");
+
+        ProjectId = projectId;
+        MetadataId = (int)metadata.Id;
+        MetadataValue = metadataValue;
+        MetadataKey = metadata.MetadataKey;
+        MetadataType = metadata.MetadataType;
+        DisplayName = metadata.DisplayName;
+        Description = metadata.Description;
+    }
+
+    public ProjectMetadata(int projectId, int metadataId, string metadataValue)
+    {
+        ProjectId = projectId;
+        MetadataId = metadataId;
+        MetadataValue = metadataValue;
+    }
+
     public int ProjectId { get; }
     public int MetadataId { get; }
     public string MetadataValue { get; set; }
