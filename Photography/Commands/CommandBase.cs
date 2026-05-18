@@ -4,36 +4,39 @@ namespace Cli.Commands;
 
 public abstract class CommandBase : ICommand
 {
+    protected Command Command = null!;
+
     protected abstract string Name { get; }
     protected abstract string Description { get; }
-
-    protected IEnumerable<string> Aliases;
-
-    /// <summary>
-    /// This method can be used for configuring anything outside of the name, description and aliases.
-    /// While the command is getting build this method gets called with the command.
-    /// </summary>
-    /// <param name="command"></param>
-    protected virtual void Configure(Command command)
-    {
-    }
 
     public abstract int Run(ParseResult parseResult);
 
 
     public Command Build()
     {
-        Command command = new Command(Name, Description);
-
-        foreach (string alias in Aliases)
-        {
-            command.Aliases.Add(alias);
-        }
-
-        Configure(command);
-
+        var command = new Command(Name, Description);
+        Command = command;
         command.SetAction(Run);
 
+
+        Configure(command);
         return command;
+    }
+
+    public void AddAliases(List<string> aliases)
+    {
+        foreach (var alias in aliases)
+        {
+            Command.Aliases.Add(alias);
+        }
+    }
+
+    /// <summary>
+    ///     This method can be used for configuring anything outside of the name, description and aliases.
+    ///     While the command is getting build this method gets called with the command.
+    /// </summary>
+    /// <param name="command"></param>
+    protected virtual void Configure(Command command)
+    {
     }
 }
