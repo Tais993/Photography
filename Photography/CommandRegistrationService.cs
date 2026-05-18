@@ -10,5 +10,6 @@ public static class CommandRegistrationService
         services.AddTransient<SearchCommand>();
         services.AddTransient<InitialiseCommand>();
         services.AddTransient<TestCommand>();
+        services.AddTransient<MetadataCommand>();
     }
 }
