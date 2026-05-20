@@ -1,4 +1,5 @@
 ﻿using Cli.Commands;
+using Cli.Commands.ProjectCommand;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cli;
@@ -11,5 +12,6 @@ public static class CommandRegistrationService
         services.AddTransient<InitialiseCommand>();
         services.AddTransient<TestCommand>();
         services.AddTransient<MetadataCommand>();
+        services.AddTransient<ProjectCommand>();
     }
 }
