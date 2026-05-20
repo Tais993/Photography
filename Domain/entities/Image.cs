@@ -1,13 +1,7 @@
 ﻿namespace Domain.entities;
 
-public class Image : IIdEntity
+public class Image : IEntity
 {
-    public int? Id { get; }
-    public int ProjectId { get; }
-    public Project? Project { get; set; }
-    public string FileName { get; }
-    public string FileType { get; }
-    public string RelationalFilePath { get; }
 
     public Image(int? id, int projectId, Project? project, string fileName, string fileType, string relationalFilePath)
     {
@@ -26,4 +20,11 @@ public class Image : IIdEntity
         FileType = fileType;
         RelationalFilePath = relationalFilePath;
     }
+
+    public int? Id { get; }
+    public int ProjectId { get; }
+    public Project? Project { get; set; }
+    public string FileName { get; }
+    public string FileType { get; }
+    public string RelationalFilePath { get; }
 }
