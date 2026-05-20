@@ -26,6 +26,15 @@ public class MetadataRepository
                          """, MapMetadata, id);
     }
 
+    public Metadata? GetByKey(string key)
+    {
+        return _db.Query("""
+                         SELECT id, metadata_key, metadata_type, display_name, description
+                         FROM public.metadata
+                         WHERE metadata_key = $1
+                         """, MapMetadata, key);
+    }
+
     public List<Metadata> GetAll()
     {
         return _db.QueryMultiple("""
@@ -46,7 +55,10 @@ public class MetadataRepository
 
     public void Update(Metadata entity)
     {
-        if (entity.Id is null) throw new ArgumentException("Metadata must have an ID", nameof(entity));
+        if (entity.Id is null)
+        {
+            throw new ArgumentException("Metadata must have an ID", nameof(entity));
+        }
 
         _db.Execute("""
                     UPDATE public.metadata
