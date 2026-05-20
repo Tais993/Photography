@@ -8,6 +8,7 @@ public interface IProjectMetadataService
     public Metadata CreateMetadata(Metadata metadata);
 
     public Metadata? GetMetadata(Metadata metadata);
+    public Metadata? GetMetadata(string metadataKey);
     public Metadata? GetMetadata(int metadataId);
 
     public void DeleteMetadata(Metadata metadata);
@@ -17,6 +18,6 @@ public interface IProjectMetadataService
     public List<ProjectMetadata> GetProjectMetadata(Project project);
     public List<ProjectMetadata> GetProjectMetadata(int projectId);
 
-    public void AddMetadataToProject(int projectId, int metadataId, string value);
+    public void AddMetadataToProject(int projectId, int metadataId, string? value);
     public void DeleteMetadataFromProject(int projectId, int metadataId);
 }
