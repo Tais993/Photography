@@ -2,33 +2,29 @@
 using Application.services.interfaces;
 using Domain.entities;
 using Infrastructure.database.repositories;
+using static Cli.Commands.CommandOptions;
 
 namespace Cli.Commands;
 
 public class SearchCommand : CommandBase
 {
-    private const string QueryName = "query";
-    private const string ProjectName = "-project";
-    private const string GlobalName = "-global";
-
+    public const string QueryGlobalName = "-global";
+    public const string QueryName = "query";
     private readonly IFileSearchService _fileSearchService;
 
-    private readonly Option<bool> _global = new(GlobalName)
+    private readonly Option<bool> _global = new Option<bool>(QueryGlobalName)
     {
         Description = "Look for an image globally outside of the current projects context",
-        Aliases = { "-g" }
-    };
-
-    private readonly Option<int> _project = new(ProjectName)
-    {
-        Description = "Looks for the image within the given project its ID",
-        Aliases = { "-p" }
+        Aliases =
+        {
+            "-g"
+        }
     };
 
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectService _projectService;
 
-    private readonly Argument<string> _query = new(QueryName)
+    private readonly Argument<string> _query = new Argument<string>(QueryName)
     {
         Description = "Photo number or filename"
     };
@@ -49,18 +45,19 @@ public class SearchCommand : CommandBase
         base.Configure(command);
 
         command.Arguments.Add(_query);
-        command.Options.Add(_project);
+        command.Options.Add(ProjectOption);
         command.Options.Add(_global);
     }
 
     public override int Run(ParseResult parseResult)
     {
-        var fileName = parseResult.GetValue<string>(QueryName);
-        var shouldByGlobal = parseResult.GetValue<bool>(GlobalName);
+        string? fileName = parseResult.GetValue<string>(QueryName);
+        bool shouldByGlobal = parseResult.GetValue<bool>(QueryGlobalName);
 
         List<Image> images;
 
-        var projectId = ResolveProjectId(parseResult.GetValue(_project));
+        int projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
+            parseResult.GetValue(ProjectOption));
 
 
         if (projectId == 0 || shouldByGlobal)
@@ -73,21 +70,11 @@ public class SearchCommand : CommandBase
         }
 
 
-        foreach (var image in images)
+        foreach (Image image in images)
         {
             Console.WriteLine($"File name: `{image.FileName}` Path: `{image.RelationalFilePath}`");
         }
 
         return 0;
-    }
-
-    private int ResolveProjectId(int projectId)
-    {
-        if (projectId == 0)
-        {
-            return _projectService.ResolveProjectId(Directory.GetCurrentDirectory());
-        }
-
-        return projectId;
     }
 }
