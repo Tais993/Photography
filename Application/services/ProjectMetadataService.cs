@@ -88,7 +88,7 @@ public class ProjectMetadataService : IProjectMetadataService
         _projectMetadataRepository.Insert(projectMetadata);
     }
 
-    public void DeleteMetadataFromProject(int projectId, int metadataId)
+    public void RemoveMetadataFromProject(int projectId, int metadataId)
     {
         _projectMetadataRepository.DeleteByKey(projectId, metadataId);
     }

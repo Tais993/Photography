@@ -19,5 +19,5 @@ public interface IProjectMetadataService
     public List<ProjectMetadata> GetProjectMetadata(int projectId);
 
     public void AddMetadataToProject(int projectId, int metadataId, string? value);
-    public void DeleteMetadataFromProject(int projectId, int metadataId);
+    public void RemoveMetadataFromProject(int projectId, int metadataId);
 }
