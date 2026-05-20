@@ -7,6 +7,11 @@ public interface IProjectMetadataService
     public Metadata CreateMetadata(string metadataKey, string metadataType, string displayName, string description);
     public Metadata CreateMetadata(Metadata metadata);
 
+    public void UpdateMetadata(int metadataId, string metadataKey, string metadataType, string displayName,
+        string description);
+
+    public void UpdateMetadata(Metadata metadata);
+
     public Metadata? GetMetadata(Metadata metadata);
     public Metadata? GetMetadata(string metadataKey);
     public Metadata? GetMetadata(int metadataId);

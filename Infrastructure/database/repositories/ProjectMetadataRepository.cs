@@ -34,13 +34,12 @@ public class ProjectMetadataRepository
                                  """, MapProjectMetadata);
     }
 
-    public ProjectMetadata Insert(ProjectMetadata entity)
+    public void Insert(ProjectMetadata entity)
     {
-        return _db.Query("""
-                         INSERT INTO public.project_metadata(project_id, metadata_id, metadata_value) 
-                         VALUES ($1, $2, $3) 
-                         RETURNING project_id, metadata_id, metadata_value
-                         """, MapProjectMetadata, entity.ProjectId, entity.MetadataId, entity.MetadataValue);
+        _db.Execute("""
+                    INSERT INTO public.project_metadata(project_id, metadata_id, metadata_value) 
+                    VALUES ($1, $2, $3) 
+                    """, entity.ProjectId, entity.MetadataId, entity.MetadataValue);
     }
 
     public void Update(ProjectMetadata entity)
