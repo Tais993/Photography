@@ -39,7 +39,8 @@ public class ProjectMetadataRepository
         return _db.Query("""
                          INSERT INTO public.project_metadata(project_id, metadata_id, metadata_value) 
                          VALUES ($1, $2, $3) 
-                         """, MapProjectMetadata);
+                         RETURNING project_id, metadata_id, metadata_value
+                         """, MapProjectMetadata, entity.ProjectId, entity.MetadataId, entity.MetadataValue);
     }
 
     public void Update(ProjectMetadata entity)
