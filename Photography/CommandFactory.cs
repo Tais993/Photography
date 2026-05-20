@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Cli.Commands;
+using Cli.Commands.ProjectCommand;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Cli;
@@ -8,12 +9,13 @@ public static class CommandFactory
 {
     public static RootCommand Commands(IServiceProvider provider)
     {
-        var rootCommand = new RootCommand("Photography projects tool!!")
+        RootCommand rootCommand = new RootCommand("Photography projects tool!!")
         {
             provider.GetRequiredService<SearchCommand>().Build(),
             provider.GetRequiredService<InitialiseCommand>().Build(),
             provider.GetRequiredService<TestCommand>().Build(),
-            provider.GetRequiredService<MetadataCommand>().Build()
+            provider.GetRequiredService<MetadataCommand>().Build(),
+            provider.GetRequiredService<ProjectCommand>().Build()
         };
 
         return rootCommand;
