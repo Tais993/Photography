@@ -37,7 +37,7 @@ public class RepositoryHelper
     {
         _logger.LogDebug("Executing {Sql}", sql);
 
-        foreach (var parameterValue in parameterValues)
+        foreach (object parameterValue in parameterValues)
         {
             _logger.LogDebug("Param: {ParameterValue}", parameterValue);
         }
@@ -47,7 +47,7 @@ public class RepositoryHelper
 
         using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
-        foreach (var parameterValue in parameterValues)
+        foreach (object parameterValue in parameterValues)
         {
             npgsqlCommand.Parameters.AddWithValue(parameterValue);
         }
@@ -59,19 +59,26 @@ public class RepositoryHelper
             throw new InvalidOperationException("Query returned no results");
         }
 
-        var tResult = resultConverter(reader);
+        TResult tResult = resultConverter(reader);
 
         return tResult;
     }
 
     public void Execute(string sql, params object[] parameterValues)
     {
+        _logger.LogDebug("Executing {Sql}", sql);
+
+        foreach (object parameterValue in parameterValues)
+        {
+            _logger.LogDebug("Param: {ParameterValue}", parameterValue);
+        }
+
         NpgsqlConnection cnx = _dataSource.OpenConnection();
 
 
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
-        foreach (var parameterValue in parameterValues)
+        foreach (object parameterValue in parameterValues)
         {
             npgsqlCommand.Parameters.AddWithValue(parameterValue);
         }
