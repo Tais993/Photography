@@ -1,18 +1,19 @@
 ﻿using System.CommandLine;
 using Application.services.interfaces;
+using Domain.entities;
 
 namespace Cli.Commands;
 
 public class MetadataCommand : CommandBase
 {
+
+    private const string MetadataKey = "-metadata-key";
+    private const string MetaDisplayName = "-display-name";
+    private const string MetaDescription = "-description";
+    private const string MetadataType = "-metadata-type";
+    private const string MetadataId = "metadata-id";
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectService _projectService;
-
-    private const string MetadataKey = "metadata-key";
-    private const string MetaDisplayName = "display-name";
-    private const string MetaDescription = "description";
-    private const string MetadataType = "metadata-type";
-    private const string MetadataId = "metadata-id";
 
     public MetadataCommand(IProjectService projectService, IProjectMetadataService projectMetadataService)
     {
@@ -31,7 +32,7 @@ public class MetadataCommand : CommandBase
         base.Configure(command);
         AddAliases(aliases);
 
-        var createCommand = new Command("create", "Create metadata")
+        Command createCommand = new Command("create", "Create metadata")
         {
             Arguments =
             {
@@ -49,7 +50,7 @@ public class MetadataCommand : CommandBase
         };
         createCommand.SetAction(CreateMetadata);
 
-        var editCommand = new Command("edit", "Edit metadata")
+        Command editCommand = new Command("edit", "Edit metadata")
         {
             Arguments =
             {
@@ -65,7 +66,7 @@ public class MetadataCommand : CommandBase
         };
         editCommand.SetAction(EditMetadata);
 
-        var deleteCommand = new Command("delete", "Delete metadata")
+        Command deleteCommand = new Command("delete", "Delete metadata")
         {
             Arguments =
             {
@@ -82,7 +83,7 @@ public class MetadataCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        var project = _projectService.ResolveProject(Directory.GetCurrentDirectory());
+        Project project = _projectService.ResolveProject(Directory.GetCurrentDirectory());
 
 
         Console.WriteLine(project);
@@ -92,10 +93,10 @@ public class MetadataCommand : CommandBase
 
     private int CreateMetadata(ParseResult parseResult)
     {
-        var metadataKey = parseResult.GetValue<string>(MetadataKey);
-        var displayName = parseResult.GetValue<string>(MetaDisplayName);
-        var description = parseResult.GetValue<string>(MetaDescription);
-        var metadataType = parseResult.GetValue<string>(MetadataType);
+        string? metadataKey = parseResult.GetValue<string>(MetadataKey);
+        string? displayName = parseResult.GetValue<string>(MetaDisplayName);
+        string? description = parseResult.GetValue<string>(MetaDescription);
+        string? metadataType = parseResult.GetValue<string>(MetadataType);
 
         if (metadataKey == null || displayName == null)
         {
@@ -110,15 +111,15 @@ public class MetadataCommand : CommandBase
 
     private int EditMetadata(ParseResult parseResult)
     {
-        var metadataId = parseResult.GetValue<int>(MetadataId);
+        int metadataId = parseResult.GetValue<int>(MetadataId);
 
 
-        var metadataKey = parseResult.GetValue<string>(MetadataKey);
-        var displayName = parseResult.GetValue<string>(MetaDisplayName);
-        var description = parseResult.GetValue<string>(MetaDescription);
-        var metadataType = parseResult.GetValue<string>(MetadataType);
+        string? metadataKey = parseResult.GetValue<string>(MetadataKey);
+        string? displayName = parseResult.GetValue<string>(MetaDisplayName);
+        string? description = parseResult.GetValue<string>(MetaDescription);
+        string? metadataType = parseResult.GetValue<string>(MetadataType);
 
-        var metadata = _projectMetadataService.GetMetadata(metadataId);
+        Metadata? metadata = _projectMetadataService.GetMetadata(metadataId);
 
         if (metadata == null)
         {
@@ -131,17 +132,21 @@ public class MetadataCommand : CommandBase
         metadata.Description = description ?? metadata.Description;
         metadata.MetadataType = metadataType ?? metadata.MetadataType;
 
+        _projectMetadataService.UpdateMetadata(metadata);
+
+        Console.WriteLine("Updated metadata in the database");
+
         return 0;
     }
 
     private int DeleteMetadata(ParseResult parseResult)
     {
-        var metadataId = parseResult.GetValue<int>(MetadataId);
+        int metadataId = parseResult.GetValue<int>(MetadataId);
 
         Console.WriteLine("Are you sure that you want to delete the metadata with its connection to the projects?");
         Console.WriteLine("This is NOT a reversable action [Y/N]");
 
-        var input = Console.ReadLine();
+        string? input = Console.ReadLine();
 
         if (!string.Equals(input, "y", StringComparison.OrdinalIgnoreCase) &&
             !string.Equals(input, "yes", StringComparison.OrdinalIgnoreCase))

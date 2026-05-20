@@ -26,6 +26,16 @@ public class ProjectMetadataService : IProjectMetadataService
         return _metadataRepository.Insert(metadata);
     }
 
+    public void UpdateMetadata(int metadataId, string metadataKey, string metadataType, string displayName, string description)
+    {
+        UpdateMetadata(new Metadata(metadataId, metadataKey, metadataType, displayName, description));
+    }
+
+    public void UpdateMetadata(Metadata metadata)
+    {
+        _metadataRepository.Update(metadata);
+    }
+
     public Metadata? GetMetadata(Metadata metadata)
     {
         if (metadata.Id == null)
