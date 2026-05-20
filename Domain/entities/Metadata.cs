@@ -1,11 +1,11 @@
 ﻿namespace Domain.entities;
 
-public class Metadata(int id, string metadataKey, string metadataType, string displayName, string description)
-    : IIdEntity
+public class Metadata(int? id, string metadataKey, string metadataType, string displayName, string description)
+    : IEntity
 {
-    public int? Id { get; } = id;
+    public string Description = description;
+    public string DisplayName = displayName;
     public string MetadataKey = metadataKey;
     public string MetadataType = metadataType;
-    public string DisplayName = displayName;
-    public string Description = description;
+    public int? Id { get; } = id;
 }
