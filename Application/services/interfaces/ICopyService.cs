@@ -2,5 +2,5 @@
 
 public interface ICopyService
 {
-    
+    public void CopyFiles(IEnumerable<string> relativeFiles, string projectLocation, string relativeTargetDirectory);
 }
