@@ -8,11 +8,19 @@ namespace Cli.Commands;
 
 public class SearchCommand : CommandBase
 {
-    public const string QueryGlobalName = "-global";
-    public const string QueryName = "query";
+    private readonly IProjectRepository _projectRepository;
     private readonly IFileSearchService _fileSearchService;
-
-    private readonly Option<bool> _global = new Option<bool>(QueryGlobalName)
+    private readonly IProjectService _projectService;
+ 
+    private const string QueryName = "query";
+    private readonly Argument<string> _queryArgument = new Argument<string>(QueryName)
+    {
+        Description = "Photo number or filename"
+    };
+    
+    
+    private const string GlobalName = "-global";
+    private readonly Option<bool> _globalOption = new Option<bool>(GlobalName)
     {
         Description = "Look for an image globally outside of the current projects context",
         Aliases =
@@ -21,12 +29,17 @@ public class SearchCommand : CommandBase
         }
     };
 
-    private readonly IProjectRepository _projectRepository;
-    private readonly IProjectService _projectService;
-
-    private readonly Argument<string> _query = new Argument<string>(QueryName)
+    private const string FileTypeName = "-filetype";
+    private readonly Option<string> _fileTypeOption = new Option<string>(FileTypeName)
     {
-        Description = "Photo number or filename"
+        Description = "The file-type"
+    };
+
+    private const string OriginFolderName = "-origin-folder";
+    private readonly Option<string> _originFolderOption = new Option<string>(OriginFolderName)
+    {
+        Description = "The origin folder",
+        DefaultValueFactory = _ => "Originals"
     };
 
     public SearchCommand(IFileSearchService fileSearchService, IProjectService projectService,
@@ -44,31 +57,35 @@ public class SearchCommand : CommandBase
     {
         base.Configure(command);
 
-        command.Arguments.Add(_query);
+        command.Arguments.Add(_queryArgument);
         command.Options.Add(ProjectOption);
-        command.Options.Add(_global);
+        command.Options.Add(_globalOption);
     }
 
     public override int Run(ParseResult parseResult)
     {
         string? fileName = parseResult.GetValue<string>(QueryName);
-        bool shouldByGlobal = parseResult.GetValue<bool>(QueryGlobalName);
+        bool shouldByGlobal = parseResult.GetValue<bool>(GlobalName);
+        string? fileType = parseResult.GetValue<string>(FileTypeName);
+        string? originFolder = parseResult.GetValue<string>(OriginFolderName);
 
-        List<Image> images;
+        int? projectId = null;
 
-        int projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
-            parseResult.GetValue(ProjectOption));
-
-
-        if (projectId == 0 || shouldByGlobal)
+        if (!shouldByGlobal)
         {
-            images = _fileSearchService.SearchImagesByNameOrNumber(fileName);
-        }
-        else
-        {
-            images = _fileSearchService.SearchImagesByNameOrNumber(projectId, fileName);
+            projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
+                parseResult.GetValue(ProjectOption));
         }
 
+        FileSearchSettings settings = new FileSearchSettings()
+        {
+            FileNameOrNumber = fileName,
+            ProjectId = projectId,
+            FileType = fileType,
+            FolderName = originFolder,
+        };
+
+        List<Image> images = _fileSearchService.SearchImages(settings);
 
         foreach (Image image in images)
         {

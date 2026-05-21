@@ -110,6 +110,34 @@ public class ImageRepository : IImageRepository
                     """, id);
     }
 
+
+    public List<Image> SearchImages(FileSearchSettings fileSearchSettings)
+    {
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, relational_file_path
+                                 FROM public.image
+                                 WHERE ($1::int IS NULL OR project_id = $1::int)
+                                   AND (
+                                     $2::text IS NULL
+                                         OR file_name ~* ('(^|[^0-9])' || $2::text || '([^0-9]|$)')
+                                     )
+                                   AND (
+                                     $3::text IS NULL
+                                         OR file_name ILIKE ('%' || $3::text || '%')
+                                     )
+                                   AND (
+                                     $4::text IS NULL
+                                         OR replace(relational_file_path, chr(92), '/') LIKE ($4::text || '/%')
+                                     )
+                                   AND (
+                                     $5::text IS NULL
+                                         OR LOWER(file_type) = LOWER($5::text)
+                                     )
+                                 """, MapImage, fileSearchSettings.ProjectId!, fileSearchSettings.FileNumber!,
+            fileSearchSettings.FileName!, fileSearchSettings.FolderName!, fileSearchSettings.FileType!);
+    }
+
+
     private static Image MapImage(NpgsqlDataReader reader)
     {
         return new Image(

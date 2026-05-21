@@ -53,11 +53,20 @@ public partial class ProjectService : IProjectService
         return possibleEmptyProjectId;
     }
 
-    public Project ResolveProject(string directory)
+    public Project? ResolveProject(string directory)
     {
         return _projectRepository.GetById(ResolveProjectId(directory));
     }
 
+    public Project? ResolveProject(string directory, int possibleEmptyProjectId)
+    {
+        if (possibleEmptyProjectId == 0)
+        {
+            return ResolveProject(Directory.GetCurrentDirectory());
+        }
+
+        return _projectRepository.GetById(possibleEmptyProjectId);
+    }
 
     public void InitialiseExistingFolder(string projectDirectory)
     {

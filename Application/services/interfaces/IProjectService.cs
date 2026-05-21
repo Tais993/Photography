@@ -34,7 +34,18 @@ public interface IProjectService
     /// <param name="directory"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public Project ResolveProject(string directory);
+    public Project? ResolveProject(string directory);
+
+    /// <summary>
+    ///     Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
+    ///     If none is found, it'll return "null".
+    /// </summary>
+    /// <param name="directory"></param>
+    /// <param name="possibleEmptyProjectId"></param>
+    /// <returns></returns>
+    /// <exception cref="InvalidOperationException"></exception>
+    public Project? ResolveProject(string directory, int possibleEmptyProjectId);
+
 
     /// <summary>
     ///     Initialises the given projects directory into the database,
