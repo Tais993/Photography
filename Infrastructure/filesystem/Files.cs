@@ -12,6 +12,11 @@ public class Files : IFiles
         return Path.GetFileName(path);
     }
 
+    public string GetFileNameWithoutExtension(string path)
+    {
+        return Path.GetFileNameWithoutExtension(path);
+    }
+
     public string GetFileExtension(string path)
     {
         return Path.GetExtension(path);
@@ -67,6 +72,11 @@ public class Files : IFiles
     public void FolderDelete(string path)
     {
         Directory.Delete(path);
+    }
+
+    public void CopyFile(string path, string newPath)
+    {
+        File.Copy(path, newPath);
     }
 
     public void MoveFile(string path, string newPath)
