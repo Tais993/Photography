@@ -13,37 +13,41 @@ public class FileSearchService : IFileSearchService
         _imagesRepository = imagesRepository;
     }
 
-    public List<Image> SearchImagesByNameOrNumber(int projectId, string name)
-    {
-        if (int.TryParse(name, out _)) return SearchImagesByNumber(projectId, name);
-
-        return SearchImagesByName(projectId, name);
-    }
-
     public List<Image> SearchImagesByNameOrNumber(string name)
     {
-        if (int.TryParse(name, out _)) return SearchImagesByNumber(name);
+        if (int.TryParse(name, out _))
+        {
+            return _imagesRepository.GetImagesByPhotoNumber(name);
+        }
 
-        return SearchImagesByName(name);
-    }
-
-    public List<Image> SearchImagesByName(string name)
-    {
         return _imagesRepository.GetImagesByFileName(name);
     }
 
-    public List<Image> SearchImagesByName(int projectId, string name)
+    public List<Image> SearchImagesByNameOrNumber(int projectId, string name)
     {
+        if (int.TryParse(name, out _))
+        {
+            return _imagesRepository.GetImagesByPhotoNumber(projectId, name);
+        }
+
+
         return _imagesRepository.GetImagesByFileName(projectId, name);
     }
 
-    public List<Image> SearchImagesByNumber(string number)
+    public List<Image> SearchImages(FileSearchSettings fileSearchSettings)
     {
-        return _imagesRepository.GetImagesByPhotoNumber(number);
-    }
-
-    public List<Image> SearchImagesByNumber(int projectId, string number)
-    {
-        return _imagesRepository.GetImagesByPhotoNumber(projectId, number);
+        if (fileSearchSettings.FileNameOrNumber != null)
+        {
+            if (int.TryParse(fileSearchSettings.FileNameOrNumber, out _))
+            {
+                fileSearchSettings.FileNumber = fileSearchSettings.FileNameOrNumber;
+            }
+            else
+            {
+                fileSearchSettings.FileName = fileSearchSettings.FileNameOrNumber;
+            }
+        }
+        
+        return _imagesRepository.SearchImages(fileSearchSettings);
     }
 }

@@ -33,24 +33,15 @@ public class RepositoryHelper
     }
 
     public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
-        params object[] parameterValues)
+        params object?[] parameterValues)
     {
         _logger.LogDebug("Executing {Sql}", sql);
-
-        foreach (object parameterValue in parameterValues)
-        {
-            _logger.LogDebug("Param: {ParameterValue}", parameterValue);
-        }
-
 
         using NpgsqlConnection cnx = _dataSource.OpenConnection();
 
         using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
-
-        foreach (object parameterValue in parameterValues)
-        {
-            npgsqlCommand.Parameters.AddWithValue(parameterValue);
-        }
+        
+        SetParameters<TResult>(parameterValues, npgsqlCommand);
 
         using NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
 
@@ -68,23 +59,33 @@ public class RepositoryHelper
     {
         _logger.LogDebug("Executing {Sql}", sql);
 
-        foreach (object parameterValue in parameterValues)
-        {
-            _logger.LogDebug("Param: {ParameterValue}", parameterValue);
-        }
-
         NpgsqlConnection cnx = _dataSource.OpenConnection();
 
 
         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
-        foreach (object parameterValue in parameterValues)
-        {
-            npgsqlCommand.Parameters.AddWithValue(parameterValue);
-        }
+        SetParameters<object>(parameterValues, npgsqlCommand);
 
         npgsqlCommand.ExecuteNonQuery();
 
         cnx.CloseAsync();
+    }
+    
+    
+    private void SetParameters<TResult>(object?[] parameterValues, NpgsqlCommand npgsqlCommand)
+    {
+        foreach (object? parameterValue in parameterValues)
+        {
+            _logger.LogDebug("Param: {ParameterValue}", parameterValue);
+
+            if (parameterValue == null)
+            {
+                npgsqlCommand.Parameters.AddWithValue(DBNull.Value);
+            }
+            else
+            {
+                npgsqlCommand.Parameters.AddWithValue(parameterValue);
+            }
+        }
     }
 }
