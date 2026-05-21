@@ -14,6 +14,8 @@ public static class DependencyInjection
         services.AddTransient<IProjectService, ProjectService>();
         services.AddTransient<IProjectMetadataService, ProjectMetadataService>();
 
+        services.AddTransient<IrfanviewService>();
+
         return services;
     }
 }

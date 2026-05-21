@@ -1,6 +1,7 @@
 ﻿using Infrastructure.database;
 using Infrastructure.database.repositories;
 using Infrastructure.filesystem;
+using Infrastructure.irfanview;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -25,6 +26,8 @@ public static class DependencyInjection
 
 
         services.AddTransient<IFiles, Files>();
+
+        services.AddTransient<IrfanViewRepository>();
         return services;
     }
 }
