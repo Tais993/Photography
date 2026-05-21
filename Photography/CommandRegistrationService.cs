@@ -13,5 +13,6 @@ public static class CommandRegistrationService
         services.AddTransient<TestCommand>();
         services.AddTransient<MetadataCommand>();
         services.AddTransient<ProjectCommand>();
+        services.AddTransient<CopyCommand>();
     }
 }
