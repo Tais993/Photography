@@ -103,7 +103,7 @@ public class CopyCommand : CommandBase
             ProjectId = project.Id
         }).Select(image => image.RelationalFilePath);
 
-        _copyService.CopyFiles(images, project.Location, destinationFolder);
+        _copyService.CopyFiles(images, project.Path, destinationFolder);
 
         return 0;
     }

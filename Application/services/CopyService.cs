@@ -16,13 +16,13 @@ public class CopyService : ICopyService
     }
 
 
-    public void CopyFiles(IEnumerable<string> relativeFiles, string projectLocation, string relativeTargetDirectory)
+    public void CopyFiles(IEnumerable<string> relativeFiles, string projectPath, string relativeTargetDirectory)
     {
-        string targetDirectory = _files.Combine(projectLocation, relativeTargetDirectory);
+        string targetDirectory = _files.Combine(projectPath, relativeTargetDirectory);
 
         foreach (string relativeFile in relativeFiles)
         {
-            string originalFile = _files.Combine(projectLocation, relativeFile);
+            string originalFile = _files.Combine(projectPath, relativeFile);
             string targetFile = _files.Combine(targetDirectory, _files.GetFileName(relativeFile));
 
             _logger.LogDebug($"Original file {originalFile}, Target file {targetFile}");

@@ -161,7 +161,7 @@ public class ProjectServiceTest
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
             projectId,
             project.Name,
-            project.Location,
+            project.Path,
             project.EventDate
         ));
 
@@ -176,7 +176,7 @@ public class ProjectServiceTest
         _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
             p.Id == null &&
             p.Name == "Merijn" &&
-            p.Location == projectDirectory &&
+            p.Path == projectDirectory &&
             p.EventDate == new DateOnly(2024, 7, 4)
         )), Times.Once);
 
@@ -210,7 +210,7 @@ public class ProjectServiceTest
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
             projectId,
             project.Name,
-            project.Location,
+            project.Path,
             project.EventDate
         ));
 
@@ -225,7 +225,7 @@ public class ProjectServiceTest
         _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
             p.Id == null &&
             p.Name == "Merijn" &&
-            p.Location == projectDirectory &&
+            p.Path == projectDirectory &&
             p.EventDate == new DateOnly(2024, 7, 4)
         )), Times.Once);
 
@@ -258,7 +258,7 @@ public class ProjectServiceTest
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
             projectId,
             project.Name,
-            project.Location,
+            project.Path,
             project.EventDate
         ));
 
@@ -273,7 +273,7 @@ public class ProjectServiceTest
         _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
             p.Id == null &&
             p.Name == "Merijn gymnasium" &&
-            p.Location == projectDirectory &&
+            p.Path == projectDirectory &&
             p.EventDate == new DateOnly(2024, 7, 4)
         )), Times.Once);
 

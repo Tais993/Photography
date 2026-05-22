@@ -21,7 +21,7 @@ public class ProjectRepository : IProjectRepository
     {
         _logger.LogInformation("GetByKey, with params: {Id}", id);
         return _db.Query("""
-                         SELECT id, name, location, event_date FROM public.project 
+                         SELECT id, name, path, event_date FROM public.project 
                          WHERE id = $1
                          """, MapProject, id);
     }
@@ -29,17 +29,17 @@ public class ProjectRepository : IProjectRepository
     public List<Project> GetAll()
     {
         return _db.QueryMultiple("""
-                                 SELECT id, name, location, event_date FROM public.project
+                                 SELECT id, name, path, event_date FROM public.project
                                  """, MapProject);
     }
 
     public Project Insert(Project project)
     {
         return _db.Query("""
-                         INSERT INTO public.project(name, location, event_date) 
+                         INSERT INTO public.project(name, path, event_date) 
                          VALUES ($1, $2, $3)
                          RETURNING *
-                         """, MapProject, project.Name, project.Location, project.EventDate);
+                         """, MapProject, project.Name, project.Path, project.EventDate);
     }
 
     public void Update(Project project)
@@ -49,10 +49,10 @@ public class ProjectRepository : IProjectRepository
         _db.Execute("""
                     UPDATE public.project
                     SET name = $1,
-                        location = $2,
+                        path = $2,
                         event_date = $3
                     WHERE id = $4
-                    """, project.Name, project.Location, project.EventDate, project.Id);
+                    """, project.Name, project.Path, project.EventDate, project.Id);
     }
 
 
@@ -72,7 +72,7 @@ public class ProjectRepository : IProjectRepository
         return new Project(
             (int)reader["id"],
             (string)reader["name"],
-            (string)reader["location"],
+            (string)reader["path"],
             (DateOnly)reader["event_date"]);
     }
 }
