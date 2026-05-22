@@ -29,14 +29,14 @@ public partial class ProjectService : IProjectService
 
     public int ResolveProjectId(string directory)
     {
-        string projectInfoLocation = _files.Combine(directory, ProjectInfoFile);
+        string projectInfoPath = _files.Combine(directory, ProjectInfoFile);
 
-        if (!_files.Exists(projectInfoLocation))
+        if (!_files.Exists(projectInfoPath))
         {
             return 0;
         }
 
-        int id = int.Parse(_files.ReadAllText(projectInfoLocation));
+        int id = int.Parse(_files.ReadAllText(projectInfoPath));
 
         _logger.LogInformation("project info file found:  id: {Id}", id);
 
@@ -89,26 +89,26 @@ public partial class ProjectService : IProjectService
 
             if (match.Success)
             {
-                string projectInfoLocation = _files.Combine(projectDirectory, ProjectInfoFile);
+                string projectInfoPath = _files.Combine(projectDirectory, ProjectInfoFile);
 
 
-                if (_files.Exists(projectInfoLocation))
+                if (_files.Exists(projectInfoPath))
                 {
                     _logger.LogInformation(
-                        "Project info file found:  name: {ReadAllText}", _files.ReadAllText(projectInfoLocation));
+                        "Project info file found:  name: {ReadAllText}", _files.ReadAllText(projectInfoPath));
                     return;
                 }
 
                 Project project = ToProject(projectDirectory, match);
 
                 project = _projectRepository.Insert(project);
-                _files.WriteAllText(project.Id + "", projectInfoLocation);
+                _files.WriteAllText(project.Id + "", projectInfoPath);
 
 
                 _logger.LogDebug(
                     "Project id: {ProjectId}, name: {ProjectName}, event_date: {ProjectEventDate}", project.Id,
                     project.Name, project.EventDate);
-                _logger.LogDebug("File should be written to {ProjectInfoLocation}", projectInfoLocation);
+                _logger.LogDebug("File should be written to {ProjectInfoPath}", projectInfoPath);
 
 
                 _logger.LogDebug("Going through all images now");
