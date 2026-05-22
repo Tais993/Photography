@@ -1,13 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
+        <!-- Project references -->
         <ProjectReference Include="..\Domain\Domain.csproj"/>
+
+        <!-- Outputs -->
         <None Include="database\migrations\*.sql">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
 
-    <ItemGroup>
+        <!-- Package references -->
         <PackageReference Include="Evolve" Version="3.4.0-alpha1"/>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="11.0.0-preview.3.26207.106"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-preview.2.26159.112"/>
