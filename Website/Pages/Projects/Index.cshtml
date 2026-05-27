@@ -1,0 +1,246 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<div class="page-body">
+
+    <div class="page-header d-print-none">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="page-pretitle">
+                    Picture Project Tool
+                </div>
+                <h2 class="page-title">
+                    Projects
+                </h2>
+                <div class="text-muted mt-1">
+                    Browse your photography projects and open one to manage images or selections.
+                </div>
+            </div>
+
+            <div class="col-auto ms-auto">
+            <span class="badge bg-blue-lt">
+                <i class="ti ti-folders me-1"></i>
+                @Model.Projects.Count project(s)
+            </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cards mt-3">
+
+        <div class="col-12">
+            <form method="get" class="card">
+                <div class="card-body">
+                    <div class="row g-2 align-items-end">
+                        <div class="col">
+                            <label class="form-label" asp-for="Search">Search projects</label>
+
+                            <div class="input-icon">
+                            <span class="input-icon-addon">
+                                <i class="ti ti-search"></i>
+                            </span>
+
+                                <input asp-for="Search"
+                                       class="form-control"
+                                       placeholder="Search by name..."/>
+                            </div>
+                        </div>
+
+                        @if (Model.SelectedProjectId is not null)
+                        {
+                            <input type="hidden" asp-for="SelectedProjectId"/>
+                        }
+
+                        <div class="col-auto">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-search me-2"></i>
+                                Search
+                            </button>
+                        </div>
+
+                        <div class="col-auto">
+                            <a asp-page="./Index" class="btn btn-outline-secondary">
+                                Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <h3 class="card-title">All projects</h3>
+                        <p class="card-subtitle">Select a project to view its details.</p>
+                    </div>
+                </div>
+
+                @if (Model.Projects.Count == 0)
+                {
+                    <div class="card-body">
+                        <div class="empty">
+                            <div class="empty-icon">
+                                <i class="ti ti-folder-off"></i>
+                            </div>
+
+                            <p class="empty-title">No projects found</p>
+
+                            <p class="empty-subtitle text-muted">
+                                Try changing your search query.
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="list-group list-group-flush">
+                        @foreach (var project in Model.Projects)
+                        {
+                            bool isSelected = project.Id == Model.SelectedProjectId;
+
+                            <a asp-page="./Index"
+                               asp-route-selectedProjectId="@project.Id"
+                               asp-route-search="@Model.Search"
+                               class="list-group-item list-group-item-action @(isSelected ? "active" : "")">
+
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                    <span class="avatar @(isSelected ? "bg-white text-blue" : "bg-blue-lt")">
+                                        <i class="ti ti-folder"></i>
+                                    </span>
+                                    </div>
+
+                                    <div class="col text-truncate">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <strong class="text-truncate">
+                                                @project.Name
+                                            </strong>
+
+                                            @if (isSelected)
+                                            {
+                                                <span class="badge bg-white text-blue">
+                                                Selected
+                                            </span>
+                                            }
+                                        </div>
+
+                                        <div class="text-muted small">
+                                            <i class="ti ti-calendar me-1"></i>
+                                            @project.EventDate.ToString("yyyy-MM-dd")
+                                        </div>
+
+                                        <div class="text-muted small text-truncate">
+                                            <i class="ti ti-folder-open me-1"></i>
+                                            @project.Path
+                                        </div>
+                                    </div>
+
+                                    <div class="col-auto">
+                                        <i class="ti ti-chevron-right text-muted"></i>
+                                    </div>
+                                </div>
+                            </a>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="card">
+                @if (Model.SelectedProject is null)
+                {
+                    <div class="card-body">
+                        <div class="empty">
+                            <div class="empty-icon">
+                                <i class="ti ti-click"></i>
+                            </div>
+
+                            <p class="empty-title">No project selected</p>
+
+                            <p class="empty-subtitle text-muted">
+                                Select a project from the list.
+                            </p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">@Model.SelectedProject.Name</h3>
+                            <p class="card-subtitle">Selected project</p>
+                        </div>
+
+                        <div class="card-actions">
+                        <span class="badge bg-green-lt">
+                            <i class="ti ti-check me-1"></i>
+                            Active
+                        </span>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="datagrid">
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Id</div>
+                                <div class="datagrid-content">@Model.SelectedProject.Id</div>
+                            </div>
+
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Name</div>
+                                <div class="datagrid-content">@Model.SelectedProject.Name</div>
+                            </div>
+
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Event date</div>
+                                <div class="datagrid-content">
+                                    @Model.SelectedProject.EventDate.ToString("yyyy-MM-dd")
+                                </div>
+                            </div>
+
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Readable date</div>
+                                <div class="datagrid-content">
+                                    @Model.SelectedProject.EventDate.ToString("dddd, dd MMMM yyyy")
+                                </div>
+                            </div>
+
+                            <div class="datagrid-item">
+                                <div class="datagrid-title">Path</div>
+                                <div class="datagrid-content text-break">
+                                    @Model.SelectedProject.Path
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="d-grid gap-2">
+                            <a class="btn btn-primary"
+                               asp-page="/Projects/Images"
+                               asp-route-projectId="@Model.SelectedProject.Id">
+                                <i class="ti ti-photo me-2"></i>
+                                Open images
+                            </a>
+
+                            <a class="btn btn-outline-primary"
+                               asp-page="/Projects/Selection"
+                               asp-route-projectId="@Model.SelectedProject.Id">
+                                <i class="ti ti-checklist me-2"></i>
+                                Open selection
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
