@@ -10,6 +10,7 @@ public interface IImageRepository
     public List<Image> GetImagesByPhotoNumber(int projectId, string fileNumber);
     public List<Image> GetImagesByPhotoNumber(string fileNumber);
     public List<Image> GetAll();
+    public List<Image> GetAllByIds(int[] imageIds);
     public List<Image> GetAllByProjectId(int projectId);
     public List<Image> GetAllByProject(Project project);
     public Image Insert(Image image);
