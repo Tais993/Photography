@@ -68,6 +68,16 @@ public partial class ProjectService : IProjectService
         return _projectRepository.GetById(possibleEmptyProjectId);
     }
 
+    public Project GetProjectById(int projectId)
+    {
+        return _projectRepository.GetById(projectId);
+    }
+
+    public List<Project> GetAllProjects()
+    {
+        return _projectRepository.GetAll();
+    }
+
     public void InitialiseExistingFolder(string projectDirectory)
     {
         string pathEnd = _files.GetPathEnd(projectDirectory);
