@@ -14,5 +14,6 @@ public static class CommandRegistrationService
         services.AddTransient<MetadataCommand>();
         services.AddTransient<ProjectCommand>();
         services.AddTransient<CopyCommand>();
+        services.AddTransient<SelectCommand>();
     }
 }
