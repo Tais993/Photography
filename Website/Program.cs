@@ -1,7 +1,16 @@
-var builder = WebApplication.CreateBuilder(args);
+using Application;
+using Infrastructure;
+
+WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationOptions {
+    Args = args,
+    ContentRootPath = AppContext.BaseDirectory,
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddApplication();
+builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
 
