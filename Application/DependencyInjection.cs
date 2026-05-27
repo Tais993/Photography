@@ -15,6 +15,7 @@ public static class DependencyInjection
         services.AddTransient<IProjectMetadataService, ProjectMetadataService>();
 
         services.AddTransient<IrfanviewService>();
+        services.AddTransient<ImageSelectionService>();
 
         return services;
     }

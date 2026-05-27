@@ -8,10 +8,10 @@ public class ImageSelectionService
 {
     private readonly ILogger<ImageSelectionService> _logger;
     private readonly SelectionRepository _selectionRepository;
-    private readonly ProjectRepository _projectRepository;
+    private readonly IProjectRepository _projectRepository;
 
     // start session
-    public ImageSelectionService(ILogger<ImageSelectionService> logger, SelectionRepository selectionRepository, ProjectRepository projectRepository)
+    public ImageSelectionService(ILogger<ImageSelectionService> logger, SelectionRepository selectionRepository, IProjectRepository projectRepository)
     {
         _logger = logger;
         _selectionRepository = selectionRepository;
@@ -30,6 +30,18 @@ public class ImageSelectionService
         return _selectionRepository.StartSession(projectId, sessionName);
     }
 
+    public SelectionSession GetOrStartSession(Project project)
+    {
+        return GetOrStartSession((int) project.Id, project.Name);
+    }
+
+    public SelectionSession GetOrStartSession(int projectId, string? sessionName)
+    {
+        sessionName ??= _projectRepository.GetById(projectId).Name;
+        
+        return _selectionRepository.GetOrStartSession(projectId, sessionName);
+        
+    }
     public void RemoveSession(Project project)
     { 
         RemoveSession((int) project.Id);
@@ -52,17 +64,18 @@ public class ImageSelectionService
 
     public void SelectImage(Image image)
     {
+        // no
         SelectImage(image.ProjectId, (int) image.Id);
     }
 
-    public void SelectImage(int projectId, int imageId)
+    public void SelectImage(int selectionId, int imageId)
     {
-        _selectionRepository.AddImageToProjectSelection(projectId, imageId);
+        _selectionRepository.AddImageToProjectSelection(selectionId, imageId);
     }
 
-    public void GetSessionImages(Project project)
+    public SelectionSession GetSessionImages(Project project)
     {
-        GetSessionImages((int) project.Id);
+        return GetSessionImages((int) project.Id);
     }
 
     
