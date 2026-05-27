@@ -23,10 +23,23 @@ public class SelectionRepository
         return _db.Query("""
                          INSERT INTO public.selection_session(project_id, name)
                          VALUES ($1, $2)
-                         """, MapSelection, projectId, sessionName
+                         """, MapSelectionWithoutImages, projectId, sessionName
         );
     }
 
+    public SelectionSession GetOrStartSession(int projectId, string sessionName)
+    {
+        return _db.Query("""
+                         INSERT INTO public.selection_session(project_id, name)
+                         VALUES ($1, $2)
+                         ON CONFLICT (project_id) 
+                         DO UPDATE SET name = $2
+                         RETURNING id, project_id, name
+                         """, MapSelectionWithoutImages, projectId, sessionName
+        );
+    }
+
+    
     public void RemoveSession(int projectId)
     {
         _db.Execute("""
@@ -52,12 +65,12 @@ public class SelectionRepository
                          """, MapSelection, id);
     }
 
-    public void AddImageToProjectSelection(int projectId, int imageId)
+    public void AddImageToProjectSelection(int selectionId, int imageId)
     {
         _db.Execute("""
                     INSERT INTO public.selection_session_image(selection_session_id, image_id)  
                     VALUES ($1, $2)
-                    """, projectId, imageId);
+                    """, selectionId, imageId);
     }
 
 
@@ -83,6 +96,7 @@ public class SelectionRepository
             LEFT JOIN public.selection_session_image ssi
             ON ss.id = ssi.selection_session_id
             WHERE ss.project_id = $1
+            GROUP BY ss.id, ss.project_id, ss.name
             """, MapSelection, projectId);
     }
 
@@ -104,4 +118,15 @@ public class SelectionRepository
             ((int[])reader["image_ids"]).ToList()
         );
     }
+    
+    private static SelectionSession MapSelectionWithoutImages(NpgsqlDataReader reader)
+    {
+        return new SelectionSession(
+            (int)reader["id"],
+            (int)reader["project_id"],
+            (string)reader["name"],
+            []
+        );
+    }
+
 }

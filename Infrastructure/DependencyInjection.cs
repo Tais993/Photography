@@ -23,6 +23,7 @@ public static class DependencyInjection
         services.AddTransient<IProjectRepository, ProjectRepository>();
         services.AddTransient<MetadataRepository>();
         services.AddTransient<ProjectMetadataRepository>();
+        services.AddTransient<SelectionRepository>();
 
 
         services.AddTransient<IFiles, Files>();
