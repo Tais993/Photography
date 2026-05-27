@@ -48,6 +48,19 @@ public interface IProjectService
 
 
     /// <summary>
+    ///     Returns the given project based on its ID.
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
+    public Project GetProjectById(int projectId);
+    
+    /// <summary>
+    ///     Returns a list of all existing projects, this doesnt look at categories yet.
+    /// </summary>
+    /// <returns></returns>
+    public List<Project> GetAllProjects();
+    
+    /// <summary>
     ///     Initialises the given projects directory into the database,
     ///     additionally this adds a file to the filesystem to remember the projects ID.
     ///     Any images from within the project will also be loaded in with its metadata saved into the database.
