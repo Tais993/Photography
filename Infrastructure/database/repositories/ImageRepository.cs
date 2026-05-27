@@ -61,8 +61,21 @@ public class ImageRepository : IImageRepository
     public List<Image> GetAll()
     {
         return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
+                                 SELECT id, project_id, file_name, file_type, relational_file_path 
+                                 FROM public.image 
                                  """, MapImage);
+    }
+
+    public List<Image> GetAllByIds(int[] imageIds)
+    {
+        if (imageIds.Length == 0) return [];
+        
+        return _db.QueryMultiple("""
+                                 SELECT id, project_id, file_name, file_type, relational_file_path
+                                 FROM public.image
+                                 WHERE id = any($1)
+                                 """, MapImage, imageIds);
+        // sql
     }
 
     public List<Image> GetAllByProjectId(int projectId)
