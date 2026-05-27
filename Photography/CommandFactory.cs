@@ -16,7 +16,8 @@ public static class CommandFactory
             provider.GetRequiredService<TestCommand>().Build(),
             provider.GetRequiredService<MetadataCommand>().Build(),
             provider.GetRequiredService<ProjectCommand>().Build(),
-            provider.GetRequiredService<CopyCommand>().Build()
+            provider.GetRequiredService<CopyCommand>().Build(),
+            provider.GetRequiredService<SelectCommand>().Build(),
         };
 
         return rootCommand;
