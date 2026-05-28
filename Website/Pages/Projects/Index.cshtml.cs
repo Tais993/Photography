@@ -9,49 +9,54 @@ namespace Website.Pages.Projects;
 public class IndexModel : PageModel
 {
     private readonly IProjectService _projectService;
+    private readonly ISearchService _searchService;
+    private readonly ILogger<IndexModel> _logger;
 
-    public IndexModel(IProjectService projectService)
+    public IndexModel(IProjectService projectService, ISearchService searchService, ILogger<IndexModel> logger)
     {
         _projectService = projectService;
+        _searchService = searchService;
+        _logger = logger;
     }
-    
+
     public List<Project> Projects { get; private set; } = [];
 
     public Project? SelectedProject { get; private set; }
 
-    [BindProperty(SupportsGet = true)]
-    public int? SelectedProjectId { get; set; }
+    [BindProperty(SupportsGet = true)] public int? SelectedProjectId { get; set; }
 
 
-    [BindProperty(SupportsGet = true)]
-    public string? Search { get; set; }
-    
+    [BindProperty(SupportsGet = true)] public string? Search { get; set; }
+
+    [BindProperty(SupportsGet = true)] public string? ProjectId { get; set; }
+
+    [BindProperty(SupportsGet = true)] public string? ProjectPath { get; set; }
+
+    [BindProperty(SupportsGet = true)] public DateOnly? EventDate { get; set; }
+
     public void OnGet()
     {
-     
-        IEnumerable<Project> projects = _projectService.GetAllProjects();
-
-        if (!string.IsNullOrWhiteSpace(Search))
+        IEnumerable<Project> projects = _searchService.SearchProjects(new ProjectSearchSettings()
         {
-            string search = Search.Trim();
-
-            projects = projects.Where(project =>
-                project.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || project.Path.Contains(search, StringComparison.OrdinalIgnoreCase)
-                || project.EventDate.ToString().Contains(search, StringComparison.OrdinalIgnoreCase)
-            );
-        }
+            EventDate = this.EventDate,
+            ProjectName = this.Search,
+            ProjectPath = this.ProjectPath,
+            ProjectId = null
+        });
         
+        _logger.LogInformation($"Found {projects.Count()} projects");
+
         Projects = projects
             .OrderByDescending(project => project.EventDate)
             .ThenBy(project => project.Name)
             .ToList();
 
-        
+        _logger.LogInformation($"Found {projects.Count()} projects");
+
         if (SelectedProjectId is not null)
         {
             SelectedProject = _projectService.GetProjectById(SelectedProjectId.Value);
-            
+
             Response.Cookies.Append(
                 LastProjectCookie,
                 SelectedProjectId.Value.ToString(),
@@ -61,8 +66,9 @@ public class IndexModel : PageModel
                     HttpOnly = true,
                     SameSite = SameSiteMode.Lax
                 });
-        } else if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText)
-                  && int.TryParse(projectIdText, out int lastProjectId))
+        }
+        else if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText) &&
+                 int.TryParse(projectIdText, out int lastProjectId))
         {
             SelectedProjectId = lastProjectId;
             SelectedProject = _projectService.GetProjectById(lastProjectId);
