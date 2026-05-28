@@ -48,6 +48,13 @@ public interface IProjectService
 
 
     /// <summary>
+    ///     Returns the given image based on its ID.
+    /// </summary>
+    /// <param name="imageId"></param>
+    /// <returns></returns>
+    public Image GetImageById(int imageId);
+    
+    /// <summary>
     ///     Returns the given project based on its ID.
     /// </summary>
     /// <param name="projectId"></param>
