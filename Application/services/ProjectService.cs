@@ -75,7 +75,12 @@ public partial class ProjectService : IProjectService
 
     public int GetProjectImageCount(int projectId)
     {
-        return _projectRepository.GetProjectImageCount(projectId);
+        return _imageRepository.GetProjectImageCount(projectId);
+    }
+    
+    public int GetProjectCount()
+    {
+        return _projectRepository.GetProjectCount();
     }
 
     public Project GetProjectById(int projectId)

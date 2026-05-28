@@ -64,16 +64,14 @@ public class ProjectRepository : IProjectRepository
                     """, id);
     }
 
-    public int GetProjectImageCount(int projectId)
+    public int GetProjectCount()
     {
         return _db.Query("""
-                         SELECT COUNT(*)
-                         FROM public.image
-                         WHERE project_id = $1
-                         """, 
-            reader => !reader.HasRows ? 0 : reader.GetInt32(0));
+                         SELECT COUNT(*) 
+                         FROM public.project
+                         """, reader => !reader.HasRows ? 0 : reader.GetInt32(0));
     }
-    
+
     public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
     {
         return _db.QueryMultiple(

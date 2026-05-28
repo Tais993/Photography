@@ -60,6 +60,12 @@ public interface IProjectService
     /// <param name="projectId"></param>
     /// <returns></returns>
     public int GetProjectImageCount(int projectId);
+
+    /// <summary>
+    ///     Returns the amount of projects that exist
+    /// </summary>
+    /// <returns></returns>
+    public int GetProjectCount();
     
     /// <summary>
     ///     Returns the given project based on its ID.
