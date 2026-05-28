@@ -19,17 +19,25 @@ public class RepositoryHelper
         params object[] parameterValues)
     {
         _logger.LogDebug("QueryMultiple, with params: {ParameterValues}", (object?)parameterValues);
-        return Query(sql, reader =>
+
+        try
         {
-            List<T> results = [];
-
-            do
+            return Query(sql, reader =>
             {
-                results.Add(resultConverter(reader));
-            } while (reader.Read());
+                List<T> results = [];
 
-            return results;
-        }, parameterValues);
+                do
+                {
+                    results.Add(resultConverter(reader));
+                } while (reader.Read());
+
+                return results;
+            }, parameterValues);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return new List<T>();
+        }
     }
 
     public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
@@ -40,7 +48,7 @@ public class RepositoryHelper
         using NpgsqlConnection cnx = _dataSource.OpenConnection();
 
         using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
-        
+
         SetParameters<TResult>(parameterValues, npgsqlCommand);
 
         using NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
@@ -70,8 +78,8 @@ public class RepositoryHelper
 
         cnx.CloseAsync();
     }
-    
-    
+
+
     private void SetParameters<TResult>(object?[] parameterValues, NpgsqlCommand npgsqlCommand)
     {
         foreach (object? parameterValue in parameterValues)
