@@ -79,4 +79,9 @@ public class IndexModel : PageModel
             SelectedProjectId = SelectedProject?.Id;
         }
     }
+    
+    public int GetProjectCount()
+    {
+        return _projectService.GetProjectCount();
+    }
 }
