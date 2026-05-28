@@ -24,40 +24,7 @@ public class ImageRepository : IImageRepository
                          WHERE id = ($1)
                          """, MapImage, id);
     }
-
-    public List<Image> GetImagesByFileName(int projectId, string fileName)
-    {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE project_id = $1 AND file_name = $2
-                                 """, MapImage, projectId, fileName);
-    }
-
-    public List<Image> GetImagesByFileName(string fileName)
-    {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE file_name = $1
-                                 """, MapImage, fileName);
-    }
-
-    public List<Image> GetImagesByPhotoNumber(string fileNumber)
-    {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE file_name ~* ('(^|[^0-9])' || $1 || '([^0-9]|$)')
-                                 """, MapImage, fileNumber);
-    }
-
-    public List<Image> GetImagesByPhotoNumber(int projectId, string fileNumber)
-    {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE project_id = $1
-                                 AND file_name ~* ('(^|[^0-9])' || $2 || '([^0-9]|$)')
-                                 """, MapImage, projectId, fileNumber);
-    }
-
+    
     public List<Image> GetAll()
     {
         return _db.QueryMultiple("""
