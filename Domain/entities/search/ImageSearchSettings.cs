@@ -1,6 +1,6 @@
 ﻿namespace Domain.entities;
 
-public class FileSearchSettings
+public class ImageSearchSettings
 {
     public int? ProjectId = null;
     public string? FileNameOrNumber = null;

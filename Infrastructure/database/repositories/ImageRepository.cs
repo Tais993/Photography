@@ -124,7 +124,7 @@ public class ImageRepository : IImageRepository
     }
 
 
-    public List<Image> SearchImages(FileSearchSettings fileSearchSettings)
+    public List<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
         return _db.QueryMultiple("""
                                  SELECT id, project_id, file_name, file_type, relational_file_path
@@ -146,8 +146,8 @@ public class ImageRepository : IImageRepository
                                      $5::text IS NULL
                                          OR LOWER(file_type) = LOWER($5::text)
                                      )
-                                 """, MapImage, fileSearchSettings.ProjectId!, fileSearchSettings.FileNumber!,
-            fileSearchSettings.FileName!, fileSearchSettings.FolderName!, fileSearchSettings.FileType!);
+                                 """, MapImage, imageSearchSettings.ProjectId!, imageSearchSettings.FileNumber!,
+            imageSearchSettings.FileName!, imageSearchSettings.FolderName!, imageSearchSettings.FileType!);
     }
 
 

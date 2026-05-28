@@ -9,7 +9,7 @@ namespace Cli.Commands;
 public class SearchCommand : CommandBase
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly IFileSearchService _fileSearchService;
+    private readonly ISearchService _searchService;
     private readonly IProjectService _projectService;
  
     private const string QueryName = "query";
@@ -42,10 +42,10 @@ public class SearchCommand : CommandBase
         DefaultValueFactory = _ => "Originals"
     };
 
-    public SearchCommand(IFileSearchService fileSearchService, IProjectService projectService,
+    public SearchCommand(ISearchService searchService, IProjectService projectService,
         IProjectRepository projectRepository)
     {
-        _fileSearchService = fileSearchService;
+        _searchService = searchService;
         _projectService = projectService;
         _projectRepository = projectRepository;
     }
@@ -77,7 +77,7 @@ public class SearchCommand : CommandBase
                 parseResult.GetValue(ProjectOption));
         }
 
-        FileSearchSettings settings = new FileSearchSettings()
+        ImageSearchSettings settings = new ImageSearchSettings()
         {
             FileNameOrNumber = fileName,
             ProjectId = projectId,
@@ -85,7 +85,7 @@ public class SearchCommand : CommandBase
             FolderName = originFolder,
         };
 
-        List<Image> images = _fileSearchService.SearchImages(settings);
+        List<Image> images = _searchService.SearchImages(settings);
 
         foreach (Image image in images)
         {
