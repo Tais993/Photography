@@ -68,6 +68,11 @@ public partial class ProjectService : IProjectService
         return _projectRepository.GetById(possibleEmptyProjectId);
     }
 
+    public Image GetImageById(int imageId)
+    {
+        return _imageRepository.GetById(imageId);
+    }
+    
     public Project GetProjectById(int projectId)
     {
         return _projectRepository.GetById(projectId);
@@ -77,6 +82,7 @@ public partial class ProjectService : IProjectService
     {
         return _projectRepository.GetAll();
     }
+    
 
     public void InitialiseExistingFolder(string projectDirectory)
     {
