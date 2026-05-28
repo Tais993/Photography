@@ -90,6 +90,15 @@ public class ImageRepository : IImageRepository
                     """, id);
     }
 
+    public int GetProjectImageCount(int projectId)
+    {
+        return _db.Query("""
+                         SELECT COUNT(*)
+                         FROM public.image
+                         WHERE project_id = $1
+                         """, reader => !reader.HasRows ? 0 : reader.GetInt32(0),
+            projectId);
+    }
 
     public List<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
