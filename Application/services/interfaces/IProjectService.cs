@@ -55,6 +55,13 @@ public interface IProjectService
     public Image GetImageById(int imageId);
     
     /// <summary>
+    ///     Returns the amount of images that are connected to the project
+    /// </summary>
+    /// <param name="projectId"></param>
+    /// <returns></returns>
+    public int GetProjectImageCount(int projectId);
+    
+    /// <summary>
     ///     Returns the given project based on its ID.
     /// </summary>
     /// <param name="projectId"></param>
@@ -66,6 +73,7 @@ public interface IProjectService
     /// </summary>
     /// <returns></returns>
     public List<Project> GetAllProjects();
+    
     
     /// <summary>
     ///     Initialises the given projects directory into the database,

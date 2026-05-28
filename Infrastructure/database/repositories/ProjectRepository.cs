@@ -64,6 +64,41 @@ public class ProjectRepository : IProjectRepository
                     """, id);
     }
 
+    public int GetProjectImageCount(int projectId)
+    {
+        return _db.Query("""
+                         SELECT COUNT(*)
+                         FROM public.image
+                         WHERE project_id = $1
+                         """, 
+            reader => !reader.HasRows ? 0 : reader.GetInt32(0));
+    }
+    
+    public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
+    {
+        return _db.QueryMultiple(
+            """
+            SELECT id, name, path, event_date
+            FROM public.project
+            WHERE ($1::int IS NULL OR id = $1::int)
+              AND (
+                  $2::text IS NULL
+                  OR name ILIKE ('%' || $2::text || '%')
+              )
+              AND (
+                  $3::text IS NULL
+                  OR path ILIKE ('%' || $3::text || '%')
+              )
+              AND (
+                  $4::date IS NULL
+                  OR event_date = $4::date
+              )
+            ORDER BY event_date DESC, name
+            """,
+            MapProject, projectSearchSettings.ProjectId, projectSearchSettings.ProjectName, projectSearchSettings.ProjectPath,
+            projectSearchSettings.EventDate
+        );
+    }
 
     private static Project MapProject(NpgsqlDataReader reader)
     {

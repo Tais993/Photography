@@ -72,7 +72,12 @@ public partial class ProjectService : IProjectService
     {
         return _imageRepository.GetById(imageId);
     }
-    
+
+    public int GetProjectImageCount(int projectId)
+    {
+        return _projectRepository.GetProjectImageCount(projectId);
+    }
+
     public Project GetProjectById(int projectId)
     {
         return _projectRepository.GetById(projectId);
