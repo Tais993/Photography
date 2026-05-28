@@ -4,4 +4,5 @@
   <Project Path="Infrastructure/Infrastructure.csproj" />
   <Project Path="Photography/Photography.csproj" />
   <Project Path="Tests/Tests.csproj" />
+  <Project Path="Website/Website.csproj" />
 </Solution>
