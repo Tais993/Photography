@@ -36,6 +36,12 @@ public class FileSearchService : IFileSearchService
 
     public List<Image> SearchImages(FileSearchSettings fileSearchSettings)
     {
+        fileSearchSettings.FileNameOrNumber = ValidateValue(fileSearchSettings.FileNameOrNumber);
+        fileSearchSettings.FileName = ValidateValue(fileSearchSettings.FileName);
+        fileSearchSettings.FileNumber = ValidateValue(fileSearchSettings.FileNumber);
+        fileSearchSettings.FolderName = ValidateValue(fileSearchSettings.FolderName);
+        fileSearchSettings.FileType = ValidateValue(fileSearchSettings.FileType);
+        
         if (fileSearchSettings.FileNameOrNumber != null)
         {
             if (int.TryParse(fileSearchSettings.FileNameOrNumber, out _))
@@ -49,5 +55,22 @@ public class FileSearchService : IFileSearchService
         }
         
         return _imagesRepository.SearchImages(fileSearchSettings);
+    }
+
+    private static string? ValidateValue(string? value)
+    {
+        if (value == null)
+        {
+            return null;
+        }
+        
+        value = value.Trim();
+
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return value;
     }
 }
