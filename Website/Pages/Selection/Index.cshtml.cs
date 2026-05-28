@@ -115,4 +115,8 @@ public class IndexModel : PageModel
         _irfanviewService.OpenImage("C:\\Program Files\\IrfanView\\i_view64.exe", imagePath);
     }
 
+    public int GetProjectImageCount()
+    {
+        return _projectService.GetProjectImageCount((int) SelectedProjectId);
+    }
 }
