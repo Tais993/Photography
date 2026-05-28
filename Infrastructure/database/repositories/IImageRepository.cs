@@ -12,6 +12,8 @@ public interface IImageRepository
     public Image Insert(Image image);
     public void Update(Image image);
     public void DeleteById(int id);
+    
+    int GetProjectImageCount(int projectId);
 
     public List<Image> SearchImages(ImageSearchSettings imageSearchSettings);
 }
