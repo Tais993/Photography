@@ -35,14 +35,19 @@
         <div class="col-12">
             <form method="get" class="card">
                 <div class="card-body">
-                    <div class="row g-2 align-items-end">
-                        <div class="col">
-                            <label class="form-label" asp-for="Search">Search projects</label>
+                    <label class="form-label" asp-for="Search">Search projects</label>
 
+                    <div class="row g-2">
+                        @if (Model.SelectedProjectId is not null)
+                        {
+                            <input type="hidden" asp-for="SelectedProjectId"/>
+                        }
+
+                        <div class="col">
                             <div class="input-icon">
-                            <span class="input-icon-addon">
-                                <i class="ti ti-search"></i>
-                            </span>
+                                <span class="input-icon-addon">
+                                    <i class="ti ti-search"></i>
+                                </span>
 
                                 <input asp-for="Search"
                                        class="form-control"
@@ -50,10 +55,35 @@
                             </div>
                         </div>
 
-                        @if (Model.SelectedProjectId is not null)
-                        {
-                            <input type="hidden" asp-for="SelectedProjectId"/>
-                        }
+                        <div class="col-md-4">
+                            <div class="input-icon">
+                                <span class="input-icon-addon">
+                                    <i class="ti ti-search"></i>
+                                </span>
+
+                                <input asp-for="ProjectPath"
+                                       class="form-control"
+                                       placeholder="Search by path..."/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-1">
+                            <div class="input-icon">
+                                <span class="input-icon-addon">
+                                    <i class="ti ti-search"></i>
+                                </span>
+
+                                <input asp-for="ProjectId"
+                                       class="form-control"
+                                       placeholder="ID"/>
+                            </div>
+                        </div>
+
+                        <div class="col-md-2">
+                                <input asp-for="EventDate"
+                                       type="date"
+                                       class="form-control"/>
+                        </div>
 
                         <div class="col-auto">
                             <button type="submit" class="btn btn-primary">
