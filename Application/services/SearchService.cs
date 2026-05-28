@@ -1,18 +1,21 @@
 ﻿using Application.services.interfaces;
 using Domain.entities;
 using Infrastructure.database.repositories;
+using Microsoft.Extensions.Logging;
 
 namespace Application.services;
 
 public class SearchService : ISearchService
 {
-    private readonly IImageRepository _imagesRepository;
     private readonly IProjectRepository _projectRepository;
+    private readonly IImageRepository _imagesRepository;
+    private readonly ILogger<SearchService> _logger;
 
-    public SearchService(IImageRepository imagesRepository, IProjectRepository projectRepository)
+    public SearchService(IImageRepository imagesRepository, IProjectRepository projectRepository, ILogger<SearchService> logger)
     {
         _imagesRepository = imagesRepository;
         _projectRepository = projectRepository;
+        _logger = logger;
     }
 
     public List<Image> SearchImages(ImageSearchSettings imageSearchSettings)
