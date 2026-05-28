@@ -10,7 +10,7 @@ namespace Cli.Commands;
 
 public class SelectCommand : CommandBase
 {
-    private readonly IFileSearchService _fileSearchService;
+    private readonly ISearchService _searchService;
     private readonly IProjectService _projectService;
     private readonly ImageSelectionService _imageSelectionService;
     private readonly IrfanviewService _irfanView;
@@ -18,10 +18,10 @@ public class SelectCommand : CommandBase
     private readonly IFiles _files;
 
 
-    public SelectCommand(IFileSearchService fileSearchService, ImageSelectionService imageSelectionService,
+    public SelectCommand(ISearchService searchService, ImageSelectionService imageSelectionService,
         IrfanviewService irfanView, ILogger<SelectCommand> logger, IFiles files, IProjectService projectService)
     {
-        _fileSearchService = fileSearchService;
+        _searchService = searchService;
         _imageSelectionService = imageSelectionService;
         _irfanView = irfanView;
         _logger = logger;
@@ -82,7 +82,7 @@ public class SelectCommand : CommandBase
         string? fileType = parseResult.GetValue<string>(_fileType);
         string originFolder = parseResult.GetValue<string>(_originFolder)!;
 
-        IEnumerable<Image> images = _fileSearchService.SearchImages(new FileSearchSettings()
+        IEnumerable<Image> images = _searchService.SearchImages(new ImageSearchSettings()
         {
             FileName = fileName,
             FileNumber = fileNumber,

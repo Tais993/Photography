@@ -17,5 +17,5 @@ public interface IImageRepository
     public void Update(Image image);
     public void DeleteById(int id);
 
-    public List<Image> SearchImages(FileSearchSettings fileSearchSettings);
+    public List<Image> SearchImages(ImageSearchSettings imageSearchSettings);
 }

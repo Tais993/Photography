@@ -9,7 +9,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddTransient<ICopyService, CopyService>();
-        services.AddTransient<IFileSearchService, FileSearchService>();
+        services.AddTransient<ISearchService, SearchService>();
         services.AddTransient<ILightroomService, LightroomService>();
         services.AddTransient<IProjectService, ProjectService>();
         services.AddTransient<IProjectMetadataService, ProjectMetadataService>();
