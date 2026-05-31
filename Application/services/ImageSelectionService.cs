@@ -40,8 +40,13 @@ public class ImageSelectionService
         sessionName ??= _projectRepository.GetById(projectId).Name;
         
         return _selectionRepository.GetOrStartSession(projectId, sessionName);
-        
     }
+
+    public int GetSessionId(int projectId)
+    {
+        return _selectionRepository.GetSessionIdByProjectId(projectId);
+    }
+    
     public void RemoveSession(Project project)
     { 
         RemoveSession((int) project.Id);
@@ -64,13 +69,17 @@ public class ImageSelectionService
 
     public void SelectImage(Image image)
     {
-        // no
-        SelectImage(image.ProjectId, (int) image.Id);
+        AddImageToSelection(image.ProjectId, (int) image.Id);
     }
 
-    public void SelectImage(int selectionId, int imageId)
+    public void AddImageToSelection(int sessionId, int imageId)
     {
-        _selectionRepository.AddImageToProjectSelection(selectionId, imageId);
+        _selectionRepository.AddImageToProjectSelection(sessionId, imageId);
+    }
+
+    public void RemoveImageFromSelection(int sessionId, int imageId)
+    {
+        _selectionRepository.RemoveImageFromProjectSelection(sessionId, imageId);
     }
 
     public SelectionSession GetSessionImages(Project project)
@@ -82,5 +91,24 @@ public class ImageSelectionService
     public SelectionSession GetSessionImages(int projectId)
     {
         return _selectionRepository.GetByProject(projectId);
+    }
+
+    public bool ImageIsSelected(int sessionId, int imageId)
+    {
+        return _selectionRepository.ImageIsSelected(sessionId, imageId);
+    }
+    
+    public bool ToggleImageSelection(int sessionId, int imageId)
+    {
+        if (ImageIsSelected(sessionId, imageId))
+        {
+            RemoveImageFromSelection(sessionId, imageId);
+            return false;
+        }
+        else
+        {
+            AddImageToSelection(sessionId, imageId);
+            return true;
+        }
     }
 }
