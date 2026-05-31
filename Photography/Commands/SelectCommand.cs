@@ -95,7 +95,7 @@ public class SelectCommand : CommandBase
 
         foreach (Image image in images)
         {
-            _imageSelectionService.SelectImage((int) selectionSession.Id, (int) image.Id);
+            _imageSelectionService.AddImageToSelection((int) selectionSession.Id, (int) image.Id);
         }
 
         return 0;
