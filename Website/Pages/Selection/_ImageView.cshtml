@@ -1,0 +1,53 @@
+﻿@using Application
+@model _ImageView
+
+<div id="image-view-@Model.ImageId" class="col-6 col-sm-4 col-md-3 col-lg-2">
+    <div class="position-relative image-hover-area">
+        <button type="button"
+                class="btn btn-sm btn-primary position-absolute top-0 start-0 m-2 image-hover-button"
+                data-image-id="@Model.ImageId"
+                onclick="toggleImageSelection(event, this)">
+            <i class="ti ti-check text-white"></i>
+        </button>
+
+        <button type="button"
+                class="card card-sm w-100 p-0 text-start overflow-hidden @(Model.Selected ? "border-primary border-2" : "")"
+                onclick="selectImage(@Model.ImageId)">
+            <div class="ratio ratio-1x1 bg-secondary-lt">
+                @if (Constants.ImageFileTypes.Contains(Model.FileType))
+                {
+                    <img src="@Url.Page("/Selection/Thumbnail", new
+                              {
+                                  imageId = Model.ImageId,
+                              })"
+                         alt="@Model.FileName"
+                         class="w-100 h-100 object-fit-cover"/>
+                }
+                else
+                {
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <i class="ti ti-photo fs-1 text-blue"></i>
+                    </div>
+                }
+            </div>
+            @if (Model.Selected)
+            {
+                <span class="badge bg-primary position-absolute top-0 start-0 m-2">
+                    <i class="ti ti-check text-white"></i>
+                </span>
+            }
+        </button>
+    </div>
+
+    <div class="card-body p-2">
+        <div class="text-truncate fw-bold">
+            @Model.FileName
+        </div>
+        <div class="text-muted small text-truncate">
+            @Model.FileType
+        </div>
+        <div class="text-muted small text-truncate">
+            @Model.RelationalFilePath
+        </div>
+    </div>
+</div>
