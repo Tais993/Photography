@@ -2,16 +2,22 @@
 using Cli;
 using Infrastructure;
 using Infrastructure.database;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateApplicationBuilder(
-        new HostApplicationBuilderSettings
-        {
-            Args = args,
-            ContentRootPath = AppContext.BaseDirectory
-        })
-    ;
+    new HostApplicationBuilderSettings
+    {
+        Args = args,
+        ContentRootPath = AppContext.BaseDirectory
+    });
+
+builder.Configuration.AddJsonFile(
+    "appsettings.shared.json",
+    optional: false,
+    reloadOnChange: true
+);
 
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
