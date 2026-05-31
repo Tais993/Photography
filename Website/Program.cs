@@ -6,6 +6,11 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(new WebApplicationO
     ContentRootPath = AppContext.BaseDirectory,
 });
 
+builder.Configuration.AddJsonFile(
+    "appsettings.shared.json",
+    optional: false,
+    reloadOnChange: true
+);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
