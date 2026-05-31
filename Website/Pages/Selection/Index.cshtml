@@ -8,7 +8,6 @@
 }
 
 <div class="page-body">
-
     <div class="page-header d-print-none">
         <div class="row align-items-center">
             <div class="col">
@@ -33,7 +32,6 @@
     </div>
 
     <div class="row row-cards mt-3">
-
         <div class="col-12">
             <form method="get" class="card">
                 <div class="card-body">
@@ -272,7 +270,93 @@
 @section Scripts {
     <script>
         async function openImageInIrfanView() {
-            await fetch(`?handler=OpenImage&SelectedProjectId=@Model.SelectedProjectId&SelectedImageId=@Model.SelectedImageId`, {});
+            const selectedProjectId = document.querySelector('input[name="SelectedProjectId"]')?.value;
+            const selectedImageId = document.querySelector('input[name="SelectedImageId"]')?.value;
+
+            await fetch(`?handler=OpenImage&SelectedProjectId=${selectedProjectId}&SelectedImageId=${selectedImageId}`, {});
         }
+
+        window.selectImage = async function selectImage(imageId) {
+            const panel = document.getElementById("selected-image-panel");
+
+            panel.classList.add("opacity-50");
+
+            const response = await fetch(`?handler=SelectedImage&imageId=${imageId}`);
+
+            if (!response.ok) {
+                panel.innerHTML = `
+            <div class="card">
+                <div class="card-body">
+                    <div class="empty">
+                        <p class="empty-title">Could not load image</p>
+                    </div>
+                </div>
+            </div>`;
+                panel.classList.remove("opacity-50");
+                return;
+            }
+
+            const selectedImageInput = document.querySelector('input[name="SelectedImageId"]');
+
+            if (selectedImageInput) {
+                selectedImageInput.value = imageId;
+            }
+
+            const url = new URL(window.location);
+            url.searchParams.set("SelectedImageId", imageId);
+            window.history.replaceState({}, "", url);
+
+            panel.innerHTML = await response.text();
+            panel.classList.remove("opacity-50");
+        }
+
+        window.resetFilters = function () {
+            const selectedProjectId = document.querySelector('input[name="SelectedProjectId"]')?.value;
+            const selectedImageId = document.querySelector('input[name="SelectedImageId"]')?.value;
+
+            const url = new URL(window.location);
+
+            url.search = "";
+
+            if (selectedProjectId) {
+                url.searchParams.set("SelectedProjectId", selectedProjectId);
+            }
+
+            if (selectedImageId) {
+                url.searchParams.set("SelectedImageId", selectedImageId);
+            }
+
+            window.location.href = url.toString();
+        }
+        
+        window.toggleImageSelection = async function toggleImageSelection(event, button) {
+            event.stopPropagation();
+            event.preventDefault();
+
+            const imageId = button.dataset.imageId;
+            const projectId = document.querySelector("[name='SelectedProjectId']").value;
+
+
+            console.log(`image-view-${imageId}`);
+            const imageView = document.getElementById(`image-view-${imageId}`);
+
+            const response = await fetch(`?handler=ToggleImageSelection&imageId=${imageId}&selectedProjectId=${projectId}`);
+
+            if (!response.ok) {
+                console.error("Could not toggle image selection");
+                return;
+            }
+
+            imageView.outerHTML = await response.text();
+        }
+
+        document.getElementById("search-form").addEventListener("submit", function () {
+            for (const element of this.querySelectorAll("input[name], select[name]")) {
+                if (!element.value) {
+                    element.disabled = true;
+                }
+            }
+        });
+
     </script>
 }
