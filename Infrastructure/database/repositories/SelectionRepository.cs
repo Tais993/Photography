@@ -65,6 +65,26 @@ public class SelectionRepository
                          """, MapSelection, id);
     }
 
+    public int GetSessionIdByProjectId(int projectId)
+    {
+        return _db.Query("""
+                         SELECT id FROM public.selection_session
+                         WHERE project_id = $1
+                         """, _db.MapToInt, projectId);
+    }
+
+    public bool ImageIsSelected(int sessionId, int imageId)
+    {
+        return _db.Query("""
+                         SELECT EXISTS (
+                             SELECT 1
+                             FROM public.selection_session_image
+                             WHERE selection_session_id = $1 
+                             AND image_id = $2
+                         );
+                         """, _db.MapToBool, sessionId, imageId);
+    }
+
     public void AddImageToProjectSelection(int selectionId, int imageId)
     {
         _db.Execute("""
@@ -118,7 +138,7 @@ public class SelectionRepository
             ((int[])reader["image_ids"]).ToList()
         );
     }
-    
+
     private static SelectionSession MapSelectionWithoutImages(NpgsqlDataReader reader)
     {
         return new SelectionSession(
