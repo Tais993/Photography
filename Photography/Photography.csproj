@@ -8,6 +8,7 @@
 
         <!-- Outputs -->
         <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+        <None Include="..\appsettings.shared.json" Link="appsettings.shared.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
 
         <!-- Package references -->
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7"/>

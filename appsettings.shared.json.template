@@ -1,0 +1,33 @@
+{
+  "FolderNames": {
+    "Originals":[
+      "Originals",
+      "Original"
+    ],
+    "Editing": [
+      "Editing",
+      "Edits",
+      "Edit"
+    ],
+    "Finals":[
+      "Finals",
+      "Final",
+      "Results"
+    ]
+  },
+  "Thumbnails": {
+    "DefaultSize": 300,
+    "LargeSize": 1200,
+    "JpegQuality": 80
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Debug",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "ConnectionStrings": {
+    "Default": ""
+  }
+}
