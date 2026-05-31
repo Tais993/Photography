@@ -5,7 +5,7 @@ using Infrastructure.filesystem;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static Application.Constants;
-using static Website.Constants;
+using static Website.WebsiteConstants;
 
 namespace Website.Pages.Selection;
 
