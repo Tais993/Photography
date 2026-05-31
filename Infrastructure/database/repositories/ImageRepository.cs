@@ -96,7 +96,7 @@ public class ImageRepository : IImageRepository
                          SELECT COUNT(*)
                          FROM public.image
                          WHERE project_id = $1
-                         """, reader => !reader.HasRows ? 0 : reader.GetInt32(0),
+                         """, _db.MapToInt,
             projectId);
     }
 

@@ -69,7 +69,7 @@ public class ProjectRepository : IProjectRepository
         return _db.Query("""
                          SELECT COUNT(*) 
                          FROM public.project
-                         """, reader => !reader.HasRows ? 0 : reader.GetInt32(0));
+                         """, _db.MapToInt);
     }
 
     public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
