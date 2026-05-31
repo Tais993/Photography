@@ -96,4 +96,15 @@ public class RepositoryHelper
             }
         }
     }
+
+    public int MapToInt(NpgsqlDataReader reader)
+    {
+        return !reader.HasRows ? 0 : reader.GetInt32(0);
+    }
+    
+    
+    public bool MapToBool(NpgsqlDataReader reader)
+    {
+        return reader.HasRows && reader.GetBoolean(0);
+    }
 }
