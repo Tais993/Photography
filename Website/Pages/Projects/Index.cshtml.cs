@@ -2,7 +2,7 @@
 using Domain.entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static Website.Constants;
+using static Website.WebsiteConstants;
 
 namespace Website.Pages.Projects;
 
