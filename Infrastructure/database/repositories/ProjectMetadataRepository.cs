@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Infrastructure.database.repositories;
 
-public class ProjectMetadataRepository
+public class ProjectMetadataRepository : IProjectMetadataRepository
 {
     private readonly RepositoryHelper _db;
     private readonly ILogger<ProjectMetadataRepository> _logger;
@@ -18,7 +18,7 @@ public class ProjectMetadataRepository
     }
 
     // PRobably shouldn't use this method
-    private List<ProjectMetadata> GetAll()
+    public List<ProjectMetadata> GetAll()
     {
         return _db.QueryMultiple("""
                                  SELECT

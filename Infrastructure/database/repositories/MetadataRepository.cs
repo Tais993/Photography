@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Infrastructure.database.repositories;
 
-public class MetadataRepository
+public class MetadataRepository : IMetadataRepository
 {
     private readonly RepositoryHelper _db;
     private readonly ILogger<MetadataRepository> _logger;

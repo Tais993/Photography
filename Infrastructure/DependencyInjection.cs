@@ -21,14 +21,14 @@ public static class DependencyInjection
 // Repositories
         services.AddTransient<IImageRepository, ImageRepository>();
         services.AddTransient<IProjectRepository, ProjectRepository>();
-        services.AddTransient<MetadataRepository>();
-        services.AddTransient<ProjectMetadataRepository>();
-        services.AddTransient<SelectionRepository>();
+        services.AddTransient<IMetadataRepository, MetadataRepository>();
+        services.AddTransient<IProjectMetadataRepository, ProjectMetadataRepository>();
+        services.AddTransient<ISelectionRepository, SelectionRepository>();
 
 
         services.AddTransient<IFiles, Files>();
 
-        services.AddTransient<IrfanViewRepository>();
+        services.AddTransient<IIrfanViewRepository, IrfanViewRepository>();
         return services;
     }
 }
