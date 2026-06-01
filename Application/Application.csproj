@@ -3,9 +3,9 @@
     <ItemGroup>
         <!-- Project references -->
         <ProjectReference Include="..\Domain\Domain.csproj"/>
-        <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
 
         <!-- Package references -->
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-preview.2.26159.112"/>
     </ItemGroup>
 
