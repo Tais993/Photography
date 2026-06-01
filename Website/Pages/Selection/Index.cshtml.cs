@@ -86,6 +86,26 @@ public class IndexModel : PageModel
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
 
+        foreach (Image image in imageList)
+        {
+            if (SelectedImageIds.Contains((int)image.Id))
+            {
+                Console.WriteLine($"Image is selected: {image.FileName}");
+            }
+
+            Console.WriteLine($"Image is NOT selected: {image.FileName}, {image.Id}");
+        }
+
+        Console.WriteLine("Selected images:");
+
+        foreach (int selectedImageId in SelectedImageIds)
+        {
+            Console.WriteLine($"Image: {selectedImageId}");
+        }
+
+        foreach (string nonRawKey in nonRawKeys)
+        {
+        }
         // afbeelding is RAW en heeft GEEN raw variant, dan is ie goedgekeurd
         // alle NIET raws
 
@@ -98,17 +118,74 @@ public class IndexModel : PageModel
         return RawFileTypes.Contains(fileType);
     }
 
-    public IActionResult OnGetOpenImage(int projectId)
+    public IActionResult OnGetOpenImage()
     {
         OpenImageInIrfanview();
 
         return new NoContentResult();
     }
 
+    public IActionResult OnGetSelectedImage(int imageId)
+    {
+        Image? image = _projectService.GetImageById(imageId);
+        SelectedImage = image;
+        SelectedImageId = imageId;
+
+        if (image is null)
+        {
+            return NotFound();
+        }
+
+        return Partial("_SelectedImage", image);
+    }
+    
+    public PartialViewResult OnGetImage(Image image)
+    {
+        bool isSelected = SelectedImageIds.Contains(image.Id!.Value);
+
+        _ImageView imageView = new _ImageView
+        {
+            Selected = isSelected,
+            ImageId = (int) image.Id,
+            FileType = image.FileType,
+            FileName = image.FileName,
+            RelationalFilePath = image.RelationalFilePath
+        };
+
+        return Partial("_ImageView", imageView);
+    }
+    
+    public IActionResult OnGetToggleImageSelection(int imageId, int selectedProjectId)
+    {
+        _logger.LogInformation("OnPostToggleImageSelection");
+        Project? project = _projectService.GetProjectById(selectedProjectId);
+        Image? image = _projectService.GetImageById(imageId);
+
+        if (project is null || image is null)
+        {
+            return NotFound();
+        }
+
+        int sessionId = _imageSelectionService.GetSessionId(selectedProjectId);
+        bool isSelected = _imageSelectionService.ToggleImageSelection(sessionId, imageId);
+
+        _ImageView imageView = new()
+        {
+            Selected = isSelected,
+            ImageId = image.Id,
+            FileType = image.FileType,
+            FileName = image.FileName,
+            RelationalFilePath = image.RelationalFilePath
+        };
+
+        _logger.LogInformation("ImageView");
+        return Partial("_ImageView", imageView);
+    }
+
     public void OpenImageInIrfanview()
     {
-        SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
-        SelectedImage = _projectService.GetImageById((int)SelectedImageId);
+        SelectedProject = _projectService.GetProjectById((int) SelectedProjectId);
+        SelectedImage = _projectService.GetImageById((int) SelectedImageId);
 
         string imagePath = _fileService.Combine(SelectedProject.Path, SelectedImage.RelationalFilePath);
 
@@ -117,6 +194,6 @@ public class IndexModel : PageModel
 
     public int GetProjectImageCount()
     {
-        return _projectService.GetProjectImageCount((int) SelectedProjectId);
+        return _projectService.GetProjectImageCount((int)SelectedProjectId);
     }
 }
