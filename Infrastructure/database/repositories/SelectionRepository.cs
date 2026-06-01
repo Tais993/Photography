@@ -4,7 +4,7 @@ using Npgsql;
 
 namespace Infrastructure.database.repositories;
 
-public class SelectionRepository
+public class SelectionRepository : ISelectionRepository
 {
     private readonly RepositoryHelper _db;
     private readonly ILogger<SelectionRepository> _logger;

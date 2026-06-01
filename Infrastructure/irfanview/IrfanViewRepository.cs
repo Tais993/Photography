@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.irfanview;
 
-public class IrfanViewRepository
+public class IrfanViewRepository : IIrfanViewRepository
 {
     private readonly ILogger<IrfanViewRepository> _logger;
 
