@@ -6,11 +6,11 @@ namespace Application.services;
 
 public class ProjectMetadataService : IProjectMetadataService
 {
-    private readonly MetadataRepository _metadataRepository;
-    private readonly ProjectMetadataRepository _projectMetadataRepository;
+    private readonly IMetadataRepository _metadataRepository;
+    private readonly IProjectMetadataRepository _projectMetadataRepository;
 
-    public ProjectMetadataService(ProjectMetadataRepository projectMetadataRepository,
-        MetadataRepository metadataRepository)
+    public ProjectMetadataService(IProjectMetadataRepository projectMetadataRepository,
+        IMetadataRepository metadataRepository)
     {
         _projectMetadataRepository = projectMetadataRepository;
         _metadataRepository = metadataRepository;

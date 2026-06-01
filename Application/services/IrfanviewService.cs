@@ -7,9 +7,9 @@ namespace Application.services;
 public class IrfanviewService
 {
     private readonly IFiles _files;
-    private readonly IrfanViewRepository _irfanViewRepository;
+    private readonly IIrfanViewRepository _irfanViewRepository;
 
-    public IrfanviewService(IrfanViewRepository irfanViewRepository, IFiles files)
+    public IrfanviewService(IIrfanViewRepository irfanViewRepository, IFiles files)
     {
         _irfanViewRepository = irfanViewRepository;
         _files = files;
