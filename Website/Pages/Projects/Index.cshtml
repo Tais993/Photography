@@ -22,10 +22,10 @@
             </div>
 
             <div class="col-auto ms-auto">
-            <span class="badge bg-blue-lt">
-                <i class="ti ti-folders me-1"></i>
-                @Model.Projects.Count out of @Model.GetProjectCount() project(s)
-            </span>
+                <span class="badge bg-blue-lt">
+                    <i class="ti ti-folders me-1"></i>
+                    @Model.Projects.Count out of @Model.GetProjectCount() project(s)
+                </span>
             </div>
         </div>
     </div>
@@ -80,9 +80,9 @@
                         </div>
 
                         <div class="col-md-2">
-                                <input asp-for="EventDate"
-                                       type="date"
-                                       class="form-control"/>
+                            <input asp-for="EventDate"
+                                   type="date"
+                                   class="form-control"/>
                         </div>
 
                         <div class="col-auto">
@@ -141,9 +141,9 @@
 
                                 <div class="row align-items-center">
                                     <div class="col-auto">
-                                    <span class="avatar @(isSelected ? "bg-white text-blue" : "bg-blue-lt")">
-                                        <i class="ti ti-folder"></i>
-                                    </span>
+                                        <span class="avatar @(isSelected ? "bg-white text-blue" : "bg-blue-lt")">
+                                            <i class="ti ti-folder"></i>
+                                        </span>
                                     </div>
 
                                     <div class="col text-truncate">
@@ -155,8 +155,8 @@
                                             @if (isSelected)
                                             {
                                                 <span class="badge bg-white text-blue">
-                                                Selected
-                                            </span>
+                                                    Selected
+                                                </span>
                                             }
                                         </div>
 
@@ -202,75 +202,24 @@
                 }
                 else
                 {
-                    <div class="card-header">
-                        <div>
-                            <h3 class="card-title">@Model.SelectedProject.Name</h3>
-                            <p class="card-subtitle">Selected project</p>
-                        </div>
-
-                        <div class="card-actions">
-                        <span class="badge bg-green-lt">
-                            <i class="ti ti-check me-1"></i>
-                            Active
-                        </span>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="datagrid">
-                            <div class="datagrid-item">
-                                <div class="datagrid-title">Id</div>
-                                <div class="datagrid-content">@Model.SelectedProject.Id</div>
-                            </div>
-
-                            <div class="datagrid-item">
-                                <div class="datagrid-title">Name</div>
-                                <div class="datagrid-content">@Model.SelectedProject.Name</div>
-                            </div>
-
-                            <div class="datagrid-item">
-                                <div class="datagrid-title">Event date</div>
-                                <div class="datagrid-content">
-                                    @Model.SelectedProject.EventDate.ToString("yyyy-MM-dd")
-                                </div>
-                            </div>
-
-                            <div class="datagrid-item">
-                                <div class="datagrid-title">Readable date</div>
-                                <div class="datagrid-content">
-                                    @Model.SelectedProject.EventDate.ToString("dddd, dd MMMM yyyy")
-                                </div>
-                            </div>
-
-                            <div class="datagrid-item">
-                                <div class="datagrid-title">Path</div>
-                                <div class="datagrid-content text-break">
-                                    @Model.SelectedProject.Path
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card-footer">
-                        <div class="d-grid gap-2">
-                            <a class="btn btn-primary"
-                               asp-page="/Projects/Images"
-                               asp-route-projectId="@Model.SelectedProject.Id">
-                                <i class="ti ti-photo me-2"></i>
-                                Open images
-                            </a>
-
-                            <a class="btn btn-outline-primary"
-                               asp-page="/Projects/Selection"
-                               asp-route-projectId="@Model.SelectedProject.Id">
-                                <i class="ti ti-checklist me-2"></i>
-                                Open selection
-                            </a>
-                        </div>
-                    </div>
+                    <partial name="_SelectedProjectView" model="Model.SelectedProject"/>
                 }
             </div>
         </div>
 
     </div>
 </div>
+
+@section Scripts {
+
+    <script>
+        window.selectProject = async function selectProject(projectID) {
+            const panel = document.getElementById("selected-project-panel");
+
+
+        }
+
+
+    </script>
+}
+
