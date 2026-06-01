@@ -10,14 +10,14 @@ namespace Cli.Commands;
 public class CopyCommand : CommandBase
 {
 
-    private readonly ImageSelectionService _imageSelectionService;
+    private readonly IImageSelectionService _imageSelectionService;
     private readonly ILogger<CopyCommand> _logger;
     private readonly IProjectService _projectService;
     private readonly ICopyService _copyService;
 
 
 
-    public CopyCommand(IProjectService projectService, ICopyService copyService, ILogger<CopyCommand> logger, ImageSelectionService imageSelectionService)
+    public CopyCommand(IProjectService projectService, ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService)
     {
         _projectService = projectService;
         _copyService = copyService;

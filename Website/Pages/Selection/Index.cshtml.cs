@@ -11,15 +11,15 @@ namespace Website.Pages.Selection;
 
 public class IndexModel : PageModel
 {
-    private readonly ImageSelectionService _imageSelectionService;
+    private readonly IImageSelectionService _imageSelectionService;
     private readonly ISearchService _searchService;
-    private readonly IrfanviewService _irfanviewService;
+    private readonly IIrfanviewService _irfanviewService;
     private readonly IProjectService _projectService;
     private readonly ILogger<IndexModel> _logger;
     private readonly IFiles _fileService;
 
-    public IndexModel(ImageSelectionService imageSelectionService, ISearchService searchService,
-        IProjectService projectService, IrfanviewService irfanviewService, IFiles fileService, ILogger<IndexModel> logger)
+    public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService,
+        IProjectService projectService, IIrfanviewService irfanviewService, IFiles fileService, ILogger<IndexModel> logger)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;

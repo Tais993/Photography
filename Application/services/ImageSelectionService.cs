@@ -6,12 +6,12 @@ namespace Application.services;
 
 public class ImageSelectionService : IImageSelectionService
 {
-    private readonly ILogger<ImageSelectionService> _logger;
+    private readonly ILogger<IImageSelectionService> _logger;
     private readonly ISelectionRepository _selectionRepository;
     private readonly IProjectRepository _projectRepository;
 
     // start session
-    public ImageSelectionService(ILogger<ImageSelectionService> logger, ISelectionRepository selectionRepository, IProjectRepository projectRepository)
+    public ImageSelectionService(ILogger<IImageSelectionService> logger, ISelectionRepository selectionRepository, IProjectRepository projectRepository)
     {
         _logger = logger;
         _selectionRepository = selectionRepository;
