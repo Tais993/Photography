@@ -39,7 +39,7 @@ public class SelectionRepository : ISelectionRepository
         );
     }
 
-    
+
     public void RemoveSession(int projectId)
     {
         _db.Execute("""
@@ -94,15 +94,13 @@ public class SelectionRepository : ISelectionRepository
     }
 
 
-    public void RemoveImageFromProjectSelection(int projectId, int imageId)
+    public void RemoveImageFromProjectSelection(int sessionId, int imageId)
     {
         _db.Execute("""
                     DELETE FROM public.selection_session_image ssi
-                    USING public.selection_session ss
-                    WHERE ssi.image_id = ss.id
-                    AND  ss.project_id = $1
+                    WHERE  ssi.selection_session_id = $1
                     AND  ssi.image_id = $2
-                    """, projectId, imageId);
+                    """, sessionId, imageId);
     }
 
     public SelectionSession GetByProject(int projectId)
