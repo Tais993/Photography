@@ -1,0 +1,59 @@
+﻿@model Domain.entities.Project
+
+<div class="card-header">
+    <div>
+        <h3 class="card-title">@Model.Name</h3>
+        <p class="card-subtitle">Selected project</p>
+    </div>
+
+    <div class="card-actions">
+        <span class="badge bg-green-lt">
+            <i class="ti ti-check me-1"></i>
+            Active
+        </span>
+    </div>
+</div>
+
+<div class="card-body">
+    <div class="datagrid">
+        <div class="datagrid-item">
+            <div class="datagrid-title">Id</div>
+            <div class="datagrid-content">@Model.Id</div>
+        </div>
+
+        <div class="datagrid-item">
+            <div class="datagrid-title">Name</div>
+            <div class="datagrid-content">@Model.Name</div>
+        </div>
+
+        <div class="datagrid-item">
+            <div class="datagrid-title">Event date</div>
+            <div class="datagrid-content">
+                @Model.EventDate.ToString("yyyy-MM-dd")
+            </div>
+        </div>
+
+        <div class="datagrid-item">
+            <div class="datagrid-title">Readable date</div>
+            <div class="datagrid-content">
+                @Model.EventDate.ToString("dddd, dd MMMM yyyy")
+            </div>
+        </div>
+
+        <div class="datagrid-item">
+            <div class="datagrid-title">Path</div>
+            <div class="datagrid-content text-break">
+                @Model.Path
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card-footer">
+    <div class="d-grid gap-2">
+        <button class="btn btn-primary">
+            <i class="ti ti-photo me-2"></i>
+            Open images
+        </button>
+    </div>
+</div>
