@@ -4,7 +4,7 @@ using Infrastructure.irfanview;
 
 namespace Application.services;
 
-public class IrfanviewService
+public class IrfanviewService : IIrfanviewService
 {
     private readonly IFiles _files;
     private readonly IIrfanViewRepository _irfanViewRepository;

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.services;
 
-public class ImageSelectionService
+public class ImageSelectionService : IImageSelectionService
 {
     private readonly ILogger<ImageSelectionService> _logger;
     private readonly ISelectionRepository _selectionRepository;
