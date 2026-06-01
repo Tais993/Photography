@@ -2,8 +2,7 @@
 
     <ItemGroup>
         <!-- Project references -->
-        <ProjectReference Include="..\Application\Application.csproj"/>
-        <ProjectReference Include="..\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\Logic\Logic.csproj" />
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
 
         <!-- Outputs -->

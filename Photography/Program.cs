@@ -19,7 +19,7 @@ builder.Configuration.AddJsonFile(
     reloadOnChange: true
 );
 
-builder.Services.AddApplication();
+builder.Services.AddLogic();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddCli();
 

@@ -14,7 +14,7 @@ builder.Configuration.AddJsonFile(
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.AddApplication();
+builder.Services.AddLogic();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 var app = builder.Build();
