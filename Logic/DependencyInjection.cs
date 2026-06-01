@@ -6,7 +6,7 @@ namespace Application;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static IServiceCollection AddLogic(this IServiceCollection services)
     {
         services.AddTransient<ICopyService, CopyService>();
         services.AddTransient<ISearchService, SearchService>();
