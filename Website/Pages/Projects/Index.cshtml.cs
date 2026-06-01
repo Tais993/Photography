@@ -84,4 +84,18 @@ public class IndexModel : PageModel
     {
         return _projectService.GetProjectCount();
     }
+    
+    public IActionResult OnGetSelectedProjectView(int projectId)
+    {
+        Project? project = _projectService.GetProjectById(projectId);
+        SelectedProject = project;
+        SelectedProjectId = projectId;
+
+        if (project is null)
+        {
+            return NotFound();
+        }
+
+        return Partial("_SelectedProjectView", project);
+    }
 }
