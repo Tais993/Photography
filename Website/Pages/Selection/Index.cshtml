@@ -1,6 +1,5 @@
 ﻿@page
 @using Domain.entities
-@using Constants = Application.Constants
 @model IndexModel
 
 @{
@@ -23,22 +22,23 @@
             </div>
 
             <div class="col-auto ms-auto">
-            <span class="badge bg-blue-lt">
-                <i class="ti ti-folders me-1"></i>
-                @Model.Images.Count out of @Model.GetProjectImageCount() image(s)
-            </span>
+                <span class="badge bg-blue-lt">
+                    <i class="ti ti-folders me-1"></i>
+                    @Model.Images.Count out of @Model.GetProjectImageCount() image(s)
+                </span>
             </div>
         </div>
     </div>
 
     <div class="row row-cards mt-3">
         <div class="col-12">
-            <form method="get" class="card">
+            <form method="get" class="card" id="search-form">
                 <div class="card-body">
                     <label class="form-label" asp-for="Search">Search images</label>
-                    
+
                     <div class="row g-2">
-                        <input type="hidden" asp-for="SelectedProjectId" />
+                        <input type="hidden" asp-for="SelectedProjectId"/>
+                        <input type="hidden" asp-for="SelectedImageId"/>
 
                         <div class="col">
                             <div class="input-icon">
@@ -62,8 +62,7 @@
                                 <option value="Finals">Finals</option>
                             </select>
                         </div>
-                        
-                        
+
                         <div class="col-md-2">
                             <select asp-for="FileType" class="form-select">
                                 <option value="">All types</option>
@@ -74,8 +73,7 @@
                                 <option value=".raw">RAW</option>
                             </select>
                         </div>
-                        
-                        
+
                         <div class="col-auto">
                             <button type="submit" class="btn btn-primary">
                                 <i class="ti ti-search me-2"></i>
@@ -84,11 +82,13 @@
                         </div>
 
                         <div class="col-auto">
-                            <a asp-page="./Index"
-                               asp-route-selectedProjectId="@Model.SelectedProjectId"
-                               class="btn btn-outline-secondary">
-                                Reset
-                            </a>
+                            <div class="col-auto">
+                                <button type="button"
+                                        class="btn btn-outline-secondary"
+                                        onclick="resetFilters()">
+                                    Reset
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -127,56 +127,15 @@
                             {
                                 bool isSelected = Model.SelectedImageIds.Contains(image.Id!.Value);
 
-                                <div class="col-6 col-sm-4 col-md-3 col-lg-2">
-                                    <a asp-page="./Index"
-                                       asp-route-SelectedProjectId="@Model.SelectedProjectId"
-                                       asp-route-SelectedImageId="@image.Id"
-                                       asp-route-search="@Model.Search"
-                                       class="card card-sm text-decoration-none @(isSelected ? "border-primary" : "")">
-
-                                        <div class="position-relative">
-                                            <div class="ratio ratio-1x1">
-                                                @if (Constants.ImageFileTypes.Contains(image.FileType))
-                                                {
-                                                    <img src="@Url.Page("/Selection/Thumbnail", new
-                                                              {
-                                                                  imageId = image.Id
-                                                              })"
-                                                         alt="@image.FileName"
-                                                         class="card-img-top object-fit-cover"/>
-                                                }
-                                                else
-                                                {
-                                                    <div
-                                                        class="d-flex align-items-center justify-content-center bg-blue-lt">
-                                                        <i class="ti ti-photo fs-1 text-blue"></i>
-                                                    </div>
-                                                }
-                                            </div>
-
-                                            @if (isSelected)
-                                            {
-                                                <span class="badge bg-primary position-absolute top-0 start-0 m-2">
-                                        <i class="ti ti-check"></i>
-                                    </span>
-                                            }
-                                        </div>
-
-                                        <div class="card-body p-2">
-                                            <div class="text-truncate fw-bold">
-                                                @image.FileName
-                                            </div>
-
-                                            <div class="text-muted small text-truncate">
-                                                @image.FileType
-                                            </div>
-
-                                            <div class="text-muted small text-truncate">
-                                                @image.RelationalFilePath
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
+                                _ImageView imageView = new _ImageView()
+                                {
+                                    Selected = isSelected,
+                                    ImageId = image.Id,
+                                    FileType = image.FileType,
+                                    FileName = image.FileName,
+                                    RelationalFilePath = image.RelationalFilePath
+                                };
+                                <partial name="_ImageView" model="imageView"/>
                             }
                         </div>
                     }
@@ -186,86 +145,46 @@
         </div>
 
         <div class="col-lg-5">
-            <div class="card">
+
+            <div id="selected-image-panel">
                 @if (Model.SelectedImageId is null)
                 {
-                    <div class="card-body">
-                        <div class="empty">
-                            <div class="empty-icon">
-                                <i class="ti ti-click"></i>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="empty">
+                                <div class="empty-icon">
+                                    <i class="ti ti-click"></i>
+                                </div>
+
+                                <p class="empty-title">No image selected</p>
+
+                                <p class="empty-subtitle text-muted">
+                                    Select an image from the list.
+                                </p>
                             </div>
-
-                            <p class="empty-title">No image selected</p>
-
-                            <p class="empty-subtitle text-muted">
-                                Select an image from the list.
-                            </p>
                         </div>
                     </div>
                 }
                 else
                 {
-                    <div class="card-header">
-                        <div>
-                            <h3 class="card-title">@Model.SelectedImage.FileName</h3>
-                            <p class="card-subtitle">Selected image</p>
-                        </div>
-
-                        <div class="card-actions">
-                        <span class="badge bg-green-lt">
-                            <i class="ti ti-check me-1"></i>
-                            Active
-                        </span>
-                        </div>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="datagrid">
-                            <div class="datagrid-item">
-                                <div class="datagrid-title">Path</div>
-                                <div class="datagrid-content text-break">
-                                    @Model.SelectedImage.RelationalFilePath
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="position-relative">
-                        <div class="ratio ratio-1x1">
-                            @if (Constants.ImageFileTypes.Contains(Model.SelectedImage.FileType))
-                            {
-                                <img src="@Url.Page("/Selection/Thumbnail", new
-                                          {
-                                              imageId = Model.SelectedImage.Id
-                                          })"
-                                     alt="@Model.SelectedImage.FileName"
-                                     class="card-img-top object-fit-cover"/>
-                            }
-                            else
-                            {
-                                <div
-                                    class="d-flex align-items-center justify-content-center bg-blue-lt">
-                                    <i class="ti ti-photo fs-1 text-blue"></i>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="d-grid gap-2">
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    onclick="openImageInIrfanView()">
-                                <i class="ti ti-photo me-2"></i>
-                                Open image in Irfanview
-                            </button>
-                        </div>
-                    </div>
+                    <partial name="_SelectedImage" model="Model.SelectedImage"/>
                 }
             </div>
         </div>
-
     </div>
 </div>
+
+<style>
+    .image-hover-button {
+        opacity: 0;
+        transition: opacity 120ms ease;
+        z-index: 2;
+    }
+
+    .image-hover-area:hover .image-hover-button {
+        opacity: 1;
+    }
+</style>
 
 @section Scripts {
     <script>
