@@ -12,7 +12,7 @@ public interface ISelectionRepository
     int GetSessionIdByProjectId(int projectId);
     bool ImageIsSelected(int sessionId, int imageId);
     void AddImageToProjectSelection(int selectionId, int imageId);
-    void RemoveImageFromProjectSelection(int projectId, int imageId);
+    void RemoveImageFromProjectSelection(int sessionId, int imageId);
     SelectionSession GetByProject(int projectId);
     void DeleteExpiredSessions();
 }
