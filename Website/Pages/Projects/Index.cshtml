@@ -1,4 +1,5 @@
 ﻿@page
+@using Domain.entities
 @model IndexModel
 
 @{
@@ -6,7 +7,6 @@
 }
 
 <div class="page-body">
-
     <div class="page-header d-print-none">
         <div class="row align-items-center">
             <div class="col">
@@ -130,52 +130,9 @@
                 else
                 {
                     <div class="list-group list-group-flush">
-                        @foreach (var project in Model.Projects)
+                        @foreach (Project project in Model.Projects)
                         {
-                            bool isSelected = project.Id == Model.SelectedProjectId;
-
-                            <a asp-page="./Index"
-                               asp-route-selectedProjectId="@project.Id"
-                               asp-route-search="@Model.Search"
-                               class="list-group-item list-group-item-action @(isSelected ? "active" : "")">
-
-                                <div class="row align-items-center">
-                                    <div class="col-auto">
-                                        <span class="avatar @(isSelected ? "bg-white text-blue" : "bg-blue-lt")">
-                                            <i class="ti ti-folder"></i>
-                                        </span>
-                                    </div>
-
-                                    <div class="col text-truncate">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <strong class="text-truncate">
-                                                @project.Name
-                                            </strong>
-
-                                            @if (isSelected)
-                                            {
-                                                <span class="badge bg-white text-blue">
-                                                    Selected
-                                                </span>
-                                            }
-                                        </div>
-
-                                        <div class="text-muted small">
-                                            <i class="ti ti-calendar me-1"></i>
-                                            @project.EventDate.ToString("yyyy-MM-dd")
-                                        </div>
-
-                                        <div class="text-muted small text-truncate">
-                                            <i class="ti ti-folder-open me-1"></i>
-                                            @project.Path
-                                        </div>
-                                    </div>
-
-                                    <div class="col-auto">
-                                        <i class="ti ti-chevron-right text-muted"></i>
-                                    </div>
-                                </div>
-                            </a>
+                            <partial name="_ProjectView" model="Model.CreateProjectView(project)"/>
                         }
                     </div>
                 }
@@ -183,7 +140,7 @@
         </div>
 
         <div class="col-lg-5">
-            <div class="card">
+            <div class="card" id="selected-project-panel">
                 @if (Model.SelectedProject is null)
                 {
                     <div class="card-body">
@@ -213,13 +170,71 @@
 @section Scripts {
 
     <script>
-        window.selectProject = async function selectProject(projectID) {
+        window.selectProject = async function selectProject(projectId) {
             const panel = document.getElementById("selected-project-panel");
+            const url = new URL(window.location);
 
+            const oldProjectId = url.searchParams.get("SelectedProjectId");
 
+            panel.classList.add("opacity-50");
+
+            const response = await fetch(`?handler=SelectedProjectView&projectId=${projectId}`, {
+                credentials: "same-origin"
+            });
+
+            if (!response.ok) {
+                panel.innerHTML = `
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="empty">
+                                <p class="empty-title">Could not load project</p>
+                            </div>
+                        </div>
+                    </div>`;
+
+                panel.classList.remove("opacity-50");
+                return;
+            }
+
+            const selectedProjectInput = document.querySelector('input[name="SelectedProjectId"]');
+
+            if (selectedProjectInput) {
+                selectedProjectInput.value = projectId;
+            }
+
+            panel.innerHTML = await response.text();
+            panel.classList.remove("opacity-50");
+
+            if (oldProjectId && oldProjectId !== projectId.toString()) {
+                await reloadProjectView(oldProjectId, projectId);
+            }
+
+            await reloadProjectView(projectId, projectId);
+
+            url.searchParams.set("SelectedProjectId", projectId);
+            window.history.replaceState({}, "", url);
         }
 
+        async function reloadProjectView(projectId, selectedProjectId) {
+            const projectView = document.getElementById(`project-view-${projectId}`);
 
+            if (!projectView) {
+                return;
+            }
+
+            const response = await fetch(
+                `?handler=ProjectView&projectId=${projectId}&selectedProjectId=${selectedProjectId}`,
+                {
+                    credentials: "same-origin"
+                }
+            );
+
+            if (!response.ok) {
+                return;
+            }
+
+            projectView.outerHTML = await response.text();
+        }
     </script>
 }
 
