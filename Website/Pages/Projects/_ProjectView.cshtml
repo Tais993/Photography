@@ -1,0 +1,42 @@
+﻿@model _ProjectView
+
+<button id="project-view-@Model.Id" onclick="selectProject(@Model.Id)"
+        class="list-group-item list-group-item-action @(Model.Selected ? "active" : "")">
+
+    <div class="row align-items-center">
+        <div class="col-auto">
+                <span class="avatar @(Model.Selected ? "bg-white text-blue" : "bg-blue-lt")">
+                    <i class="ti ti-folder"></i>
+                </span>
+        </div>
+
+        <div class="col text-truncate">
+            <div class="d-flex align-items-center gap-2">
+                <strong class="text-truncate">
+                    @Model.Name
+                </strong>
+
+                @if (Model.Selected)
+                {
+                    <span class="badge bg-white text-blue">
+                            Selected
+                        </span>
+                }
+            </div>
+
+            <div class="text-muted small">
+                <i class="ti ti-calendar me-1"></i>
+                @Model.EventDate.Value.ToString("yyyy-MM-dd")
+            </div>
+
+            <div class="text-muted small text-truncate">
+                <i class="ti ti-folder-open me-1"></i>
+                @Model.Path
+            </div>
+        </div>
+
+        <div class="col-auto">
+            <i class="ti ti-chevron-right text-muted"></i>
+        </div>
+    </div>
+</button>

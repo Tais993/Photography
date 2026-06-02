@@ -57,15 +57,7 @@ public class IndexModel : PageModel
         {
             SelectedProject = _projectService.GetProjectById(SelectedProjectId.Value);
 
-            Response.Cookies.Append(
-                LastProjectCookie,
-                SelectedProjectId.Value.ToString(),
-                new CookieOptions
-                {
-                    Expires = DateTimeOffset.UtcNow.AddDays(30),
-                    HttpOnly = true,
-                    SameSite = SameSiteMode.Lax
-                });
+            UpdateProjectCookie();
         }
         else if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText) &&
                  int.TryParse(projectIdText, out int lastProjectId))
@@ -79,7 +71,32 @@ public class IndexModel : PageModel
             SelectedProjectId = SelectedProject?.Id;
         }
     }
-    
+
+    private void UpdateProjectCookie()
+    {
+        Response.Cookies.Append(
+            LastProjectCookie,
+            SelectedProjectId.Value.ToString(),
+            new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddDays(30),
+                HttpOnly = true,
+                SameSite = SameSiteMode.Lax
+            });
+    }
+
+    internal _ProjectView CreateProjectView(Project project)
+    {
+        return new _ProjectView
+        {
+            Selected = project.Id == SelectedProjectId,
+            Id = project.Id,
+            Name = project.Name,
+            Path = project.Path,
+            EventDate = project.EventDate
+        };
+    }
+
     public int GetProjectCount()
     {
         return _projectService.GetProjectCount();
@@ -95,7 +112,24 @@ public class IndexModel : PageModel
         {
             return NotFound();
         }
+        
+        UpdateProjectCookie();
 
         return Partial("_SelectedProjectView", project);
+    }
+    
+    public IActionResult OnGetProjectView(int projectId, int selectedProjectId)
+    {
+        Project? project = _projectService.GetProjectById(projectId);
+
+        if (project is null)
+        {
+            return NotFound();
+        }
+
+        SelectedProjectId = selectedProjectId;
+        SelectedProject = project;
+
+        return Partial("_ProjectView", CreateProjectView(project));
     }
 }
