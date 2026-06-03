@@ -1,4 +1,5 @@
-﻿using Domain.entities;
+﻿using System.Text;
+using Domain.entities;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -102,28 +103,54 @@ public class ImageRepository : IImageRepository
 
     public List<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path
-                                 FROM public.image
-                                 WHERE ($1::int IS NULL OR project_id = $1::int)
-                                   AND (
-                                     $2::text IS NULL
-                                         OR file_name ~* ('(^|[^0-9])' || $2::text || '([^0-9]|$)')
-                                     )
-                                   AND (
-                                     $3::text IS NULL
-                                         OR file_name ILIKE ('%' || $3::text || '%')
-                                     )
-                                   AND (
-                                     $4::text IS NULL
-                                         OR replace(relational_file_path, chr(92), '/') LIKE ($4::text || '/%')
-                                     )
-                                   AND (
-                                     $5::text IS NULL
-                                         OR LOWER(file_type) = LOWER($5::text)
-                                     )
-                                 """, MapImage, imageSearchSettings.ProjectId!, imageSearchSettings.FileNumber!,
-            imageSearchSettings.FileName!, imageSearchSettings.FolderName!, imageSearchSettings.FileType!);
+        StringBuilder sqlBuilder = new();
+        List<string> whereClauses = [];
+        List<object?> parameters = [];
+
+        sqlBuilder.Append("""
+                          SELECT id, project_id, file_name, file_type, relational_file_path
+                          FROM public.image
+                          """);
+        
+        if (imageSearchSettings.ProjectId is not null)
+        {
+            parameters.Add(imageSearchSettings.ProjectId);
+            whereClauses.Add($"project_id = ${parameters.Count}::int");
+        }
+
+        if (!string.IsNullOrWhiteSpace(imageSearchSettings.FileNumber))
+        {
+            parameters.Add(imageSearchSettings.FileNumber);
+            whereClauses.Add($"file_name ~* ('(^|[^0-9])' || ${parameters.Count}::text || '([^0-9]|$)')");
+        }
+        
+        if (!string.IsNullOrWhiteSpace(imageSearchSettings.FileName))
+        {
+            parameters.Add(imageSearchSettings.FileName);
+            whereClauses.Add($"file_name ILIKE ('%' || ${parameters.Count}::text || '%')");
+        }
+        
+        if (!string.IsNullOrWhiteSpace(imageSearchSettings.FolderName))
+        {
+            parameters.Add(imageSearchSettings.FolderName);
+            whereClauses.Add($"replace(relational_file_path, chr(92), '/') LIKE (${parameters.Count}::text || '/%')");
+        }
+        
+        if (!string.IsNullOrWhiteSpace(imageSearchSettings.FileType))
+        {
+            parameters.Add(imageSearchSettings.FileType);
+            whereClauses.Add($"LOWER(file_type) = LOWER(${parameters.Count}::text)");
+        }
+        
+        if (whereClauses.Count > 0)
+        {
+            sqlBuilder.AppendLine("\nWHERE " + string.Join("\n  AND ", whereClauses));
+        }
+
+        sqlBuilder.AppendLine("\nORDER BY id DESC, file_name");
+        
+        return _db.QueryMultiple(sqlBuilder.ToString(),
+            MapImage, parameters.ToArray());
     }
 
 
