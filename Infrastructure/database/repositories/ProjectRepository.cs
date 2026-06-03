@@ -91,6 +91,12 @@ public class ProjectRepository : IProjectRepository
             parameters.Add(projectSearchSettings.ProjectId);
             whereClauses.Add($"id = ${parameters.Count}::int");
         }
+        
+        if (projectSearchSettings.ParentProjectId is not null)
+        {
+            parameters.Add(projectSearchSettings.ParentProjectId);
+            whereClauses.Add($"parent_project_id = ${parameters.Count}::int");
+        }
 
         if (!string.IsNullOrWhiteSpace(projectSearchSettings.ProjectName))
         {
