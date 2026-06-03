@@ -44,7 +44,7 @@ public class IndexModel : PageModel
 
     [BindProperty(SupportsGet = true)] public string? FileType { get; set; }
 
-    public void OnGet()
+    public PageResult OnGet()
     {
         if (SelectedProjectId is not null)
         {
@@ -55,6 +55,12 @@ public class IndexModel : PageModel
         {
             SelectedProjectId = lastProjectId;
             SelectedProject = _projectService.GetProjectById(lastProjectId);
+        }
+        else
+        {
+            Images = [];
+            SelectedImageIds = [];
+            return Page();
         }
 
         if (SelectedImageId is not null)
@@ -74,6 +80,8 @@ public class IndexModel : PageModel
         };
 
         Images = _searchService.SearchImages(settings);
+
+        return Page();
     }
 
     public IEnumerable<Image> HideNefFilesWhenJpgExists()
@@ -138,7 +146,7 @@ public class IndexModel : PageModel
 
         return Partial("_SelectedImage", image);
     }
-    
+
     public PartialViewResult OnGetImage(Image image)
     {
         bool isSelected = SelectedImageIds.Contains(image.Id!.Value);
@@ -146,7 +154,7 @@ public class IndexModel : PageModel
         _ImageView imageView = new _ImageView
         {
             Selected = isSelected,
-            ImageId = (int) image.Id,
+            ImageId = (int)image.Id,
             FileType = image.FileType,
             FileName = image.FileName,
             RelationalFilePath = image.RelationalFilePath
@@ -154,7 +162,7 @@ public class IndexModel : PageModel
 
         return Partial("_ImageView", imageView);
     }
-    
+
     public IActionResult OnGetToggleImageSelection(int imageId, int selectedProjectId)
     {
         _logger.LogInformation("OnPostToggleImageSelection");
@@ -184,8 +192,8 @@ public class IndexModel : PageModel
 
     public void OpenImageInIrfanview()
     {
-        SelectedProject = _projectService.GetProjectById((int) SelectedProjectId);
-        SelectedImage = _projectService.GetImageById((int) SelectedImageId);
+        SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
+        SelectedImage = _projectService.GetImageById((int)SelectedImageId);
 
         string imagePath = _fileService.Combine(SelectedProject.Path, SelectedImage.RelationalFilePath);
 
@@ -194,6 +202,11 @@ public class IndexModel : PageModel
 
     public int GetProjectImageCount()
     {
+        if (SelectedProject is null)
+        {
+            return 0;
+        }
+
         return _projectService.GetProjectImageCount((int)SelectedProjectId);
     }
 }
