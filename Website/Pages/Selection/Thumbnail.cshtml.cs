@@ -121,7 +121,9 @@ public class ThumbnailModel : PageModel
     
     private void SetThumbnailCacheHeaders()
     {
-        Response.Headers.CacheControl = "public,max-age=604800";
+        Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
+        Response.Headers.Pragma = "no-cache";
+        Response.Headers.Expires = "0";
     }
 
     private static string? GetContentType(string fileType)
