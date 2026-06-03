@@ -18,7 +18,8 @@
   "Thumbnails": {
     "DefaultSize": 300,
     "LargeSize": 1200,
-    "JpegQuality": 80
+    "JpegQuality": 80,
+    "CachePath": "C:\\PictureProjectCache\\Thumbnails"
   },
   "Logging": {
     "LogLevel": {

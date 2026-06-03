@@ -20,7 +20,8 @@ public class ThumbnailModel : PageModel
     private int _largeSize;
     private int _jpegQuality;
 
-    public ThumbnailModel(ISearchService searchService, IProjectService projectService, ILogger<ThumbnailModel> logger, IFiles files, IConfiguration configuration)
+    public ThumbnailModel(ISearchService searchService, IProjectService projectService, ILogger<ThumbnailModel> logger,
+        IFiles files, IConfiguration configuration)
     {
         _searchService = searchService;
         _projectService = projectService;
@@ -35,8 +36,6 @@ public class ThumbnailModel : PageModel
 
     public IActionResult OnGet(int imageId, string size = "default")
     {
-        _logger.LogInformation($"ImageId: {imageId}");
-        
         Image image = _projectService.GetImageById(imageId);
         Project? project = _projectService.GetProjectById(image.ProjectId);
 
@@ -45,23 +44,38 @@ public class ThumbnailModel : PageModel
             return NotFound();
         }
 
-        _logger.LogInformation($"Image is found");
-        _logger.LogInformation($"Project is found");
-        
         string fullPath = _files.Combine(project.Path, image.RelationalFilePath);
-        
+
         if (!System.IO.File.Exists(fullPath))
         {
             return NotFound();
         }
-        
+
         int maxSize = size.Equals("large", StringComparison.OrdinalIgnoreCase)
             ? _largeSize
             : _defaultSize;
 
-        uint thumbnailSize = (uint) maxSize;
-        
-        using MagickImage imageFile = new(fullPath);
+        string cachePath = GetThumbnailCachePath(imageId, size, maxSize);
+
+        if (ThumbnailCacheIsValid(fullPath, cachePath))
+        {
+            SetThumbnailCacheHeaders();
+            return PhysicalFile(cachePath, "image/jpeg");
+        }
+
+        Directory.CreateDirectory(Path.GetDirectoryName(cachePath)!);
+
+        GenerateThumbnail(fullPath, cachePath, maxSize);
+
+        SetThumbnailCacheHeaders();
+        return PhysicalFile(cachePath, "image/jpeg");
+    }
+
+    private void GenerateThumbnail(string originalPath, string cachePath, int maxSize)
+    {
+        uint thumbnailSize = (uint)maxSize;
+
+        using MagickImage imageFile = new(originalPath);
 
         imageFile.AutoOrient();
 
@@ -73,10 +87,41 @@ public class ThumbnailModel : PageModel
         imageFile.Format = MagickFormat.Jpeg;
         imageFile.Quality = (uint)_jpegQuality;
 
-        using MemoryStream stream = new();
-        imageFile.Write(stream);
+        imageFile.Write(cachePath);
+    }
 
-        return File(stream.ToArray(), "image/jpeg");
+    private string GetThumbnailCachePath(int imageId, string size, int maxSize)
+    {
+        string cacheRoot = _configuration.GetValue<string>("Thumbnails:CachePath") ??
+                           Path.Combine(AppContext.BaseDirectory, "thumbnail-cache");
+
+        string safeSize = size.Equals("large", StringComparison.OrdinalIgnoreCase)
+            ? "large"
+            : "default";
+
+        return Path.Combine(
+            cacheRoot,
+            safeSize,
+            $"{imageId}_{maxSize}_q{_jpegQuality}.jpg"
+        );
+    }
+
+    private static bool ThumbnailCacheIsValid(string originalPath, string cachePath)
+    {
+        if (!System.IO.File.Exists(cachePath))
+        {
+            return false;
+        }
+
+        DateTime originalModified = System.IO.File.GetLastWriteTimeUtc(originalPath);
+        DateTime cacheModified = System.IO.File.GetLastWriteTimeUtc(cachePath);
+
+        return cacheModified >= originalModified;
+    }
+    
+    private void SetThumbnailCacheHeaders()
+    {
+        Response.Headers.CacheControl = "public,max-age=604800";
     }
 
     private static string? GetContentType(string fileType)
@@ -90,4 +135,5 @@ public class ThumbnailModel : PageModel
             _ => null
         };
     }
+
 }
