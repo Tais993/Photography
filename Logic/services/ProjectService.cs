@@ -179,7 +179,7 @@ public class ProjectService : IProjectService
             else
             {
                 _logger.LogDebug($"Image Folder: {subDirectory}");
-                InitializeImages(subDirectory, project.Id.Value);
+                InitializeImages(projectDirectory, subDirectory, project.Id.Value);
             }
         }
 
@@ -216,16 +216,17 @@ public class ProjectService : IProjectService
     /// <summary>
     /// This method expects a project's subfolder already, and this also
     /// </summary>
+    /// <param name="projectDirectory">a subfolder from within a project that contains images</param>
     /// <param name="projectSubDirectory">a subfolder from within a project that contains images</param>
     /// <param name="projectId"></param>
-    public void InitializeImages(string projectSubDirectory, int projectId)
+    public void InitializeImages(string projectDirectory, string projectSubDirectory, int projectId)
     {
         foreach (string filePath in _files.GetFiles(projectSubDirectory))
         {
-            string fileName = _files.GetFileName(filePath);
             string fileExtension = _files.GetFileExtension(filePath);
-            string relativeFilePath = _files.GetRelativePath(projectSubDirectory, filePath);
-
+            string fileName = _files.GetFileName(filePath).Replace(fileExtension, "");
+            string relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
+            
             Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
 
             _imageRepository.Insert(image);
