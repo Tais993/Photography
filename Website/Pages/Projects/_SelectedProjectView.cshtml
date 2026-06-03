@@ -16,27 +16,41 @@
 
 <div class="card-body">
     <div class="datagrid">
-        <div class="datagrid-item">
-            <div class="datagrid-title">Id</div>
-            <div class="datagrid-content">@Model.Id</div>
-        </div>
 
-        <div class="datagrid-item">
-            <div class="datagrid-title">Name</div>
-            <div class="datagrid-content">@Model.Name</div>
-        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Id</div>
+                    <div class="datagrid-content">@Model.Id</div>
+                </div>
+            </div>
 
-        <div class="datagrid-item">
-            <div class="datagrid-title">Event date</div>
-            <div class="datagrid-content">
-                @Model.EventDate.ToString("yyyy-MM-dd")
+            <div class="col-md-6">
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Name</div>
+                    <div class="datagrid-content">@Model.Name</div>
+                </div>
             </div>
         </div>
 
-        <div class="datagrid-item">
-            <div class="datagrid-title">Readable date</div>
-            <div class="datagrid-content">
-                @Model.EventDate.ToString("dddd, dd MMMM yyyy")
+        <div class="row">
+            @if (Model.ParentProjectId is not null)
+            {
+                <div class="col-md-6">
+                    <div class="datagrid-item">
+                        <div class="datagrid-title">Parent project ID</div>
+                        <div class="datagrid-content">@Model.ParentProjectId</div>
+                    </div>
+                </div>
+            }
+
+            <div class="col-md-6">
+                <div class="datagrid-item">
+                    <div class="datagrid-title">Event date</div>
+                    <div class="datagrid-content">
+                        @Model.EventDate.ToString("yyyy-MM-dd")
+                    </div>
+                </div>
             </div>
         </div>
 
