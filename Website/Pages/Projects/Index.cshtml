@@ -170,12 +170,14 @@
 @section Scripts {
 
     <script>
+        let initialProjectId = "@Model.SelectedProjectId";
+        
         window.selectProject = async function selectProject(projectId) {
             const panel = document.getElementById("selected-project-panel");
             const url = new URL(window.location);
 
             const oldProjectId = url.searchParams.get("SelectedProjectId");
-
+            
             panel.classList.add("opacity-50");
 
             const response = await fetch(`?handler=SelectedProjectView&projectId=${projectId}`, {
@@ -205,9 +207,11 @@
             panel.innerHTML = await response.text();
             panel.classList.remove("opacity-50");
 
-            if (oldProjectId && oldProjectId !== projectId.toString()) {
+            if (!oldProjectId && initialProjectId !== projectId.toString()) {
+                await reloadProjectView(initialProjectId, projectId);
+            } else if (oldProjectId && oldProjectId !== projectId.toString()) {
                 await reloadProjectView(oldProjectId, projectId);
-            }
+            } 
 
             await reloadProjectView(projectId, projectId);
 
