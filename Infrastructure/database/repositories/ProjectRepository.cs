@@ -21,7 +21,7 @@ public class ProjectRepository : IProjectRepository
     {
         _logger.LogInformation("GetByKey, with params: {Id}", id);
         return _db.Query("""
-                         SELECT id, name, path, event_date FROM public.project 
+                         SELECT id, name, path, event_date, parent_project_id FROM public.project 
                          WHERE id = $1
                          """, MapProject, id);
     }
@@ -29,17 +29,17 @@ public class ProjectRepository : IProjectRepository
     public List<Project> GetAll()
     {
         return _db.QueryMultiple("""
-                                 SELECT id, name, path, event_date FROM public.project
+                                 SELECT id, name, path, event_date, parent_project_id FROM public.project
                                  """, MapProject);
     }
 
     public Project Insert(Project project)
     {
         return _db.Query("""
-                         INSERT INTO public.project(name, path, event_date) 
-                         VALUES ($1, $2, $3)
+                         INSERT INTO public.project(name, path, event_date, parent_project_id) 
+                         VALUES ($1, $2, $3, $4)
                          RETURNING *
-                         """, MapProject, project.Name, project.Path, project.EventDate);
+                         """, MapProject, project.Name, project.Path, project.EventDate, project.ParentProjectId);
     }
 
     public void Update(Project project)
@@ -50,9 +50,10 @@ public class ProjectRepository : IProjectRepository
                     UPDATE public.project
                     SET name = $1,
                         path = $2,
-                        event_date = $3
-                    WHERE id = $4
-                    """, project.Name, project.Path, project.EventDate, project.Id);
+                        event_date = $3,
+                        parent_project_id = $4
+                    WHERE id = $5
+                    """, project.Name, project.Path, project.EventDate, project.ParentProjectId, project.Id);
     }
 
 
@@ -76,7 +77,7 @@ public class ProjectRepository : IProjectRepository
     {
         return _db.QueryMultiple(
             """
-            SELECT id, name, path, event_date
+            SELECT id, name, path, event_date, parent_project_id
             FROM public.project
             WHERE ($1::int IS NULL OR id = $1::int)
               AND (
@@ -101,11 +102,17 @@ public class ProjectRepository : IProjectRepository
     private static Project MapProject(NpgsqlDataReader reader)
     {
         if (!reader.HasRows) return null!;
+        
+        int? parentProjectId = reader["parent_project_id"] == DBNull.Value
+            ? null
+            : (int)reader["parent_project_id"];
+
 
         return new Project(
             (int)reader["id"],
             (string)reader["name"],
             (string)reader["path"],
-            (DateOnly)reader["event_date"]);
+            (DateOnly)reader["event_date"],
+            parentProjectId);
     }
 }
