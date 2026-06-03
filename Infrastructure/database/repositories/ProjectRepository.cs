@@ -1,4 +1,5 @@
-﻿using Domain.entities;
+﻿using System.Text;
+using Domain.entities;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
@@ -75,28 +76,49 @@ public class ProjectRepository : IProjectRepository
 
     public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
     {
-        return _db.QueryMultiple(
-            """
-            SELECT id, name, path, event_date, parent_project_id
-            FROM public.project
-            WHERE ($1::int IS NULL OR id = $1::int)
-              AND (
-                  $2::text IS NULL
-                  OR name ILIKE ('%' || $2::text || '%')
-              )
-              AND (
-                  $3::text IS NULL
-                  OR path ILIKE ('%' || $3::text || '%')
-              )
-              AND (
-                  $4::date IS NULL
-                  OR event_date = $4::date
-              )
-            ORDER BY event_date DESC, name
-            """,
-            MapProject, projectSearchSettings.ProjectId, projectSearchSettings.ProjectName, projectSearchSettings.ProjectPath,
-            projectSearchSettings.EventDate
-        );
+
+        StringBuilder sqlBuilder = new();
+        List<string> whereClauses = [];
+        List<object?> parameters = [];
+
+        sqlBuilder.Append("""
+                          SELECT id, name, path, event_date, parent_project_id
+                          FROM public.project
+                          """);
+        
+        if (projectSearchSettings.ProjectId is not null)
+        {
+            parameters.Add(projectSearchSettings.ProjectId);
+            whereClauses.Add($"id = ${parameters.Count}::int");
+        }
+
+        if (!string.IsNullOrWhiteSpace(projectSearchSettings.ProjectName))
+        {
+            parameters.Add(projectSearchSettings.ProjectName);
+            whereClauses.Add($"name ILIKE ('%' || ${parameters.Count}::text || '%')");
+        }
+
+        if (!string.IsNullOrWhiteSpace(projectSearchSettings.ProjectPath))
+        {
+            parameters.Add(projectSearchSettings.ProjectPath);
+            whereClauses.Add($"path ILIKE ('%' || ${parameters.Count}::text || '%')");
+        }
+
+        if (projectSearchSettings.EventDate is not null)
+        {
+            parameters.Add(projectSearchSettings.EventDate);
+            whereClauses.Add($"event_date = ${parameters.Count}::date");
+        }
+
+        if (whereClauses.Count > 0)
+        {
+            sqlBuilder.AppendLine("\nWHERE " + string.Join("\n  AND ", whereClauses));
+        }
+
+        sqlBuilder.AppendLine("\nORDER BY event_date DESC, name");
+        
+        return _db.QueryMultiple(sqlBuilder.ToString(),
+            MapProject, parameters.ToArray());
     }
 
     private static Project MapProject(NpgsqlDataReader reader)
