@@ -43,7 +43,7 @@
                             <input type="hidden" asp-for="SelectedProjectId"/>
                         }
 
-                        <div class="col">
+                        <div class="col-md-2">
                             <div class="input-icon">
                                 <span class="input-icon-addon">
                                     <i class="ti ti-search"></i>
@@ -67,24 +67,42 @@
                             </div>
                         </div>
 
-                        <div class="col-md-1">
+                        <div class="col-auto">
                             <div class="input-icon">
                                 <span class="input-icon-addon">
                                     <i class="ti ti-search"></i>
                                 </span>
 
                                 <input asp-for="ProjectId"
-                                       class="form-control"
+                                       class="form-control w-auto"
                                        type="text"
                                        inputmode="numeric"
                                        pattern="[0-9]*"
+                                       size="7"
                                        placeholder="ID"/>
                             </div>
                         </div>
+                        
+                        <div class="col-auto">
+                            <div class="input-icon">
+                                <span class="input-icon-addon">
+                                    <i class="ti ti-search"></i>
+                                </span>
 
-                        <div class="col-md-2">
+                                <input asp-for="ParentProjectId"
+                                       class="form-control w-auto"
+                                       type="text"
+                                       inputmode="numeric"
+                                       pattern="[0-9]*"
+                                       size="7"
+                                       placeholder="parent ID"/>
+                            </div>
+                        </div>
+
+                        <div class="col-auto">
                             <input asp-for="EventDate"
                                    type="date"
+                                   asp-format="{0:yyyy-MM-dd}"
                                    class="form-control"/>
                         </div>
 

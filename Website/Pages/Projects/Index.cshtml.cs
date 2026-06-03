@@ -29,6 +29,7 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)] public int? ProjectId { get; set; }
+    [BindProperty(SupportsGet = true)] public int? ParentProjectId { get; set; }
 
     [BindProperty(SupportsGet = true)] public string? ProjectPath { get; set; }
 
@@ -41,7 +42,8 @@ public class IndexModel : PageModel
             EventDate = this.EventDate,
             ProjectName = this.Search,
             ProjectPath = this.ProjectPath,
-            ProjectId = this.ProjectId
+            ProjectId = this.ProjectId,
+            ParentProjectId = this.ParentProjectId
         });
         
         _logger.LogInformation($"Found {projects.Count()} projects");
