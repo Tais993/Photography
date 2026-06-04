@@ -12,6 +12,7 @@ public static class DependencyInjection
         services.AddTransient<ISearchService, SearchService>();
         services.AddTransient<ILightroomService, LightroomService>();
         services.AddTransient<IProjectService, ProjectService>();
+        services.AddTransient<IProjectInitialisingService, ProjectInitialisingService>();
         services.AddTransient<IProjectMetadataService, ProjectMetadataService>();
 
         services.AddTransient<IIrfanviewService, IrfanviewService>();

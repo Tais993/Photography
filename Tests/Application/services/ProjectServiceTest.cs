@@ -1,4 +1,6 @@
-﻿using Application.services;
+﻿using Application;
+using Application.services;
+using Application.services.interfaces;
 using Domain.entities;
 using Infrastructure.database.repositories;
 using Infrastructure.filesystem;
@@ -14,7 +16,8 @@ public class ProjectServiceTest
     private Mock<IProjectRepository> _projectRepository = null!;
     private Mock<IImageRepository> _imageRepository = null!;
     private Mock<IFiles> _files = null!;
-    private Mock<ILogger<ProjectService>> _projectLogger = null!;
+    private Mock<ILogger<ProjectService>> _logger = null!;
+    private Mock<IProjectMetadataService> _metadataService = null!;
     private ProjectService _projectService = null!;
 
     [SetUp]
@@ -23,17 +26,24 @@ public class ProjectServiceTest
         _projectRepository = new Mock<IProjectRepository>();
         _imageRepository = new Mock<IImageRepository>();
         _files = new Mock<IFiles>();
-        _projectLogger = new Mock<ILogger<ProjectService>>();
+        _logger = new Mock<ILogger<ProjectService>>();
+        _metadataService = new Mock<IProjectMetadataService>();
 
-        _projectService = new ProjectService(_projectRepository.Object, _imageRepository.Object, _files.Object,
-            _projectLogger.Object);
+        _projectService = new ProjectService(
+            _projectRepository.Object,
+            _imageRepository.Object,
+            _files.Object,
+            _logger.Object,
+            new FolderNameOptions(),
+            _metadataService.Object
+        );
     }
 
     [Test]
-    public void ResolveProject_ProjectExists()
+    public void ResolveProject_ProjectExists_ReturnsProject_WithEmptyProjectId()
     {
-        const string projectDirectory = "C:\\2024-07-4-Merijn";
-        const string projectInfoDirectory = "C:\\2024-07-4-Merijn";
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
 
         Project expectedProject = new Project(
             2,
@@ -43,274 +53,222 @@ public class ProjectServiceTest
         );
 
         // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.ReadAllText(It.IsAny<string>())).Returns("2");
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
+        _files
+            .Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
+            .Returns(projectInfoPath);
 
-        _projectRepository.Setup(r => r.GetById(2))
+        _files
+            .Setup(f => f.Exists(projectInfoPath))
+            .Returns(true);
+
+        _files
+            .Setup(f => f.ReadAllText(projectInfoPath))
+            .Returns("2");
+
+        _projectRepository
+            .Setup(r => r.GetById(2))
             .Returns(expectedProject);
 
         // Execution
-        var result = _projectService.ResolveProject(projectDirectory);
+        Project? result = _projectService.ResolveProject(projectDirectory, 0);
+
+        
+        // Asserts
+        Assert.That(result, Is.EqualTo(expectedProject));
+        _projectRepository.Verify(r => r.GetById(2), Times.Once);
+    }
+    
+    [Test]
+    public void ResolveProject_ProjectExists_ReturnsProject_WithProjectId()
+    {
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+
+        Project expectedProject = new Project(
+            2,
+            "Merijn",
+            projectDirectory,
+            new DateOnly(2024, 7, 4)
+        );
+
+        // Mocks
+        _projectRepository
+            .Setup(r => r.GetById(2))
+            .Returns(expectedProject);
+
+        // Execution
+        Project? result = _projectService.ResolveProject(projectDirectory, 2);
+
+        
+        // Asserts
+        Assert.That(result, Is.EqualTo(expectedProject));
+        _projectRepository.Verify(r => r.GetById(2), Times.Once);
+    }
+    
+    [Test]
+    public void ResolveProjectId_ProjectExists_ReturnsProjectId_WithEmptyProjectId()
+    {
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
+        
+        const int projectId = 6;
+
+        // Mocks
+        _files
+            .Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
+            .Returns(projectInfoPath);
+
+        _files
+            .Setup(f => f.Exists(projectInfoPath))
+            .Returns(true);
+
+        _files
+            .Setup(f => f.ReadAllText(projectInfoPath))
+            .Returns(projectId + "");
+        
+        // Execution
+        int result = _projectService.ResolveProjectId(projectDirectory, 0);
+
+        // Asserts
+        Assert.That(result, Is.EqualTo(projectId));
+        _files.Verify(f => f.ReadAllText(It.IsAny<string>()), Times.Once);
+        _projectRepository.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
+    }
+    
+    [Test]
+    public void ResolveProjectId_ProjectNotInitialised_ReturnsZero_WithProjectId()
+    {
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
+        
+        const int projectId = 6;
+
+        // Mocks
+        // Execution
+        int result = _projectService.ResolveProjectId(projectDirectory, projectId);
+
+        // Asserts
+        Assert.That(result, Is.EqualTo(projectId));
+        _files.Verify(f => f.ReadAllText(It.IsAny<string>()), Times.Never);
+        _projectRepository.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
+    }
+    
+    
+    [Test]
+    public void ResolveProjectId_ProjectNotInitialised_ReturnsZero()
+    {
+        const string projectDirectory = @"C:\2024-07-04-Merijn";
+        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
+
+        // Mocks
+        _files
+            .Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
+            .Returns(projectInfoPath);
+
+        _files
+            .Setup(f => f.Exists(projectInfoPath))
+            .Returns(false);
+
+        // Execution
+        int result = _projectService.ResolveProjectId(projectDirectory);
+
+        // Asserts
+        Assert.That(result, Is.EqualTo(0));
+        _files.Verify(f => f.ReadAllText(It.IsAny<string>()), Times.Never);
+        _projectRepository.Verify(r => r.GetById(It.IsAny<int>()), Times.Never);
+    }
+    
+    [Test]
+    public void GetImageById_ReturnsImage()
+    {
+        Image expectedImage = new Image(
+            1,
+            "DSC_1234",
+            ".NEF",
+            @"Original\DSC_1234.NEF"
+        );
+
+        // Mocks
+        _imageRepository
+            .Setup(r => r.GetById(5))
+            .Returns(expectedImage);
+
+        // Execution
+        Image result = _projectService.GetImageById(5);
+
+        // Asserts
+        Assert.That(result, Is.EqualTo(expectedImage));
+    }
+
+    [Test]
+    public void GetProjectImageCount_ReturnsCount()
+    {
+        // Mocks
+        _imageRepository
+            .Setup(r => r.GetProjectImageCount(2))
+            .Returns(42);
+
+        // Execution
+        int result = _projectService.GetProjectImageCount(2);
+
+        // Asserts
+        Assert.That(result, Is.EqualTo(42));
+    }
+
+    [Test]
+    public void GetProjectCount_ReturnsCount()
+    {
+        // Mocks
+        _projectRepository
+            .Setup(r => r.GetProjectCount())
+            .Returns(7);
+
+        // Execution
+        int result = _projectService.GetProjectCount();
+
+        // Asserts
+        Assert.That(result, Is.EqualTo(7));
+    }
+
+    [Test]
+    public void GetProjectById_ReturnsProject()
+    {
+        Project expectedProject = new Project(
+            2,
+            "Merijn",
+            @"C:\2024-07-04-Merijn",
+            new DateOnly(2024, 7, 4)
+        );
+
+        // Mocks
+        _projectRepository
+            .Setup(r => r.GetById(2))
+            .Returns(expectedProject);
+
+        // Execution
+        Project result = _projectService.GetProjectById(2);
 
         // Asserts
         Assert.That(result, Is.EqualTo(expectedProject));
     }
 
     [Test]
-    public void ResolveProject_ProjectNotInitialized()
+    public void GetAllProjects_ReturnsProjects()
     {
-        const string projectDirectory = "C:\\2024-07-4-Merijn";
-        const string projectInfoDirectory = "C:\\2024-07-4-Merijn";
-
-        // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-
-        // Execution
-        int id = _projectService.ResolveProjectId(projectDirectory);
-
-        // Asserts
-        Assert.That(id, Is.EqualTo(0));
-    }
-
-
-    [Test]
-    public void InitialiseProject_IgnoresCategoryFolders()
-    {
-        const string projectDirectory = "C:\\.2024-07-4-Merijn";
-
-        // Mocks
-        _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns(".2024-07-04-Merijn");
-
-        // Execution
-        _projectService.InitialiseExistingFolder(projectDirectory);
-
-        // Asserts
-        _files.Verify(f => f.Combine(It.IsAny<string[]>()), Times.Never);
-        _files.Verify(f => f.Exists(It.IsAny<string>()), Times.Never);
-        _files.Verify(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        _projectRepository.Verify(r => r.Insert(It.IsAny<Project>()), Times.Never);
-    }
-
-
-    [Test]
-    public void InitialiseProject_IgnoresIncorrectFolderNames()
-    {
-        const string projectDirectory = "C:\\2024-0a74-Merijn";
-
-        // Mocks
-        _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-0a74-Merijn");
-
-        // Execution
-        _projectService.InitialiseExistingFolder(projectDirectory);
-
-        // Asserts
-        _files.Verify(f => f.Combine(It.IsAny<string[]>()), Times.Never);
-        _files.Verify(f => f.Exists(It.IsAny<string>()), Times.Never);
-        _files.Verify(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        _projectRepository.Verify(r => r.Insert(It.IsAny<Project>()), Times.Never);
-    }
-
-
-    [Test]
-    public void InitialiseProject_IgnoresAlreadyInitialisedProject()
-    {
-        const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string projectInfoDirectory = @"C:\2024-07-04-Merijn\project.info";
-
-        // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-07-04-Merijn");
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(true);
-
-        // Execution
-        _projectService.InitialiseExistingFolder(projectDirectory);
-
-        // Asserts
-        _files.Verify(f => f.Combine(It.IsAny<string[]>()), Times.Once);
-        _files.Verify(f => f.Exists(It.IsAny<string>()), Times.Once);
-        _files.Verify(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
-        _projectRepository.Verify(r => r.Insert(It.IsAny<Project>()), Times.Never);
-    }
-
-
-    [Test]
-    public void InitialiseProject_SuccessfullySavesData()
-    {
-        const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string projectInfoDirectory = @"C:\2024-07-04-Merijn\project.info";
-
-        const int projectId = 2;
-
-
-        Project expectedProject = new Project(
-            projectId,
-            "Merijn",
-            projectDirectory,
-            new DateOnly(2024, 7, 4)
-        );
-
-        // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-07-04-Merijn");
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-        _files.Setup(f =>
-            f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
-
-        _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
-            projectId,
-            project.Name,
-            project.Path,
-            project.EventDate
-        ));
-
-
-        // Execution
-        _projectService.InitialiseExistingFolder(projectDirectory);
-
-        // Assert
-        _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
-        _files.Verify(f => f.Exists(projectInfoDirectory), Times.Once);
-
-        _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
-            p.Id == null &&
-            p.Name == "Merijn" &&
-            p.Path == projectDirectory &&
-            p.EventDate == new DateOnly(2024, 7, 4)
-        )), Times.Once);
-
-        _files.Verify(f => f.WriteAllText("2", projectInfoDirectory), Times.Once);
-    }
-
-
-    [Test]
-    public void InitialiseProject_SuccessfullySavesData_SingleDigitMonthAndDay()
-    {
-        const string projectDirectory = @"C:\2024-7-4-Merijn";
-        const string projectInfoDirectory = @"C:\2024-7-4-Merijn\project.info";
-
-        const int projectId = 2;
-
-
-        Project expectedProject = new Project(
-            projectId,
-            "Merijn",
-            projectDirectory,
-            new DateOnly(2024, 7, 4)
-        );
-
-        // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-7-4-Merijn");
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-        _files.Setup(f =>
-            f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
-
-        _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
-            projectId,
-            project.Name,
-            project.Path,
-            project.EventDate
-        ));
-
-
-        // Execution
-        _projectService.InitialiseExistingFolder(projectDirectory);
-
-        // Assert
-        _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
-        _files.Verify(f => f.Exists(projectInfoDirectory), Times.Once);
-
-        _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
-            p.Id == null &&
-            p.Name == "Merijn" &&
-            p.Path == projectDirectory &&
-            p.EventDate == new DateOnly(2024, 7, 4)
-        )), Times.Once);
-
-        _files.Verify(f => f.WriteAllText("2", projectInfoDirectory), Times.Once);
-    }
-
-    [Test]
-    public void InitialiseProject_SuccessfullySavesData_SpacesInProjectName()
-    {
-        const string projectDirectory = @"C:\2024-07-04-Merijn gymnasium";
-        const string projectInfoDirectory = @"C:\2024-07-04-Merijn gymnasium\project.info";
-
-        const int projectId = 2;
-
-
-        Project expectedProject = new Project(
-            projectId,
-            "Merijn gymnasium",
-            projectDirectory,
-            new DateOnly(2024, 7, 4)
-        );
-
-        // Mocks
-        _files.Setup(f => f.Combine(It.IsAny<string[]>())).Returns(projectInfoDirectory);
-        _files.Setup(f => f.GetPathEnd(It.IsAny<string>())).Returns("2024-07-04-Merijn gymnasium");
-        _files.Setup(f => f.Exists(It.IsAny<string>())).Returns(false);
-        _files.Setup(f =>
-            f.WriteAllText(It.Is<string>(s => s == 2 + ""), It.Is<string>(s => s == projectInfoDirectory)));
-
-        _projectRepository.Setup(r => r.Insert(It.IsAny<Project>())).Returns((Project project) => new Project(
-            projectId,
-            project.Name,
-            project.Path,
-            project.EventDate
-        ));
-
-
-        // Execution
-        _projectService.InitialiseExistingFolder(projectDirectory);
-
-        // Assert
-        _files.Verify(f => f.Combine(projectDirectory, ProjectService.ProjectInfoFile), Times.Once);
-        _files.Verify(f => f.Exists(projectInfoDirectory), Times.Once);
-
-        _projectRepository.Verify(r => r.Insert(It.Is<Project>(p =>
-            p.Id == null &&
-            p.Name == "Merijn gymnasium" &&
-            p.Path == projectDirectory &&
-            p.EventDate == new DateOnly(2024, 7, 4)
-        )), Times.Once);
-
-        _files.Verify(f => f.WriteAllText("2", projectInfoDirectory), Times.Once);
-    }
-
-
-    [Test]
-    public void ProjectNameRegex_MatchesValidProjectFolder()
-    {
-        // Arrange
-        const string folderName = "2024-07-04-Merijn";
-
-        // Act
-        var match = ProjectService.ProjectNameRegex.Match(folderName);
-
-        Assert.Multiple(() =>
+        List<Project> expectedProjects = new List<Project>
         {
-            // Assert
-            Assert.That(match.Success, Is.True);
-            Assert.That(match.Groups[1].Value, Is.EqualTo("2024"));
-            Assert.That(match.Groups[2].Value, Is.EqualTo("07"));
-            Assert.That(match.Groups[3].Value, Is.EqualTo("04"));
-            Assert.That(match.Groups[4].Value, Is.EqualTo("Merijn"));
-        });
-    }
+            new Project(1, "Ardennen", @"C:\2026-06-01-Ardennen", new DateOnly(2026, 6, 1)),
+            new Project(2, "Antwerpen", @"C:\2024-01-10-Antwerpen", new DateOnly(2026, 1, 10))
+        };
 
-    [Test]
-    public void ProjectNameRegex_DoesNotMatchInvalidProjectFolder()
-    {
-        // Arrange
-        const string folderName = "invalid-folder-name";
+        // Mocks
+        _projectRepository
+            .Setup(r => r.GetAll())
+            .Returns(expectedProjects);
 
-        // Act
-        var match = ProjectService.ProjectNameRegex.Match(folderName);
+        // Execution
+        List<Project> result = _projectService.GetAllProjects();
 
-        // Assert
-        Assert.That(match.Success, Is.False);
+        // Asserts
+        Assert.That(result, Is.EqualTo(expectedProjects));
     }
 }

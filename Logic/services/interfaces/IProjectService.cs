@@ -79,16 +79,4 @@ public interface IProjectService
     /// </summary>
     /// <returns></returns>
     public List<Project> GetAllProjects();
-    
-    
-    /// <summary>
-    ///     Initialises the given projects directory into the database,
-    ///     additionally this adds a file to the filesystem to remember the projects ID.
-    ///     Any images from within the project will also be loaded in with its metadata saved into the database.
-    ///     Any collection folders are ignored for now, additionally if a subfolder was given its ignored as its not recognized
-    ///     as a project folder.
-    ///     In future versions this method will run recursively, including for any sub/collection folders.
-    /// </summary>
-    /// <param name="projectDirectory"></param>
-    public void InitialiseExistingFolder(string projectDirectory);
 }
