@@ -33,9 +33,7 @@ public class ProjectServiceTest
             _projectRepository.Object,
             _imageRepository.Object,
             _files.Object,
-            _logger.Object,
-            new FolderNameOptions(),
-            _metadataService.Object
+            _logger.Object
         );
     }
 

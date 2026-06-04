@@ -19,7 +19,7 @@ public class ProjectService : IProjectService
 
 
     public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files,
-        ILogger<ProjectService> logger, FolderNameOptions options, IProjectMetadataService metadataService)
+        ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
