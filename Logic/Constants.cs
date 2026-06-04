@@ -1,7 +1,14 @@
-﻿namespace Application;
+﻿using System.Text.RegularExpressions;
+
+namespace Application;
 
 public class Constants
 {
+    public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
+    public static readonly Regex SubProjectNameRegex = new Regex("\\.([^.]*)");
+
+    public const string ProjectInfoFile = "project.info";
+    
     public static readonly HashSet<string> ImageFileTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg",
