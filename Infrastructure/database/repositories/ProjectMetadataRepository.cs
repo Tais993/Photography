@@ -23,23 +23,22 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
         return _db.QueryMultiple("""
                                  SELECT
                                  project_id,
-                                 metadata_id,
-                                 metadata_value,
                                  metadata_key,
+                                 metadata_value,
                                  metadata_type,
                                  display_name,
                                  description
                                  FROM public.project_metadata pm
-                                 JOIN public.metadata m on m.id = pm.metadata_id
+                                 JOIN public.metadata m on m.metadata_key = pm.metadata_key
                                  """, MapProjectMetadata);
     }
 
     public void Insert(ProjectMetadata entity)
     {
         _db.Execute("""
-                    INSERT INTO public.project_metadata(project_id, metadata_id, metadata_value) 
+                    INSERT INTO public.project_metadata(project_id, metadata_key, metadata_value) 
                     VALUES ($1, $2, $3) 
-                    """, entity.ProjectId, entity.MetadataId, entity.MetadataValue);
+                    """, entity.ProjectId, entity.MetadataKey, entity.MetadataValue);
     }
 
     public void Update(ProjectMetadata entity)
@@ -48,35 +47,34 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
                     UPDATE public.project_metadata
                     SET metadata_value = $1
                     WHERE project_id = $2
-                    AND metadata_id = $3;
-                    """, entity.MetadataValue, entity.ProjectId, entity.MetadataId);
+                    AND metadata_key = $3;
+                    """, entity.MetadataValue, entity.ProjectId, entity.MetadataKey);
     }
 
-    public ProjectMetadata? GetById(int projectId, int metadataId)
+    public ProjectMetadata? GetByKey(int projectId, string metadataKey)
     {
         return _db.Query("""
                          SELECT
                              project_id,
-                             metadata_id,
                              metadata_value,
                              metadata_key,
                              metadata_type,
                              display_name,
                              description
                          FROM public.project_metadata pm
-                         JOIN public.metadata m on m.id = pm.metadata_id
-                         WHERE project_id = $1 AND metadata_id = $2
-                         """, MapProjectMetadata, projectId, metadataId);
+                         JOIN public.metadata m on m.metadata_key = pm.metadata_key
+                         WHERE project_id = $1 AND metadata_key = $2
+                         """, MapProjectMetadata, projectId, metadataKey);
     }
 
-    public void DeleteByKey(int projectId, int metadataId)
+    public void DeleteByKey(int projectId, string metadataKey)
     {
         {
             _db.Execute("""
                         DELETE FROM project_metadata
                                WHERE project_id = $1 
-                               AND metadata_id = $2
-                        """, projectId, metadataId);
+                               AND metadata_key = $2
+                        """, projectId, metadataKey);
         }
     }
 
@@ -85,14 +83,13 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
         return _db.QueryMultiple("""
                                  SELECT
                                      project_id,
-                                     metadata_id,
                                      metadata_value,
                                      metadata_key,
                                      metadata_type,
                                      display_name,
                                      description
                                  FROM public.project_metadata pm
-                                 JOIN public.metadata m on m.id = pm.metadata_id
+                                 JOIN public.metadata m on m.metadata_key = pm.metadata_key
                                  WHERE project_id = $1
                                  """, MapProjectMetadata, projectId);
     }
@@ -101,7 +98,6 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
     {
         return new ProjectMetadata(
             (int)reader["project_id"],
-            (int)reader["metadata_id"],
             (string)reader["metadata_value"],
             (string)reader["metadata_key"],
             (string)reader["metadata_type"],
