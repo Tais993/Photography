@@ -11,7 +11,6 @@ public class MetadataCommand : CommandBase
     private const string MetaDisplayName = "-display-name";
     private const string MetaDescription = "-description";
     private const string MetadataType = "-metadata-type";
-    private const string MetadataId = "metadata-id";
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectService _projectService;
 
@@ -54,11 +53,10 @@ public class MetadataCommand : CommandBase
         {
             Arguments =
             {
-                new Argument<int>(MetadataId)
+                new Argument<string>(MetadataKey)
             },
             Options =
             {
-                new Option<string>(MetadataKey),
                 new Option<string>(MetaDisplayName),
                 new Option<string>(MetaDescription),
                 new Option<string>(MetadataType)
@@ -70,7 +68,8 @@ public class MetadataCommand : CommandBase
         {
             Arguments =
             {
-                new Argument<int>(MetadataId)
+                new Argument<string>(MetadataKey)
+                
             }
         };
         deleteCommand.SetAction(DeleteMetadata);
@@ -111,15 +110,14 @@ public class MetadataCommand : CommandBase
 
     private int EditMetadata(ParseResult parseResult)
     {
-        int metadataId = parseResult.GetValue<int>(MetadataId);
+        string metadataKey = parseResult.GetValue<string>(MetadataKey);
 
 
-        string? metadataKey = parseResult.GetValue<string>(MetadataKey);
         string? displayName = parseResult.GetValue<string>(MetaDisplayName);
         string? description = parseResult.GetValue<string>(MetaDescription);
         string? metadataType = parseResult.GetValue<string>(MetadataType);
 
-        Metadata? metadata = _projectMetadataService.GetMetadata(metadataId);
+        Metadata? metadata = _projectMetadataService.GetMetadata(metadataKey);
 
         if (metadata == null)
         {
@@ -141,7 +139,7 @@ public class MetadataCommand : CommandBase
 
     private int DeleteMetadata(ParseResult parseResult)
     {
-        int metadataId = parseResult.GetValue<int>(MetadataId);
+        string metadataKey = parseResult.GetValue<string>(MetadataKey);
 
         Console.WriteLine("Are you sure that you want to delete the metadata with its connection to the projects?");
         Console.WriteLine("This is NOT a reversable action [Y/N]");
@@ -155,7 +153,7 @@ public class MetadataCommand : CommandBase
             return 0;
         }
 
-        _projectMetadataService.DeleteMetadata(metadataId);
+        _projectMetadataService.DeleteMetadata(metadataKey);
 
         return 0;
     }

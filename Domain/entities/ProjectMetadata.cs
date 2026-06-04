@@ -2,11 +2,10 @@
 
 public class ProjectMetadata : IEntity
 {
-    public ProjectMetadata(int projectId, int metadataId, string metadataValue, string metadataKey,
+    public ProjectMetadata(int projectId, string metadataValue, string metadataKey,
         string metadataType, string displayName, string description)
     {
         ProjectId = projectId;
-        MetadataId = metadataId;
         MetadataValue = metadataValue;
         MetadataKey = metadataKey;
         MetadataType = metadataType;
@@ -16,13 +15,12 @@ public class ProjectMetadata : IEntity
 
     public ProjectMetadata(int projectId, Metadata metadata, string metadataValue)
     {
-        if (metadata.Id == null)
+        if (metadata.MetadataKey == null)
         {
             throw new ArgumentNullException("metadata", "metadata id cannot be null");
         }
 
         ProjectId = projectId;
-        MetadataId = (int)metadata.Id;
         MetadataValue = metadataValue;
         MetadataKey = metadata.MetadataKey;
         MetadataType = metadata.MetadataType;
@@ -30,15 +28,14 @@ public class ProjectMetadata : IEntity
         Description = metadata.Description;
     }
 
-    public ProjectMetadata(int projectId, int metadataId, string? metadataValue)
+    public ProjectMetadata(int projectId, string metadataKey, string? metadataValue)
     {
         ProjectId = projectId;
-        MetadataId = metadataId;
+        MetadataKey = metadataKey;
         MetadataValue = metadataValue;
     }
-
+    
     public int ProjectId { get; }
-    public int MetadataId { get; }
     public string? MetadataValue { get; set; }
     public string MetadataKey { get; }
     public string MetadataType { get; }
