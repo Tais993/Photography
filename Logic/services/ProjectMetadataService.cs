@@ -18,7 +18,7 @@ public class ProjectMetadataService : IProjectMetadataService
 
     public Metadata CreateMetadata(string metadataKey, string metadataType, string displayName, string description)
     {
-        return CreateMetadata(new Metadata(0, metadataKey, metadataType, displayName, description));
+        return CreateMetadata(new Metadata(metadataKey, metadataType, displayName, description));
     }
 
     public Metadata CreateMetadata(Metadata metadata)
@@ -26,9 +26,9 @@ public class ProjectMetadataService : IProjectMetadataService
         return _metadataRepository.Insert(metadata);
     }
 
-    public void UpdateMetadata(int metadataId, string metadataKey, string metadataType, string displayName, string description)
+    public void UpdateMetadata(string metadataKey, string metadataType, string displayName, string description)
     {
-        UpdateMetadata(new Metadata(metadataId, metadataKey, metadataType, displayName, description));
+        UpdateMetadata(new Metadata(metadataKey, metadataType, displayName, description));
     }
 
     public void UpdateMetadata(Metadata metadata)
@@ -38,12 +38,12 @@ public class ProjectMetadataService : IProjectMetadataService
 
     public Metadata? GetMetadata(Metadata metadata)
     {
-        if (metadata.Id == null)
+        if (metadata.MetadataKey == null)
         {
-            throw new ArgumentNullException("metadata.Id");
+            throw new ArgumentNullException("metadata.MetadataKey");
         }
 
-        return GetMetadata((int)metadata.Id);
+        return GetMetadata(metadata.MetadataKey);
     }
 
     public Metadata? GetMetadata(string metadataKey)
@@ -59,18 +59,18 @@ public class ProjectMetadataService : IProjectMetadataService
 
     public void DeleteMetadata(Metadata metadata)
     {
-        if (metadata.Id == null)
+        if (metadata.MetadataKey == null)
         {
-            throw new ArgumentNullException("metadata.Id");
+            throw new ArgumentNullException("metadata.MetadataKey");
         }
 
-        DeleteMetadata((int)metadata.Id);
+        DeleteMetadata(metadata.MetadataKey);
     }
 
 
-    public void DeleteMetadata(int projectId)
+    public void DeleteMetadata(string metadataKey)
     {
-        _metadataRepository.DeleteById(projectId);
+        _metadataRepository.DeleteById(metadataKey);
     }
 
 
@@ -89,17 +89,18 @@ public class ProjectMetadataService : IProjectMetadataService
         return _projectMetadataRepository.GetAllByProjectId(projectId);
     }
 
-    public void AddMetadataToProject(int projectId, int metadataId, string? value)
+    public void AddMetadataToProject(int projectId, string metadataKey, string? value)
     {
         value ??= string.Empty;
 
-        ProjectMetadata projectMetadata = new ProjectMetadata(projectId, metadataId, value);
+        ProjectMetadata projectMetadata = new ProjectMetadata(projectId, metadataKey, value);
 
         _projectMetadataRepository.Insert(projectMetadata);
     }
+    
 
-    public void RemoveMetadataFromProject(int projectId, int metadataId)
+    public void RemoveMetadataFromProject(int projectId, string metadataKey)
     {
-        _projectMetadataRepository.DeleteByKey(projectId, metadataId);
+        _projectMetadataRepository.DeleteByKey(projectId, metadataKey);
     }
 }

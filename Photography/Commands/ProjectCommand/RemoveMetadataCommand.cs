@@ -16,7 +16,6 @@ public class RemoveMetadataCommand : CommandBase
         _projectMetadataService = projectMetadataService;
     }
 
-    private static string MetadataIdName => "-metadata-id";
     private static string MetadataKeyName => "-metadata-key";
 
     protected override string Name => "metadata-remove";
@@ -32,10 +31,6 @@ public class RemoveMetadataCommand : CommandBase
         {
             Description = "The key of the metadata"
         });
-        command.Options.Add(new Option<int>(MetadataIdName)
-        {
-            Description = "The ID of the metadata"
-        });
     }
 
     public override int Run(ParseResult parseResult)
@@ -47,11 +42,11 @@ public class RemoveMetadataCommand : CommandBase
 
         if (metadata == null)
         {
-            Console.WriteLine("No valid metadata-key or metadata-id was given");
+            Console.WriteLine("No valid metadata-key was given");
             return 2;
         }
 
-        _projectMetadataService.RemoveMetadataFromProject(projectId, (int)metadata.Id);
+        _projectMetadataService.RemoveMetadataFromProject(projectId, metadata.MetadataKey);
 
         return 0;
     }
@@ -59,13 +54,7 @@ public class RemoveMetadataCommand : CommandBase
     public Metadata? ResolveMetadata(ParseResult parseResult)
     {
         string metadataKey = parseResult.GetValue<string>(MetadataKeyName);
-        int metadataId = parseResult.GetValue<int>(MetadataIdName);
 
-        if (metadataKey != null)
-        {
-            return _projectMetadataService.GetMetadata(metadataKey);
-        }
-
-        return _projectMetadataService.GetMetadata(metadataId);
+        return _projectMetadataService.GetMetadata(metadataKey);
     }
 }

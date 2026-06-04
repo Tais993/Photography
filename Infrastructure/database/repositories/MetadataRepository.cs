@@ -48,40 +48,38 @@ public class MetadataRepository : IMetadataRepository
         return _db.Query("""
                          INSERT INTO public.metadata(metadata_key, metadata_type, display_name, description) 
                          VALUES ($1, $2, $3, $4)
-                         RETURNING id, metadata_key, metadata_type, display_name, description
+                         RETURNING metadata_key, metadata_type, display_name, description
                          """, MapMetadata, entity.MetadataKey, entity.MetadataType, entity.DisplayName,
             entity.Description);
     }
 
     public void Update(Metadata entity)
     {
-        if (entity.Id is null)
+        if (entity.MetadataKey is null)
         {
             throw new ArgumentException("Metadata must have an ID", nameof(entity));
         }
 
         _db.Execute("""
                     UPDATE public.metadata
-                    SET metadata_key = $1,
-                        metadata_type = $2,
+                    SET metadata_type = $2,
                         display_name = $3,
                         description = $4
-                    WHERE id = $5
-                    """, entity.MetadataKey, entity.MetadataType, entity.DisplayName, entity.Description, entity.Id);
+                    WHERE metadata_key = $5
+                    """, entity.MetadataType, entity.DisplayName, entity.Description, entity.MetadataKey);
     }
 
-    public void DeleteById(int id)
+    public void DeleteById(string metadataKey)
     {
         _db.Execute("""
                     DELETE FROM public.metadata
-                    WHERE id = $1
-                    """, id);
+                    WHERE metadata_key = $1
+                    """, metadataKey);
     }
 
     private static Metadata MapMetadata(NpgsqlDataReader reader)
     {
         return new Metadata(
-            (int)reader["id"],
             (string)reader["metadata_key"],
             (string)reader["metadata_type"],
             (string)reader["display_name"],

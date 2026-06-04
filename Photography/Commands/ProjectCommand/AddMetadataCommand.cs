@@ -20,7 +20,6 @@ public class AddMetadataCommand : CommandBase
     protected override string Name => "metadata-add";
     protected override string Description => "Adds the given metadata to the project";
 
-    private static string MetadataIdName => "-metadata-id";
     private static string MetadataKeyName => "-metadata-key";
     private static string ValueName => "-value";
 
@@ -32,11 +31,6 @@ public class AddMetadataCommand : CommandBase
         {
             Description = "The key of the metadata"
         });
-        command.Options.Add(new Option<int>(MetadataIdName)
-        {
-            Description = "The ID of the metadata"
-        });
-
         command.Options.Add(new Option<string>(ValueName)
         {
             Description = "The value of the metadata"
@@ -55,13 +49,13 @@ public class AddMetadataCommand : CommandBase
 
         if (metadata == null)
         {
-            Console.WriteLine("No valid metadata-key or metadata-id was given");
+            Console.WriteLine("No valid metadata-key was given");
             return 2;
         }
 
         string? value = parseResult.GetValue<string>(ValueName);
 
-        _projectMetadataService.AddMetadataToProject(projectId, (int)metadata.Id!, value);
+        _projectMetadataService.AddMetadataToProject(projectId, metadata.MetadataKey, value);
 
         return 0;
     }
@@ -69,13 +63,7 @@ public class AddMetadataCommand : CommandBase
     public Metadata? ResolveMetadata(ParseResult parseResult)
     {
         string metadataKey = parseResult.GetValue<string>(MetadataKeyName);
-        int metadataId = parseResult.GetValue<int>(MetadataIdName);
 
-        if (metadataKey != null)
-        {
-            return _projectMetadataService.GetMetadata(metadataKey);
-        }
-
-        return _projectMetadataService.GetMetadata(metadataId);
+        return _projectMetadataService.GetMetadata(metadataKey);
     }
 }

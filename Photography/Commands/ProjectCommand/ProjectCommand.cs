@@ -5,7 +5,6 @@ namespace Cli.Commands.ProjectCommand;
 
 public class ProjectCommand : CommandBase
 {
-    private const string MetadataId = "metadata-id";
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectService _projectService;
 
