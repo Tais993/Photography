@@ -33,7 +33,6 @@ public class ProjectInitialisingServiceTest
             _projectRepository.Object,
             _imageRepository.Object,
             _logger.Object,
-            new FolderNameOptions(),
             _metadataService.Object,
             _files.Object
         );

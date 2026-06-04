@@ -13,17 +13,15 @@ public class ProjectInitialisingService : IProjectInitialisingService
     private readonly IProjectRepository _projectRepository;
     private readonly IImageRepository _imageRepository;
     private readonly ILogger<ProjectService> _logger;
-    private readonly FolderNameOptions _options;
     private readonly IProjectMetadataService _metadataService;
     private readonly IFiles _files;
 
     public ProjectInitialisingService(IProjectRepository projectRepository, IImageRepository imageRepository,
-        ILogger<ProjectService> logger, FolderNameOptions options, IProjectMetadataService metadataService, IFiles files)
+        ILogger<ProjectService> logger, IProjectMetadataService metadataService, IFiles files)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
         _logger = logger;
-        _options = options;
         _metadataService = metadataService;
         _files = files;
     }
