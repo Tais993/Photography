@@ -1,14 +1,12 @@
 ﻿using System.CommandLine;
 using Application.services.interfaces;
 using Domain.entities;
-using Infrastructure.database.repositories;
 using static Cli.Commands.CommandOptions;
 
 namespace Cli.Commands;
 
 public class SearchCommand : CommandBase
 {
-    private readonly IProjectRepository _projectRepository;
     private readonly ISearchService _searchService;
     private readonly IProjectService _projectService;
  
@@ -42,12 +40,10 @@ public class SearchCommand : CommandBase
         DefaultValueFactory = _ => "Originals"
     };
 
-    public SearchCommand(ISearchService searchService, IProjectService projectService,
-        IProjectRepository projectRepository)
+    public SearchCommand(ISearchService searchService, IProjectService projectService)
     {
         _searchService = searchService;
         _projectService = projectService;
-        _projectRepository = projectRepository;
     }
 
     protected override string Name => "search";
