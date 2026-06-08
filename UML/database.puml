@@ -1,54 +1,57 @@
 ﻿@startuml
 
-skinparam classAttributeIconSize 0
-skinparam shadowing false
 skinparam linetype ortho
 skinparam packageStyle rectangle
 
-package "PhotographyNET.database.repositories\nCode diagram for Repository component" {
+package "PhotographyNET" {
+  package "Infrastructure" {
+    package "database" {
+      package "repositories" {
+        
+        class ProjectRepository {
+          - _db : RepositoryHelper
+          + GetById(id : int) : Project?
+          + GetAll() : List<Project>
+          + Insert(project : Project) : Project
+          + Update(project : Project) : void
+          + DeleteById(id : int) : void
+          + SearchProjects(settings : ProjectSearchSettings) : List<Project>
+        }
 
-    class RepositoryHelper {
-        - _dataSource : NpgsqlDataSource
-        --
-        + RepositoryHelper(dataSource : NpgsqlDataSource, logger : ILogger<RepositoryHelper>)
-        + QueryMultiple<T>(sql : string, resultConverter : Func<NpgsqlDataReader, T>, parameterValues : object[]) : List<T>
-        + Query<TResult>(sql : string, resultConverter : Func<NpgsqlDataReader, TResult>, parameterValues : object[]) : TResult
-        + Execute(sql : string, parameterValues : object[]) : void
+        class ImageRepository {
+          - _db : RepositoryHelper
+          + GetAll() : List<Image>
+          + GetAllByProjectId(projectId : int) : List<Image>
+          + Insert(image : Image) : Image
+          + Update(image : Image) : void
+          + DeleteById(id : int) : void
+        }
+
+        class RepositoryHelper {
+          - _dataSource
+          - _logger
+          + QueryMultiple<T>(sql : string, resultConverter, parameterValues : object[]) : List<T>
+          + Query<TResult>(sql : string, resultConverter, parameterValues : object?[]) : TResult
+          + Execute(sql : string, parameterValues : object[]) : void
+          - SetParameters<TResult>(parameterValues : object?[], command) : void
+          + MapToInt(reader) : int
+          + MapToBool(reader) : bool
+        }
+      }
     }
+  }
 
-    class ImageRepository {
-        - _db : RepositoryHelper
-        --
-        + GetAll() : List<Image>
-        + GetAllByProjectId(projectId : int) : List<Image>
-        + Insert(image : Image) : Image
-        + Update(image : Image) : void
-        + DeleteByKey(id : int) : void
-    }
-
-    class ProjectRepository {
-        - _db : RepositoryHelper
-        --
-        + GetByKey(id : int) : Project?
-        + GetAll() : List<Project>
-        + Insert(project : Project) : Project
-        + Update(project : Project) : void
-        + DeleteByKey(id : int) : void
-    }
-
-    class Image
+  package "Domain" {
     class Project
-
-    class NpgsqlDataSource
+    class Image
+    class ProjectSearchSettings
+  }
 }
 
-ImageRepository --> RepositoryHelper : uses
 ProjectRepository --> RepositoryHelper : uses
+ImageRepository --> RepositoryHelper : uses
 
-ImageRepository --> Image : manages
-ImageRepository --> Project : queries by project
-ProjectRepository --> Project : manages
-
-RepositoryHelper --> NpgsqlDataSource : opens connection
-
+ProjectRepository --> Project : maps
+ImageRepository --> Image : maps
+ProjectRepository --> ProjectSearchSettings : uses
 @enduml

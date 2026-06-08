@@ -1,4 +1,4 @@
-﻿@startuml C3_BusinessLogic
+﻿@startuml C3_SearchCommand
 !include <C4/C4_Component>
 
 title C3 - Component Diagram - Search Command
@@ -8,27 +8,35 @@ LAYOUT_LEFT_RIGHT()
 Person(user, "Photographer")
 
 Container_Boundary(presentation, "Presentation Layer") {
-    Container_Boundary(CLI, "CLI") {
-        Container(search, "Search command", "C# / .NET", "Command which searches for specific files/images")
+    Container_Boundary(cli, "CLI Application") {
+        Component(searchCommand, "SearchCommand", "C# / System.CommandLine", "CLI command for searching images")
     }
 }
 
-Container_Boundary(business, "Business Logic Application") {
-    Component(fileSystemService, "FileSearchService", "", "")
+Container_Boundary(application, "Application / Logic Layer") {
+    Component(projectService, "ProjectService", "C#", "Resolves the current project and project context")
+    Component(searchService, "SearchService", "C#", "Searches images by using project and image data")
 }
 
-Container_Boundary(infra, "Infrastructure Components") {
-    Component(repository, "Image Repository", "C#", "Reads and writes database data")
-    Component(fs, "File System Service", "C#", "Handles scanning, copy, move, and verification")
+Container_Boundary(infra, "Infrastructure Layer") {
+    Component(repository, "Repository", "C#", "Retrieves project and image data")
+    Component(fileSystem, "File System Component", "C#", "Reads project.info and file system data")
 }
 
+ContainerDb(database, "PostgreSQL Database", "SQL", "Stores projects and image records")
+System_Ext(fs, "File System", "Project folders, image files, and project.info")
 
-Rel(user, search, "Uses")
+Rel(user, searchCommand, "Executes command")
 
-Rel(search, fileSystemService, "entry")
+Rel(searchCommand, projectService, "Delegates project resolving")
+Rel(searchCommand, searchService, "Delegates search logic")
 
-Rel(fileSystemService, fs, "Looks up file on drive")
-Rel(fileSystemService, repository, "Checks database for file")
+Rel(projectService, fileSystem, "Reads project identification")
+Rel(projectService, repository, "Requests project")
+
+Rel(searchService, repository, "Requests project and image data")
+
+Rel(repository, database, "Reads")
+Rel(fileSystem, fs, "Reads")
 
 @enduml
-
