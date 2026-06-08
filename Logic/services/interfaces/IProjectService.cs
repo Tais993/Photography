@@ -9,15 +9,6 @@ namespace Application.services.interfaces;
 public interface IProjectService
 {
     /// <summary>
-    ///     Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
-    ///     If none is found, it'll return "0".
-    /// </summary>
-    /// <param name="directory"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public int ResolveProjectId(string directory);
-
-    /// <summary>
     ///     This resolves the given directory, but only if the given project ID is 0.
     ///     Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
     ///     If none is found, it'll return "0".
@@ -26,15 +17,7 @@ public interface IProjectService
     /// <param name="possiblyEmptyProjectId"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public int ResolveProjectId(string directory, int possiblyEmptyProjectId);
-
-    /// <summary>
-    ///     Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
-    /// </summary>
-    /// <param name="directory"></param>
-    /// <returns></returns>
-    /// <exception cref="InvalidOperationException"></exception>
-    public Project? ResolveProject(string directory);
+    public int ResolveProjectId(string directory, int possiblyEmptyProjectId = 0);
 
     /// <summary>
     ///     Based on a given directory, resolves any projects that can be found within the main, and or its parent folder.
@@ -44,7 +27,7 @@ public interface IProjectService
     /// <param name="possibleEmptyProjectId"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    public Project? ResolveProject(string directory, int possibleEmptyProjectId);
+    public Project? ResolveProject(string directory, int possibleEmptyProjectId = 0);
 
 
     /// <summary>
