@@ -1,6 +1,6 @@
 ﻿@startuml
 
-interface Interface {
+interface ICommand {
     + Build() : System.CommandLine.Command
     + Run(parseResult : System.CommandLine.ParseResult) : int
 }
@@ -8,9 +8,9 @@ interface Interface {
 abstract class CommandBase {
     {abstract} + Name : String
     {abstract} + Description : String
-    + Aliases : IEnumerable<String>
 
-    + Configure(command : System.CommandLine.Command) : void
+    # Configure(command : System.CommandLine.Command) : void
+    + AddAliases(aliases : List<String>) : void
     {abstract} + Run(parseResult : System.CommandLine.ParseResult) : int
     + Build() : System.CommandLine.Command
 }
@@ -19,9 +19,10 @@ class SearchCommand {
     + Name : String
     + Description : String
     - _query : Argument<String>
-    - _exact : Option<String>
+    - _exact : Option<Boolean>
+    - _global : Option<Boolean>
 
-    + Configure(command : System.CommandLine.Command) : void
+    # Configure(command : System.CommandLine.Command) : void
     + Run(parseResult : System.CommandLine.ParseResult) : int
 }
 
@@ -30,11 +31,11 @@ class InitialiseCommand {
     + Description : String
     - _mainFolder : Option<String>
 
-    + Configure(command : System.CommandLine.Command) : void
+    # Configure(command : System.CommandLine.Command) : void
     + Run(parseResult : System.CommandLine.ParseResult) : int
 }
 
-Interface <|.. CommandBase
+ICommand <|.. CommandBase
 CommandBase <|-- SearchCommand
 CommandBase <|-- InitialiseCommand
 

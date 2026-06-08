@@ -3,14 +3,16 @@
 
 title C1 - System Context - Picture project maintenance tool
 
-Person(user, "Photographer", "Manages photography projects")
+Person(user, "Photographer", "Manages folder-based photography projects")
 
-System(system, "Picture Project Maintenance Tool", "Recognises projects, searches files, copies photos to editing folders, and supports project transfer workflows")
+System(system, "Picture Project Maintenance Tool", "Recognises projects, searches images, manages selections, copies photos to editing folders, stores metadata, and supports CLI and website workflows")
 
-System_Ext(fs, "File System", "Contains project folders, image files, and archive locations")
+System_Ext(fs, "File System", "Contains project folders, image files, required folders, and project.info files")
+System_Ext(irfanview, "IrfanView", "External image viewer used to open images and retrieve the currently opened image")
 System_Ext(lightroom, "Adobe Lightroom", "Used for image editing after preparation by the tool")
 
-Rel(user, system, "Uses")
-Rel(system, fs, "Reads, validates, copies, and moves files/folders")
-Rel(system, lightroom, "Prepares files for editing in")
+Rel(user, system, "Uses through CLI and website")
+Rel(system, fs, "Reads project folders, searches images, and copies images")
+Rel(system, irfanview, "Opens images in and reads currently opened image from")
+Rel(system, lightroom, "Future integration with")
 @enduml
