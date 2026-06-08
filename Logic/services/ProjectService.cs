@@ -29,42 +29,32 @@ public class ProjectService : IProjectService
 
 
 
-    public int ResolveProjectId(string directory)
-    {
-        string projectInfoPath = _files.Combine(directory, Constants.ProjectInfoFile);
-
-        if (!_files.Exists(projectInfoPath))
-        {
-            return 0;
-        }
-
-        int id = int.Parse(_files.ReadAllText(projectInfoPath));
-
-        _logger.LogInformation("project info file found:  id: {Id}", id);
-
-        return id;
-    }
-
-    public int ResolveProjectId(string directory, int possibleEmptyProjectId)
+    public int ResolveProjectId(string directory, int possibleEmptyProjectId = 0)
     {
         if (possibleEmptyProjectId == 0)
         {
-            return ResolveProjectId(directory);
+            string projectInfoPath = _files.Combine(directory, Constants.ProjectInfoFile);
+
+            if (!_files.Exists(projectInfoPath))
+            {
+                return 0;
+            }
+
+            int id = int.Parse(_files.ReadAllText(projectInfoPath));
+
+            _logger.LogInformation("project info file found:  id: {Id}", id);
+
+            return id;
         }
 
         return possibleEmptyProjectId;
     }
 
-    public Project? ResolveProject(string directory)
-    {
-        return _projectRepository.GetById(ResolveProjectId(directory));
-    }
-
-    public Project? ResolveProject(string directory, int possibleEmptyProjectId)
+    public Project? ResolveProject(string directory, int possibleEmptyProjectId = 0)
     {
         if (possibleEmptyProjectId == 0)
         {
-            return ResolveProject(directory);
+            return _projectRepository.GetById(ResolveProjectId(directory));
         }
 
         return _projectRepository.GetById(possibleEmptyProjectId);
