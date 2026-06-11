@@ -59,16 +59,6 @@ public class ProjectService : IProjectService
         return _projectRepository.GetById(possibleEmptyProjectId);
     }
 
-    public Image GetImageById(int imageId)
-    {
-        return _imageRepository.GetById(imageId);
-    }
-
-    public int GetProjectImageCount(int projectId)
-    {
-        return _imageRepository.GetProjectImageCount(projectId);
-    }
-
     public int GetProjectCount()
     {
         return _projectRepository.GetProjectCount();

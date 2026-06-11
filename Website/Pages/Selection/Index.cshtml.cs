@@ -1,4 +1,5 @@
 ﻿using Application.interfaces;
+using Application.services;
 using Application.services.interfaces;
 using Domain.entities;
 using Domain.entities.search;
@@ -15,14 +16,16 @@ public class IndexModel : PageModel
     private readonly ISearchService _searchService;
     private readonly IIrfanviewService _irfanviewService;
     private readonly IProjectService _projectService;
+    private readonly IImageService _imageService;
     private readonly ILogger<IndexModel> _logger;
     private readonly IFiles _fileService;
 
-    public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService,
+    public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService, IImageService imageService,
         IProjectService projectService, IIrfanviewService irfanviewService, IFiles fileService, ILogger<IndexModel> logger)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;
+        _imageService = imageService;
         _irfanviewService = irfanviewService;
         _fileService = fileService;
         _logger = logger;
@@ -65,7 +68,7 @@ public class IndexModel : PageModel
 
         if (SelectedImageId is not null)
         {
-            SelectedImage = _projectService.GetImageById(SelectedImageId.Value);
+            SelectedImage = _imageService.GetImageById(SelectedImageId.Value);
         }
 
         SelectionSession selectionSession = _imageSelectionService.GetOrStartSession(SelectedProject);
@@ -135,7 +138,7 @@ public class IndexModel : PageModel
 
     public IActionResult OnGetSelectedImage(int imageId)
     {
-        Image? image = _projectService.GetImageById(imageId);
+        Image? image = _imageService.GetImageById(imageId);
         SelectedImage = image;
         SelectedImageId = imageId;
 
@@ -167,7 +170,7 @@ public class IndexModel : PageModel
     {
         _logger.LogInformation("OnPostToggleImageSelection");
         Project? project = _projectService.GetProjectById(selectedProjectId);
-        Image? image = _projectService.GetImageById(imageId);
+        Image? image = _imageService.GetImageById(imageId);
 
         if (project is null || image is null)
         {
@@ -193,7 +196,7 @@ public class IndexModel : PageModel
     public void OpenImageInIrfanview()
     {
         SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
-        SelectedImage = _projectService.GetImageById((int)SelectedImageId);
+        SelectedImage = _imageService.GetImageById((int)SelectedImageId);
 
         string imagePath = _fileService.Combine(SelectedProject.Path, SelectedImage.RelationalFilePath);
 
@@ -207,6 +210,6 @@ public class IndexModel : PageModel
             return 0;
         }
 
-        return _projectService.GetProjectImageCount((int)SelectedProjectId);
+        return _imageService.GetProjectImageCount((int)SelectedProjectId);
     }
 }

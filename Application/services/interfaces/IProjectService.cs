@@ -31,21 +31,7 @@ public interface IProjectService
 
 
     /// <summary>
-    ///     Returns the given image based on its ID.
-    /// </summary>
-    /// <param name="imageId"></param>
-    /// <returns></returns>
-    public Image GetImageById(int imageId);
-    
-    /// <summary>
-    ///     Returns the amount of images that are connected to the project
-    /// </summary>
-    /// <param name="projectId"></param>
-    /// <returns></returns>
-    public int GetProjectImageCount(int projectId);
-
-    /// <summary>
-    ///     Returns the amount of projects that exist
+    ///     Returns the number of projects that exist
     /// </summary>
     /// <returns></returns>
     public int GetProjectCount();
@@ -58,7 +44,7 @@ public interface IProjectService
     public Project GetProjectById(int projectId);
     
     /// <summary>
-    ///     Returns a list of all existing projects, this doesnt look at categories yet.
+    ///     Returns a list of all existing projects, this doesn't look at categories yet.
     /// </summary>
     /// <returns></returns>
     public List<Project> GetAllProjects();
