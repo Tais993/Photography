@@ -4,7 +4,7 @@ using Domain.entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.services;
+namespace Tests.Application.services;
 
 [TestFixture]
 [TestOf(typeof(ImageService))]
