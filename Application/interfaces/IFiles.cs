@@ -41,6 +41,13 @@ public interface IFiles
     string GetPathEnd(string path);
 
     /// <summary>
+    ///     Gets the full directory based on the given path, but it removes the filename.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public string GetDirectoryName(string path);
+
+    /// <summary>
     ///     Creates
     /// </summary>
     /// <param name="relativeTo"></param>
