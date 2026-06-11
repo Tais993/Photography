@@ -87,40 +87,9 @@ public class IndexModel : PageModel
         return Page();
     }
 
-    public IEnumerable<Image> HideNefFilesWhenJpgExists()
+    public IEnumerable<Image> GetImages()
     {
-        List<Image> imageList = Images.ToList();
-
-        HashSet<string> nonRawKeys = imageList
-            .Where(image => !IsRaw(image.FileType))
-            .Select(image => image.FileName)
-            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-
-        foreach (Image image in imageList)
-        {
-            if (SelectedImageIds.Contains((int)image.Id))
-            {
-                Console.WriteLine($"Image is selected: {image.FileName}");
-            }
-
-            Console.WriteLine($"Image is NOT selected: {image.FileName}, {image.Id}");
-        }
-
-        Console.WriteLine("Selected images:");
-
-        foreach (int selectedImageId in SelectedImageIds)
-        {
-            Console.WriteLine($"Image: {selectedImageId}");
-        }
-
-        foreach (string nonRawKey in nonRawKeys)
-        {
-        }
-        // afbeelding is RAW en heeft GEEN raw variant, dan is ie goedgekeurd
-        // alle NIET raws
-
-        return imageList.Where(image => !IsRaw(image.FileType) || !nonRawKeys.Contains(image.FileName));
+        return _imageService.HideRawFilesWhenNonRawExists(Images);
     }
 
 

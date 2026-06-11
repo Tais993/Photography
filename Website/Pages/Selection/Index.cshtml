@@ -123,7 +123,7 @@
                     else
                     {
                         <div class="row row-cards">
-                            @foreach (Image image in Model.HideNefFilesWhenJpgExists())
+                            @foreach (Image image in Model.GetImages())
                             {
                                 bool isSelected = Model.SelectedImageIds.Contains(image.Id!.Value);
 
