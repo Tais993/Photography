@@ -94,5 +94,11 @@ public class Files : IFiles
     public void MoveFolder(string path, string newPath)
     {
         Directory.Move(path, newPath);
+        
+    }
+    
+    public DateTime GetLastWriteTimeUtc(string path)
+    {
+        return File.GetLastWriteTimeUtc(path);
     }
 }

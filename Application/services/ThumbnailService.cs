@@ -9,7 +9,7 @@ namespace Application.services;
 
 public class ThumbnailService : IThumbnailService
 {
-    private readonly IImageThumbnailGenerator _thumbnailGenerator;
+    private readonly IThumbnailGenerator _thumbnailGenerator;
     private readonly IProjectService _projectService;
     private readonly IImageService _imageService;
     private readonly IConfiguration _configuration;
@@ -22,7 +22,7 @@ public class ThumbnailService : IThumbnailService
 
     public ThumbnailService(
         IProjectService projectService, IFiles files, IConfiguration configuration,
-        ILogger<ThumbnailService> logger, IImageService imageService, IImageThumbnailGenerator thumbnailGenerator)
+        ILogger<ThumbnailService> logger, IImageService imageService, IThumbnailGenerator thumbnailGenerator)
     {
         _projectService = projectService;
         _files = files;
@@ -116,8 +116,8 @@ public class ThumbnailService : IThumbnailService
             return false;
         }
 
-        DateTime originalModified = File.GetLastWriteTimeUtc(originalPath);
-        DateTime cacheModified = File.GetLastWriteTimeUtc(cachePath);
+        DateTime originalModified = _files.GetLastWriteTimeUtc(originalPath);
+        DateTime cacheModified = _files.GetLastWriteTimeUtc(cachePath);
 
         return cacheModified >= originalModified;
     }

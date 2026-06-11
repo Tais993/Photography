@@ -92,8 +92,11 @@ public interface IFiles
     /// <returns></returns>
     string ReadAllText(string path);
 
+    /// <summary>
+    /// Deletes a file from the given path.
+    /// </summary>
+    /// <param name="path"></param>
     void DeleteFile(string path);
-
 
 
     /// <summary>
@@ -130,4 +133,13 @@ public interface IFiles
     /// <param name="path">The current path</param>
     /// <param name="newPath">The new path</param>
     void MoveFolder(string path, string newPath);
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public DateTime GetLastWriteTimeUtc(string path);
+
 }
