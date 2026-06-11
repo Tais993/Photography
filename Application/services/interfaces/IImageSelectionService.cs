@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.services;
+namespace Application.services.interfaces;
 
 public interface IImageSelectionService
 {

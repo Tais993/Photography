@@ -1,4 +1,5 @@
-﻿using Domain.entities;
+﻿using Application.interfaces;
+using Domain.entities;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 

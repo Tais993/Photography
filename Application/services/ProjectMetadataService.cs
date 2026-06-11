@@ -1,6 +1,6 @@
-﻿using Application.services.interfaces;
+﻿using Application.interfaces;
+using Application.services.interfaces;
 using Domain.entities;
-using Infrastructure.database.repositories;
 
 namespace Application.services;
 

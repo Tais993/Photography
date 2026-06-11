@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Infrastructure.filesystem;
-using Infrastructure.irfanview;
+using Application.interfaces;
+using Application.services.interfaces;
 
 namespace Application.services;
 

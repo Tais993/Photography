@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using Application.services.interfaces;
 using Domain.entities;
+using Domain.entities.search;
 using static Cli.Commands.CommandOptions;
 
 namespace Cli.Commands;

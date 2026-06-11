@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Application;
 
-namespace Tests;
+namespace Tests.Application;
 
 [TestFixture]
 [TestOf(typeof(Constants))]

@@ -1,6 +1,7 @@
-﻿using Application.services.interfaces;
+﻿using Application.interfaces;
+using Application.services.interfaces;
 using Domain.entities;
-using Infrastructure.database.repositories;
+using Domain.entities.search;
 using Microsoft.Extensions.Logging;
 
 namespace Application.services;

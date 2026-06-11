@@ -1,8 +1,8 @@
 ﻿using System.CommandLine;
-using Application.services;
+using Application.interfaces;
 using Application.services.interfaces;
 using Domain.entities;
-using Infrastructure.filesystem;
+using Domain.entities.search;
 using Microsoft.Extensions.Logging;
 using static Cli.Commands.CommandOptions;
 

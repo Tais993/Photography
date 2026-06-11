@@ -1,4 +1,5 @@
 ﻿using Domain.entities;
+using Domain.entities.search;
 
 namespace Application.services.interfaces;
 

@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Infrastructure.database.repositories;
+namespace Application.interfaces;
 
 public interface IProjectMetadataRepository
 {

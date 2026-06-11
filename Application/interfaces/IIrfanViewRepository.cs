@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.irfanview;
+﻿namespace Application.interfaces;
 
 public interface IIrfanViewRepository
 {

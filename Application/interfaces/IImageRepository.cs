@@ -1,6 +1,7 @@
 ﻿using Domain.entities;
+using Domain.entities.search;
 
-namespace Infrastructure.database.repositories;
+namespace Application.interfaces;
 
 public interface IImageRepository
 {

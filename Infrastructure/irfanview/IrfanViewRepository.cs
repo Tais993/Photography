@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Application.interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.irfanview;
