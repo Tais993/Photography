@@ -5,6 +5,9 @@ riderModule.iml
 /_ReSharper.Caches/
 .idea
 
+*.jpg
+*.png
+
 /Photography/appsettings.json
 /Website/appsettings.json
 appsettings.shared.json
