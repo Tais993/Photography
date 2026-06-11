@@ -3,7 +3,7 @@
     <ItemGroup>
         <!-- Project references -->
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
-        <ProjectReference Include="..\Logic\Logic.csproj" />
+        <ProjectReference Include="..\Application\Application.csproj" />
 
         <!-- Outputs -->
         <None Update="appsettings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>

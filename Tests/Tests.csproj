@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <!-- Project references -->
-        <ProjectReference Include="..\Logic\Logic.csproj"/>
+        <ProjectReference Include="..\Application\Application.csproj" />
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
 
         <!-- Package references -->
