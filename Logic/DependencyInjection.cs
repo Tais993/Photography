@@ -8,15 +8,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddLogic(this IServiceCollection services)
     {
-        services.AddTransient<ICopyService, CopyService>();
-        services.AddTransient<ISearchService, SearchService>();
-        services.AddTransient<ILightroomService, LightroomService>();
-        services.AddTransient<IProjectService, ProjectService>();
-        services.AddTransient<IProjectInitialisingService, ProjectInitialisingService>();
-        services.AddTransient<IProjectMetadataService, ProjectMetadataService>();
+        services.AddScoped<ICopyService, CopyService>();
+        services.AddScoped<ISearchService, SearchService>();
+        services.AddScoped<ILightroomService, LightroomService>();
+        services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
+        services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
 
-        services.AddTransient<IIrfanviewService, IrfanviewService>();
-        services.AddTransient<IImageSelectionService, ImageSelectionService>();
+        services.AddScoped<IIrfanviewService, IrfanviewService>();
+        services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
         return services;
     }
