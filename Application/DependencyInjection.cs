@@ -20,6 +20,7 @@ public static class DependencyInjection
             services.AddScoped<IIrfanviewService, IrfanviewService>();
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
+            services.AddScoped<IThumbnailService, ThumbnailService>();
             return services;
         }
     }
