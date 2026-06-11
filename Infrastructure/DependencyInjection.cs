@@ -16,19 +16,19 @@ public static class DependencyInjection
         // ?? throw new InvalidOperationException("Missing connection string.");
         services.AddSingleton(new NpgsqlDataSourceBuilder(connectionString).Build());
         services.AddTransient<MigrationService>();
-        services.AddTransient<RepositoryHelper>();
+        services.AddScoped<RepositoryHelper>();
 
-// Repositories
-        services.AddTransient<IImageRepository, ImageRepository>();
-        services.AddTransient<IProjectRepository, ProjectRepository>();
-        services.AddTransient<IMetadataRepository, MetadataRepository>();
-        services.AddTransient<IProjectMetadataRepository, ProjectMetadataRepository>();
-        services.AddTransient<ISelectionRepository, SelectionRepository>();
+        // Repositories
+        services.AddScoped<IImageRepository, ImageRepository>();
+        services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<IMetadataRepository, MetadataRepository>();
+        services.AddScoped<IProjectMetadataRepository, ProjectMetadataRepository>();
+        services.AddScoped<ISelectionRepository, SelectionRepository>();
 
 
-        services.AddTransient<IFiles, Files>();
+        services.AddScoped<IFiles, Files>();
 
-        services.AddTransient<IIrfanViewRepository, IrfanViewRepository>();
+        services.AddScoped<IIrfanViewRepository, IrfanViewRepository>();
         return services;
     }
 }
