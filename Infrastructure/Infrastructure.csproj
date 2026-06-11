@@ -3,6 +3,7 @@
     <ItemGroup>
         <!-- Project references -->
         <ProjectReference Include="..\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\Logic\Logic.csproj" />
 
         <!-- Outputs -->
         <None Include="database\migrations\*.sql">
