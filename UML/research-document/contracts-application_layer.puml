@@ -1,0 +1,25 @@
+﻿@startuml
+title Contracts in Application Layer
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Application" {
+    package "Services" {
+        class "ProjectService" as ProjectService
+    }
+
+    package "Interfaces" {
+        interface "IProjectRepository" as IProjectRepository
+    }
+}
+
+package "Infrastructure" {
+    class "ProjectRepository" as ProjectRepository
+}
+
+ProjectService --> IProjectRepository
+ProjectRepository ..|> IProjectRepository
+
+@enduml

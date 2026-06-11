@@ -1,0 +1,19 @@
+﻿@startuml
+title Contracts in Infrastructure
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Infrastructure" {
+    interface "IProjectRepository" as IProjectRepository
+    class "ProjectRepository" as ProjectRepository
+}
+
+package "Application" {
+    class "ProjectService" as ProjectService
+}
+
+ProjectService --> IProjectRepository
+ProjectRepository ..|> IProjectRepository
+
+@enduml

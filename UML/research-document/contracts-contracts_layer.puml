@@ -1,0 +1,23 @@
+﻿@startuml
+title Contracts in Separate Contracts Layer
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "Application" {
+    class "ProjectService" as ProjectService
+}
+
+package "Contracts" {
+    interface "IProjectRepository" as IProjectRepository
+}
+
+package "Infrastructure" {
+    class "ProjectRepository" as ProjectRepository
+}
+
+ProjectService --> IProjectRepository
+ProjectRepository ..|> IProjectRepository
+
+@enduml
