@@ -1,6 +1,6 @@
 ﻿namespace Domain.entities;
 
-public class SelectionSession : IEntity
+public class SelectionSession
 {
     public SelectionSession(int? id, int projectId, string name, List<int>? imageIds)
     {

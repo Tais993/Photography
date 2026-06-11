@@ -1,7 +1,6 @@
 ﻿namespace Domain.entities;
 
 public class Metadata(string metadataKey, string metadataType, string displayName, string description)
-    : IEntity
 {
     public string Description = description;
     public string DisplayName = displayName;

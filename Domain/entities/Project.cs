@@ -1,6 +1,6 @@
 ﻿namespace Domain.entities;
 
-public class Project : IEntity
+public class Project
 {
     public Project(int? id, string name, string path, DateOnly eventDate, int? parentProjectId)
     {
