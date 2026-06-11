@@ -14,19 +14,19 @@ public class IndexModel : PageModel
 {
     private readonly IImageSelectionService _imageSelectionService;
     private readonly ISearchService _searchService;
-    private readonly IIrfanviewService _irfanviewService;
+    private readonly IIrfanViewService _irfanViewService;
     private readonly IProjectService _projectService;
     private readonly IImageService _imageService;
     private readonly ILogger<IndexModel> _logger;
     private readonly IFiles _fileService;
 
     public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService, IImageService imageService,
-        IProjectService projectService, IIrfanviewService irfanviewService, IFiles fileService, ILogger<IndexModel> logger)
+        IProjectService projectService, IIrfanViewService irfanViewService, IFiles fileService, ILogger<IndexModel> logger)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;
         _imageService = imageService;
-        _irfanviewService = irfanviewService;
+        _irfanViewService = irfanViewService;
         _fileService = fileService;
         _logger = logger;
         _projectService = projectService;
@@ -131,7 +131,7 @@ public class IndexModel : PageModel
 
     public IActionResult OnGetOpenImage()
     {
-        OpenImageInIrfanview();
+        OpenImageInIrfanView();
 
         return new NoContentResult();
     }
@@ -193,14 +193,14 @@ public class IndexModel : PageModel
         return Partial("_ImageView", imageView);
     }
 
-    public void OpenImageInIrfanview()
+    public void OpenImageInIrfanView()
     {
         SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
         SelectedImage = _imageService.GetImageById((int)SelectedImageId);
 
         string imagePath = _fileService.Combine(SelectedProject.Path, SelectedImage.RelationalFilePath);
 
-        _irfanviewService.OpenImage("C:\\Program Files\\IrfanView\\i_view64.exe", imagePath);
+        _irfanViewService.OpenImage(imagePath);
     }
 
     public int GetProjectImageCount()

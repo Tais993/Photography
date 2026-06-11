@@ -1,20 +1,5 @@
 {
-  "FolderNames": {
-    "Originals":[
-      "Originals",
-      "Original"
-    ],
-    "Editing": [
-      "Editing",
-      "Edits",
-      "Edit"
-    ],
-    "Finals":[
-      "Finals",
-      "Final",
-      "Results"
-    ]
-  },
+  "IrfanViewPath": "C:\\Program Files\\IrfanView\\i_view64.exe",
   "Thumbnails": {
     "DefaultSize": 300,
     "LargeSize": 1200,
@@ -30,5 +15,21 @@
   "AllowedHosts": "*",
   "ConnectionStrings": {
     "Default": ""
-  }
+  },
+   "FolderNames": {
+       "Originals":[
+         "Originals",
+         "Original"
+       ],
+       "Editing": [
+         "Editing",
+         "Edits",
+         "Edit"
+       ],
+       "Finals":[
+         "Finals",
+         "Final",
+         "Results"
+       ]
+     },
 }

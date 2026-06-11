@@ -1,22 +1,24 @@
 ﻿using System.Diagnostics;
 using Application.interfaces;
 using Application.services.interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace Application.services;
 
-public class IrfanviewService : IIrfanviewService
+public class IrfanViewService : IIrfanViewService
 {
+    private readonly string? _irfanViewPath;
     private readonly IFiles _files;
     private readonly IIrfanViewRepository _irfanViewRepository;
 
-    public IrfanviewService(IIrfanViewRepository irfanViewRepository, IFiles files)
+    public IrfanViewService(IIrfanViewRepository irfanViewRepository, IFiles files, IConfiguration config)
     {
+        _irfanViewPath = config.GetValue<string>("IrfanViewPath");
         _irfanViewRepository = irfanViewRepository;
         _files = files;
     }
 
-
-
+    
     public string? GetFileName(string? givenFileName)
     {
         if (givenFileName != null)
@@ -34,14 +36,11 @@ public class IrfanviewService : IIrfanviewService
         return null;
     }
 
-    public void OpenImage(string irfanviewPath, string fullPath)
+    public void OpenImage(string fullPath)
     {
-        string irfanViewPath = @"C:\Program Files\IrfanView\i_view64.exe";
-        string imagePath = @"C:\Users\tijs\OneDrive\Desktop\Backup important\Picturestesting\2026-01-29-Selena\Original\DSC_7654.JPG";
-
         Process.Start(new ProcessStartInfo
         {
-            FileName = irfanviewPath,
+            FileName = _irfanViewPath,
             Arguments = $"\"{fullPath}\"",
             UseShellExecute = false
         });
