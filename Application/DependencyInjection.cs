@@ -14,6 +14,7 @@ public static class DependencyInjection
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<ILightroomService, LightroomService>();
             services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
             services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
 

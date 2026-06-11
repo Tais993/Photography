@@ -11,6 +11,7 @@ namespace Application.services;
 public class ThumbnailService : IThumbnailService
 {
     private readonly IProjectService _projectService;
+    private readonly IImageService _imageService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ThumbnailService> _logger;
     private readonly IFiles _files;
@@ -20,15 +21,14 @@ public class ThumbnailService : IThumbnailService
     private readonly int _jpegQuality;
 
     public ThumbnailService(
-        IProjectService projectService,
-        IFiles files,
-        IConfiguration configuration,
-        ILogger<ThumbnailService> logger)
+        IProjectService projectService, IFiles files, IConfiguration configuration,
+        ILogger<ThumbnailService> logger, IImageService imageService)
     {
         _projectService = projectService;
         _files = files;
         _configuration = configuration;
         _logger = logger;
+        _imageService = imageService;
 
         _defaultSize = _configuration.GetValue<int>("Thumbnails:DefaultSize", 300);
         _largeSize = _configuration.GetValue<int>("Thumbnails:LargeSize", 1200);
@@ -37,7 +37,7 @@ public class ThumbnailService : IThumbnailService
 
     public ThumbnailResult GetThumbnail(int imageId, string size = "default")
     {
-        Image? image = _projectService.GetImageById(imageId);
+        Image? image = _imageService.GetImageById(imageId);
 
         if (image is null)
         {
@@ -112,8 +112,8 @@ public class ThumbnailService : IThumbnailService
     /// <returns></returns>
     private string GetThumbnailCachePath(int imageId, string size, int maxSize)
     {
-        string cacheRoot = _configuration.GetValue<string>("Thumbnails:CachePath")
-                           ?? Path.Combine(AppContext.BaseDirectory, "thumbnail-cache");
+        string cacheRoot = _configuration.GetValue<string>("Thumbnails:CachePath") ??
+                           Path.Combine(AppContext.BaseDirectory, "thumbnail-cache");
 
         string safeSize = size.Equals("large", StringComparison.OrdinalIgnoreCase)
             ? "large"

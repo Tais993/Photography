@@ -175,43 +175,6 @@ public class ProjectServiceTest
     }
     
     [Test]
-    public void GetImageById_ReturnsImage()
-    {
-        Image expectedImage = new Image(
-            1,
-            "DSC_1234",
-            ".NEF",
-            @"Original\DSC_1234.NEF"
-        );
-
-        // Mocks
-        _imageRepository
-            .Setup(r => r.GetById(5))
-            .Returns(expectedImage);
-
-        // Execution
-        Image result = _projectService.GetImageById(5);
-
-        // Asserts
-        Assert.That(result, Is.EqualTo(expectedImage));
-    }
-
-    [Test]
-    public void GetProjectImageCount_ReturnsCount()
-    {
-        // Mocks
-        _imageRepository
-            .Setup(r => r.GetProjectImageCount(2))
-            .Returns(42);
-
-        // Execution
-        int result = _projectService.GetProjectImageCount(2);
-
-        // Asserts
-        Assert.That(result, Is.EqualTo(42));
-    }
-
-    [Test]
     public void GetProjectCount_ReturnsCount()
     {
         // Mocks
