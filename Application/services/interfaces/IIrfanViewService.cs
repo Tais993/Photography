@@ -1,7 +1,7 @@
 ﻿namespace Application.services.interfaces;
 
-public interface IIrfanviewService
+public interface IIrfanViewService
 {
     string? GetFileName(string? givenFileName);
-    void OpenImage(string irfanviewPath, string fullPath);
+    void OpenImage(string fullPath);
 }

@@ -13,13 +13,13 @@ public class SelectCommand : CommandBase
     private readonly ISearchService _searchService;
     private readonly IProjectService _projectService;
     private readonly IImageSelectionService _imageSelectionService;
-    private readonly IIrfanviewService _irfanView;
+    private readonly IIrfanViewService _irfanView;
     private readonly ILogger<SelectCommand> _logger;
     private readonly IFiles _files;
 
 
     public SelectCommand(ISearchService searchService, IImageSelectionService imageSelectionService,
-        IIrfanviewService irfanView, ILogger<SelectCommand> logger, IFiles files, IProjectService projectService)
+        IIrfanViewService irfanView, ILogger<SelectCommand> logger, IFiles files, IProjectService projectService)
     {
         _searchService = searchService;
         _imageSelectionService = imageSelectionService;
