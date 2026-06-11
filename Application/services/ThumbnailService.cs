@@ -1,7 +1,6 @@
 ﻿using Application.interfaces;
 using Application.services.interfaces;
 using Domain.entities;
-using ImageMagick;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Image = Domain.entities.Image;
@@ -10,6 +9,7 @@ namespace Application.services;
 
 public class ThumbnailService : IThumbnailService
 {
+    private readonly IImageThumbnailGenerator _thumbnailGenerator;
     private readonly IProjectService _projectService;
     private readonly IImageService _imageService;
     private readonly IConfiguration _configuration;
@@ -22,13 +22,14 @@ public class ThumbnailService : IThumbnailService
 
     public ThumbnailService(
         IProjectService projectService, IFiles files, IConfiguration configuration,
-        ILogger<ThumbnailService> logger, IImageService imageService)
+        ILogger<ThumbnailService> logger, IImageService imageService, IImageThumbnailGenerator thumbnailGenerator)
     {
         _projectService = projectService;
         _files = files;
         _configuration = configuration;
         _logger = logger;
         _imageService = imageService;
+        _thumbnailGenerator = thumbnailGenerator;
 
         _defaultSize = _configuration.GetValue<int>("Thumbnails:DefaultSize", 300);
         _largeSize = _configuration.GetValue<int>("Thumbnails:LargeSize", 1200);
@@ -53,7 +54,7 @@ public class ThumbnailService : IThumbnailService
 
         string fullPath = _files.Combine(project.Path, image.RelationalFilePath);
 
-        if (!File.Exists(fullPath))
+        if (!_files.Exists(fullPath))
         {
             _logger.LogWarning("Original image file was not found: {Path}", fullPath);
             return ThumbnailResult.NotFound();
@@ -64,8 +65,8 @@ public class ThumbnailService : IThumbnailService
 
         if (!ThumbnailCacheIsValid(fullPath, cachePath))
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(cachePath)!);
-            GenerateThumbnail(fullPath, cachePath, maxSize);
+            _files.FolderCreate(_files.GetDirectoryName(cachePath)!);
+            _thumbnailGenerator.GenerateThumbnail(fullPath, cachePath, maxSize, (uint) _jpegQuality);
         }
 
         return ThumbnailResult.Success(cachePath);
@@ -76,31 +77,6 @@ public class ThumbnailService : IThumbnailService
         return size.Equals("large", StringComparison.OrdinalIgnoreCase)
             ? _largeSize
             : _defaultSize;
-    }
-
-    /// <summary>
-    /// Based on the original file's path, it writes a thumbnail version of the file to the given cachePath
-    /// </summary>
-    /// <param name="originalPath"></param>
-    /// <param name="cachePath"></param>
-    /// <param name="maxSize"></param>
-    private void GenerateThumbnail(string originalPath, string cachePath, int maxSize)
-    {
-        uint thumbnailSize = (uint)maxSize;
-
-        using MagickImage imageFile = new(originalPath);
-
-        imageFile.AutoOrient();
-
-        imageFile.Resize(new MagickGeometry(thumbnailSize, thumbnailSize)
-        {
-            IgnoreAspectRatio = false
-        });
-
-        imageFile.Format = MagickFormat.Jpeg;
-        imageFile.Quality = (uint)_jpegQuality;
-
-        imageFile.Write(cachePath);
     }
 
     /// <summary>
@@ -133,9 +109,9 @@ public class ThumbnailService : IThumbnailService
     /// <param name="cachePath">The file path of the cached thumbnail.</param>
     /// <returns>
     /// </returns>
-    private static bool ThumbnailCacheIsValid(string originalPath, string cachePath)
+    private bool ThumbnailCacheIsValid(string originalPath, string cachePath)
     {
-        if (!File.Exists(cachePath))
+        if (!_files.Exists(cachePath))
         {
             return false;
         }

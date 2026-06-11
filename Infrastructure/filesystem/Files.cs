@@ -31,6 +31,11 @@ public class Files : IFiles
         );
     }
 
+    public string GetDirectoryName(string path)
+    {
+        return Path.GetDirectoryName(path);
+    }
+
     public string GetRelativePath(string relativeTo, string path)
     {
         return Path.GetRelativePath(relativeTo, path);

@@ -2,6 +2,7 @@
 using Infrastructure.database;
 using Infrastructure.database.repositories;
 using Infrastructure.filesystem;
+using Infrastructure.images;
 using Infrastructure.irfanview;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,6 +33,8 @@ public static class DependencyInjection
             services.AddScoped<IFiles, Files>();
 
             services.AddScoped<IIrfanViewRepository, IrfanViewRepository>();
+
+            services.AddScoped<IThumbnailGenerator, MagickThumbnailGenerator>();
             return services;
         }
     }
