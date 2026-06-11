@@ -1,7 +1,7 @@
-﻿using Application.services;
+﻿using Application.interfaces;
 using Application.services.interfaces;
 using Domain.entities;
-using Infrastructure.filesystem;
+using Domain.entities.search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static Application.Constants;

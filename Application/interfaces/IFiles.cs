@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.filesystem;
+﻿namespace Application.interfaces;
 
 public interface IFiles
 {

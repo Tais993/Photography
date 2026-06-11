@@ -1,6 +1,5 @@
-﻿using Application.services.interfaces;
-using Infrastructure.database.repositories;
-using Infrastructure.filesystem;
+﻿using Application.interfaces;
+using Application.services.interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Application.services;

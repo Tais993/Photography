@@ -1,4 +1,4 @@
-﻿namespace Domain.entities;
+﻿namespace Domain.entities.search;
 
 public class ImageSearchSettings
 {

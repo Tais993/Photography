@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.filesystem;
+﻿using Application.interfaces;
+
+namespace Infrastructure.filesystem;
 
 public class Files : IFiles
 {

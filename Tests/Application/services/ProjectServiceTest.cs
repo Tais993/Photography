@@ -1,9 +1,8 @@
 ﻿using Application;
+using Application.interfaces;
 using Application.services;
 using Application.services.interfaces;
 using Domain.entities;
-using Infrastructure.database.repositories;
-using Infrastructure.filesystem;
 using Microsoft.Extensions.Logging;
 using Moq;
 

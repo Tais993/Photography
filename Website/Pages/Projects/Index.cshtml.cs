@@ -1,5 +1,6 @@
 ﻿using Application.services.interfaces;
 using Domain.entities;
+using Domain.entities.search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static Website.WebsiteConstants;
