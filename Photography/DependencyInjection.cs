@@ -4,9 +4,12 @@ namespace Cli;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddCli(this IServiceCollection services)
+    extension(IServiceCollection services)
     {
-        CommandRegistrationService.Register(services);
-        return services;
+        public IServiceCollection AddCli()
+        {
+            CommandRegistrationService.Register(services);
+            return services;
+        }
     }
 }
