@@ -26,8 +26,8 @@ public class ProjectInitialisingService : IProjectInitialisingService
         _files = files;
     }
 
-    
-    
+
+
     /// <summary>
     /// Initialises the given projects directory into the database,
     /// additionally this adds a file to the filesystem to remember the projects ID.
@@ -86,14 +86,14 @@ public class ProjectInitialisingService : IProjectInitialisingService
                 $"Project info file found:  name: {_files.ReadAllText(projectInfoPath)}");
             return;
         }
-        
+
         _logger.LogInformation("Initialising project: {1}", projectDirectory);
 
         Project project;
 
         if (parentProject is null)
         {
-            project = ToProject(projectDirectory, match);   
+            project = ToProject(projectDirectory, match);
         }
         else
         {
@@ -102,7 +102,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
         project = _projectRepository.Insert(project);
         _files.WriteAllText(project.Id + "", projectInfoPath);
-        
+
         InitialiseProjectSubFolders(projectDirectory, project);
     }
 
@@ -122,8 +122,8 @@ public class ProjectInitialisingService : IProjectInitialisingService
             }
         }
     }
-    
-    
+
+
     /// <summary>
     /// This method expects a project's subfolder already, and this also
     /// </summary>
@@ -137,7 +137,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
             string fileExtension = _files.GetFileExtension(filePath);
             string fileName = _files.GetFileName(filePath).Replace(fileExtension, "");
             string relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
-            
+
             Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
 
             _imageRepository.Insert(image);
@@ -153,10 +153,10 @@ public class ProjectInitialisingService : IProjectInitialisingService
     {
         throw new NotImplementedException();
     }
-    
-    
-    
-    
+
+
+
+
 
     private static Project ToProject(string subdirectory, Match match)
     {
