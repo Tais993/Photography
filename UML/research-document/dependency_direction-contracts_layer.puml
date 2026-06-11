@@ -1,0 +1,28 @@
+﻿@startuml
+title Dependency Direction
+
+skinparam componentStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "Presentation Layer" as Presentation {
+  component "UI / CLI / API" as UI
+}
+
+package "Application / Logic Layer" as Application {
+  component "Services / Use Cases" as Services
+}
+
+package "Contracts Layer" as Contracts {
+  component "Infrastructure Contracts" as InfraContracts
+}
+
+package "Infrastructure Layer" as Infrastructure {
+  component "Database / File System\nExternal Services" as Infra
+}
+
+UI --> Services
+Services --> InfraContracts
+Infra --> InfraContracts
+
+@enduml
