@@ -1,6 +1,6 @@
 ﻿namespace Domain.entities;
 
-public class ProjectMetadata : IEntity
+public class ProjectMetadata
 {
     public ProjectMetadata(int projectId, string metadataValue, string metadataKey,
         string metadataType, string displayName, string description)

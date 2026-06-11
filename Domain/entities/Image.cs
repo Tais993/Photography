@@ -1,6 +1,6 @@
 ﻿namespace Domain.entities;
 
-public class Image : IEntity
+public class Image
 {
 
     public Image(int? id, int projectId, Project? project, string fileName, string fileType, string relationalFilePath)
