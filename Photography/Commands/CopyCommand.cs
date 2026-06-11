@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using Application.services;
 using Application.services.interfaces;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
