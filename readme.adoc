@@ -1,0 +1,127 @@
+﻿= Picture Project Maintenance Tool
+
+A local tool for managing folder-based photography projects.
+
+The picture project maintenance tool helps with repetitive photography workflows, it recognise project folders, searches images, selects files and copies them to the correct folder.
+
+This project was created for my own photography workflow, where projects often contain hundreds of images stored in a fixed folder structure.
+
+== Status
+
+This project is under active development.
+
+The current version focuses on the core workflow:
+
+* Recognising and storing photography projects
+* Searching images inside projects
+* Selecting images
+* Copying images to editing folders
+* Viewing projects and images through a website
+
+Some planned features, such as full archive/transfer workflows, are still being developed.
+
+== Features
+
+* CLI for fast command-based workflows
+* Website for visual project browsing
+* DB for projects, images, metadata and selections
+* Persistent image selection sessions
+* Cached thumbnail generation
+* RAW/JPG handling support
+
+== Project structure
+
+[source,text]
+----
+Domain           Core entities
+Application      Services, use-cases and infrastructure contracts
+Infrastructure   Database, file system and external tool implementations
+Cli              Command-line interface
+Website          Razor Pages website
+Tests            Unit tests
+----
+
+Both the CLI and Website use the same application services. This keeps the main logic reusable and prevents duplicated behaviour between frontends.
+
+== Running the project
+
+=== Prerequisites
+
+* .NET SDK
+* PostgreSQL
+* Valid configuration file
+* IrfanView, if IrfanView-related features are used
+
+=== CLI
+
+[source,bash]
+----
+dotnet run --project Cli
+----
+
+=== Website
+
+[source,bash]
+----
+dotnet run --project Website
+----
+
+== Configuration
+
+The application uses shared configuration for settings such as:
+
+* Database connection
+* Thumbnail cache location
+* Thumbnail sizes
+* JPEG quality
+* External tool paths
+
+A local configuration file is required before running the project.
+
+== Testing
+
+Run all tests with:
+
+[source,bash]
+----
+dotnet test
+----
+
+The tests mainly focus on application services, such as image handling, image selection, copying files and thumbnail caching.
+
+== Architecture
+
+The project uses a layered architecture:
+
+[source,text]
+----
+Presentation
+    ↓
+Application / Logic
+    ↓
+Infrastructure implementations
+----
+
+Infrastructure functionality is accessed through interfaces defined by the application layer. This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or IrfanView.
+
+== Documentation
+
+More detailed documentation is available in the project portfolio:
+
+* Project plan
+* Analysis document
+* Design document
+* Manage document
+* Research document about infrastructure contract placement
+
+== Technologies
+
+* C#
+* .NET
+* ASP.NET Razor Pages
+* System.CommandLine
+* PostgreSQL
+* Npgsql
+* ImageMagick / Magick.NET
+* NUnit
+* Moq
