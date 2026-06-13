@@ -1,0 +1,39 @@
+﻿@startuml
+left to right direction
+skinparam linetype ortho
+
+package "Presentation layer" {
+    class "ThumbnailModel\n(Razor Page)" as ThumbnailModel
+}
+
+package "Application / Logic layer" {
+    interface IThumbnailService
+    class ThumbnailService
+    class ThumbnailResult
+
+    interface IThumbnailGenerator
+    interface IFiles
+}
+
+package "Infrastructure layer" {
+    class "ImageMagickThumbnailGenerator" as MagickGenerator
+    class "FileSystem" as FileSystem
+}
+
+package "External library" {
+    class "MagickImage" as MagickImage
+}
+
+ThumbnailModel --> IThumbnailService
+
+IThumbnailService <|.. ThumbnailService
+ThumbnailService --> IFiles
+ThumbnailService --> IThumbnailGenerator
+ThumbnailService --> ThumbnailResult
+
+IThumbnailGenerator <|.. MagickGenerator
+MagickGenerator --> MagickImage
+
+IFiles <|.. FileSystem
+
+@enduml
