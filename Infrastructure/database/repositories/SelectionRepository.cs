@@ -24,6 +24,7 @@ public class SelectionRepository : ISelectionRepository
         return _db.Query("""
                          INSERT INTO public.selection_session(project_id, name)
                          VALUES ($1, $2)
+                         RETURNING id, project_id, name
                          """, MapSelectionWithoutImages, projectId, sessionName
         );
     }
