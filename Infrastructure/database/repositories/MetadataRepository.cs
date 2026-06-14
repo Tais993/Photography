@@ -18,19 +18,10 @@ public class MetadataRepository : IMetadataRepository
         _db = db;
     }
 
-    public Metadata? GetById(int id)
-    {
-        return _db.Query("""
-                         SELECT id, metadata_key, metadata_type, display_name, description
-                         FROM public.metadata
-                         WHERE id = $1
-                         """, MapMetadata, id);
-    }
-
     public Metadata? GetByKey(string key)
     {
         return _db.Query("""
-                         SELECT id, metadata_key, metadata_type, display_name, description
+                         SELECT metadata_key, metadata_type, display_name, description
                          FROM public.metadata
                          WHERE metadata_key = $1
                          """, MapMetadata, key);
@@ -39,7 +30,7 @@ public class MetadataRepository : IMetadataRepository
     public List<Metadata> GetAll()
     {
         return _db.QueryMultiple("""
-                                 SELECT id, metadata_key, metadata_type, display_name, description
+                                 SELECT metadata_key, metadata_type, display_name, description
                                  FROM public.metadata
                                  """, MapMetadata);
     }
@@ -63,10 +54,10 @@ public class MetadataRepository : IMetadataRepository
 
         _db.Execute("""
                     UPDATE public.metadata
-                    SET metadata_type = $2,
-                        display_name = $3,
-                        description = $4
-                    WHERE metadata_key = $5
+                    SET metadata_type = $1,
+                        display_name = $2,
+                        description = $3
+                    WHERE metadata_key = $4
                     """, entity.MetadataType, entity.DisplayName, entity.Description, entity.MetadataKey);
     }
 

@@ -51,12 +51,6 @@ public class ProjectMetadataService : IProjectMetadataService
         return _metadataRepository.GetByKey(metadataKey);
     }
 
-    public Metadata? GetMetadata(int projectId)
-    {
-        return _metadataRepository.GetById(projectId);
-    }
-
-
     public void DeleteMetadata(Metadata metadata)
     {
         if (metadata.MetadataKey == null)

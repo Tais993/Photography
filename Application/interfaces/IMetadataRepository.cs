@@ -4,7 +4,6 @@ namespace Application.interfaces;
 
 public interface IMetadataRepository
 {
-    Metadata? GetById(int id);
     Metadata? GetByKey(string key);
     List<Metadata> GetAll();
     Metadata Insert(Metadata entity);
