@@ -2,7 +2,8 @@
 
 A local tool for managing folder-based photography projects.
 
-The picture project maintenance tool helps with repetitive photography workflows, it recognise project folders, searches images, selects files and copies them to the correct folder.
+The Picture Project Maintenance Tool helps with repetitive photography workflows.
+It recognises project folders, searches images, selects files and copies them to the correct folder.
 
 This project was created for my own photography workflow, where projects often contain hundreds of images stored in a fixed folder structure.
 
@@ -24,7 +25,7 @@ Some planned features, such as full archive/transfer workflows, are still being 
 
 * CLI for fast command-based workflows
 * Website for visual project browsing
-* DB for projects, images, metadata and selections
+* Database storage for projects, images, metadata and selections
 * Persistent image selection sessions
 * Cached thumbnail generation
 * RAW/JPG handling support
@@ -41,7 +42,79 @@ Website          Razor Pages website
 Tests            Unit tests
 ----
 
-Both the CLI and Website use the same application services. This keeps the main logic reusable and prevents duplicated behaviour between frontends.
+Both the CLI and Website use the same application services.
+This keeps the main logic reusable and prevents duplicated behaviour between frontends.
+
+== Photography project structure
+
+The application expects photography projects to use a folder-based structure.
+
+A normal project folder should use the following naming convention:
+
+[source,text]
+----
+YYYY-MM-DD-name
+----
+
+Example:
+
+[source,text]
+----
+2026-04-04-Kalkar
+----
+
+A project usually contains these folders:
+
+[source,text]
+----
+2026-04-04-Kalkar/
+    originals/
+    editing/
+    finals/
+----
+
+The `originals` folder contains the original image files.
+The `editing` folder is used for files that have been selected for editing.
+The `finals` folder is used for finished exports.
+
+== Subprojects
+
+Subprojects are supported by placing a folder inside the main project folder with a name starting with a dot.
+
+Example:
+
+[source,text]
+----
+2026-04-04-Kalkar/
+    originals/
+    editing/
+    finals/
+        .saturday/
+            originals/
+            editing/
+            finals/
+
+----
+
+A subproject uses the date from the parent project, but has its own name and folder structure.
+
+== Project identification
+
+When a project is initialised, the application creates a `project.info` file inside the project folder.
+
+This file contains the project ID from the database.
+It allows the application to recognise the project again later, even if the folder is opened directly.
+
+Example:
+
+[source,text]
+----
+2026-04-04-Kalkar/
+    project.info
+    originals/
+    editing/
+    finals/
+----
 
 == Running the project
 
@@ -52,21 +125,7 @@ Both the CLI and Website use the same application services. This keeps the main 
 * Valid configuration file
 * IrfanView, if IrfanView-related features are used
 
-=== CLI
-
-[source,bash]
-----
-dotnet run --project Cli
-----
-
-=== Website
-
-[source,bash]
-----
-dotnet run --project Website
-----
-
-== Configuration
+=== Configuration
 
 The application uses shared configuration for settings such as:
 
@@ -76,7 +135,79 @@ The application uses shared configuration for settings such as:
 * JPEG quality
 * External tool paths
 
-A local configuration file is required before running the project.
+Create or update the local configuration file before running the application.
+
+Example configuration values:
+
+[source,json]
+----
+{
+  "ConnectionStrings": {
+  "DefaultConnection": "Host=localhost;Port=5432;Database=photography;Username=postgres;Password=password"
+},
+  "Thumbnails": {
+    "DefaultSize": 300,
+    "LargeSize": 1200,
+    "JpegQuality": 80,
+    "CachePath": "thumbnail-cache"
+  }
+}
+----
+
+Do not commit real passwords or personal configuration values.
+
+=== CLI
+
+Run the CLI with:
+
+[source,bash]
+----
+dotnet run --project Cli
+----
+
+The CLI is intended for fast workflows, such as initialising projects, searching images, selecting images and copying files.
+
+=== Website
+
+Run the website with:
+
+[source,bash]
+----
+dotnet run --project Website
+----
+
+The website can be used to visually browse projects and images.
+
+== Trying the application
+
+To try the application, create a small test project folder first:
+
+[source,text]
+----
+2026-04-04-TestProject/
+    originals/
+        DSC_1234.JPG
+        DSC_1234.NEF
+        DSC_1235.JPG
+    editing/
+    finals/
+----
+
+Then run the CLI or website and initialise the project.
+After the project has been initialised, the application can store the project and image information in the database.
+
+A basic test workflow is:
+
+[source,text]
+----
+1. Create a test project folder.
+2. Add a few JPG or RAW files to the originals folder.
+3. Run the CLI and initialise the project.
+4. Search for an image by filename or number.
+5. Select one or more images.
+6. Copy the selected images to the editing folder.
+7. Open the website to view the project and generated thumbnails.
+----
 
 == Testing
 
@@ -96,13 +227,14 @@ The project uses a layered architecture:
 [source,text]
 ----
 Presentation
-    ↓
+↓
 Application / Logic
-    ↓
+↓
 Infrastructure implementations
 ----
 
-Infrastructure functionality is accessed through interfaces defined by the application layer. This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or IrfanView.
+Infrastructure functionality is accessed through interfaces defined by the application layer.
+This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or IrfanView.
 
 == Documentation
 
