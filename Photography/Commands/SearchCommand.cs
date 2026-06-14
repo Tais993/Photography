@@ -57,6 +57,8 @@ public class SearchCommand : CommandBase
         command.Arguments.Add(_queryArgument);
         command.Options.Add(ProjectOption);
         command.Options.Add(_globalOption);
+        command.Options.Add(_fileTypeOption);
+        command.Options.Add(_originFolderOption);
     }
 
     public override int Run(ParseResult parseResult)
