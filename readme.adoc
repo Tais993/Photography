@@ -1,4 +1,5 @@
 ﻿image:https://github.com/Tais993/Photography/actions/workflows/unit-tests.yml/badge.svg[Unit tests]
+image:https://codecov.io/gh/Tais993/Photography/branch/main/graph/badge.svg[Code coverage]
 
 = Picture Project Maintenance Tool
 
