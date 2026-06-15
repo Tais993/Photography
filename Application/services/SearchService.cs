@@ -3,6 +3,7 @@ using Application.services.interfaces;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
+using static Application.Constants;
 
 namespace Application.services;
 
@@ -42,11 +43,34 @@ public class SearchService : ISearchService
         return _imagesRepository.SearchImages(imageSearchSettings);
     }
 
+    public IEnumerable<Image> HideRawFilesWhenNonRawExists(IEnumerable<Image> images)
+    {
+        List<Image> imageList = images.ToList();
+
+        // This gets a Set of all images that are NOT raws
+        HashSet<string> nonRawFileNames = imageList
+            .Where(image => !IsRaw(image.FileType))
+            .Select(image => Path.GetFileNameWithoutExtension(image.FileName))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        // afbeelding is RAW en heeft GEEN raw variant, dan is ie goedgekeurd
+        // 
+        return imageList.Where(image =>
+            !IsRaw(image.FileType) ||
+            !nonRawFileNames.Contains(Path.GetFileNameWithoutExtension(image.FileName))
+        );
+    }
+    
+    private static bool IsRaw(string fileType)
+    {
+        return RawFileTypes.Contains(fileType);
+    }
+
     public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
     {
         projectSearchSettings.ProjectName = ValidateStringValue(projectSearchSettings.ProjectName);
         projectSearchSettings.ProjectPath = ValidateStringValue(projectSearchSettings.ProjectPath);
-        
+
         return _projectRepository.SearchProjects(projectSearchSettings);
     }
 
@@ -56,7 +80,7 @@ public class SearchService : ISearchService
         {
             return null;
         }
-        
+
         value = value.Trim();
 
         if (string.IsNullOrWhiteSpace(value))

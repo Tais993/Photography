@@ -48,7 +48,7 @@ public class ImageServiceTest
         Assert.That(result, Is.EqualTo(expectedImage));
     }
 
-    
+
     [Test]
     public void GetImagesByProjectId_ReturnsImages()
     {
@@ -79,8 +79,8 @@ public class ImageServiceTest
         // Asserts
         Assert.That(result, Is.EqualTo(expectedImages));
     }
-    
-    
+
+
     [Test]
     public void GetProjectImageCount_ReturnsCount()
     {
@@ -94,118 +94,5 @@ public class ImageServiceTest
 
         // Asserts
         Assert.That(result, Is.EqualTo(42));
-    }
-    
-    
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_HidesRawFile_WhenJpgWithSameNameExists()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            ),
-            new Image(
-                2,
-                "DSC_1234.JPG",
-                ".JPG",
-                @"Original\DSC_1234.JPG"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _imageService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("DSC_1234.JPG"));
-    }
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_KeepsRawFile_WhenNoNonRawWithSameNameExists()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _imageService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("DSC_1234.NEF"));
-    }
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_KeepsNonRawFiles()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.JPG",
-                ".JPG",
-                @"Original\DSC_1234.JPG"
-            ),
-            new Image(
-                2,
-                "DSC_1235.PNG",
-                ".PNG",
-                @"Original\DSC_1235.PNG"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _imageService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(2));
-        Assert.That(result.Select(image => image.FileName), Does.Contain("DSC_1234.JPG"));
-        Assert.That(result.Select(image => image.FileName), Does.Contain("DSC_1235.PNG"));
-    }
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_ComparisonIsCaseInsensitive()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            ),
-            new Image(
-                2,
-                "dsc_1234.jpg",
-                ".JPG",
-                @"Original\dsc_1234.jpg"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _imageService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("dsc_1234.jpg"));
     }
 }

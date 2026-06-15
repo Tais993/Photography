@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.services;
+namespace Application.services.interfaces;
 
 public interface IImageService
 {
@@ -24,11 +24,4 @@ public interface IImageService
     /// <param name="projectId"></param>
     /// <returns></returns>
     public int GetProjectImageCount(int projectId);
-    
-    /// <summary>
-    ///     Based on the given list, filters all RAW files that ALSO have a JPG in the list
-    /// </summary>
-    /// <param name="images"></param>
-    /// <returns></returns>
-    IEnumerable<Image> HideRawFilesWhenNonRawExists(IEnumerable<Image> images);
 }
