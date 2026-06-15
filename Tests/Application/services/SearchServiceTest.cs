@@ -308,6 +308,44 @@ public class SearchServiceTests
     }
     
     
+    [Test]
+    public void SearchImages_HideRawImagesWhenJpgExists_Success()
+    {
+        ImageSearchSettings settings = new()
+        {
+            HideRawImagesWhenJpgExists = true
+        };
+
+        List<Image> images =
+        [
+            new Image(
+                1,
+                "DSC_1234.NEF",
+                ".NEF",
+                @"Original\DSC_1234.NEF"
+            ),
+            new Image(
+                2,
+                "DSC_1234.JPG",
+                ".JPG",
+                @"Original\DSC_1234.JPG"
+            )
+        ];
+
+        // Mocks
+        _imageRepository
+            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(images);
+
+        // Execution
+        List<Image> result = _searchService.SearchImages(settings).Items;
+
+        // Asserts
+        Assert.That(result, Has.Count.EqualTo(1));
+        Assert.That(result[0].FileName, Is.EqualTo("DSC_1234.JPG"));
+    }
+    
+    
         [Test]
     public void HideRawFilesWhenNonRawExists_HidesRawFile_WhenJpgWithSameNameExists()
     {
@@ -329,6 +367,7 @@ public class SearchServiceTests
 
         // Execution
         List<Image> result = _searchService
+                
             .HideRawFilesWhenNonRawExists(images)
             .ToList();
 
