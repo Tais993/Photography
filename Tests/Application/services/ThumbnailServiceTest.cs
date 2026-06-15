@@ -22,14 +22,15 @@ public class ThumbnailServiceTest
 
     private ThumbnailService _thumbnailService = null!;
 
-    private readonly string _projectPath = @"C:" + Path.DirectorySeparatorChar + "Projects" + Path.DirectorySeparatorChar + "Test";
-    private readonly string _relativeFilePath = @"Original" + Path.DirectorySeparatorChar + "DSC_1234.JPG";
-    private readonly string _originalPath = @"C:" + Path.DirectorySeparatorChar + "Projects" + Path.DirectorySeparatorChar + "Test" + Path.DirectorySeparatorChar + "Original" + Path.DirectorySeparatorChar + "DSC_1234.JPG";
-    private readonly string _cacheRoot = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache";
-    private readonly string _cacheDirectory = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "default";
-    private readonly string _defaultCachePath = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "default" + Path.DirectorySeparatorChar + "5_300_q80.jpg";
-    private readonly string _largeCachePath = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "large" + Path.DirectorySeparatorChar + "5_1200_q80.jpg";
-
+    private string _testRoot = null!;
+    private string _projectPath = null!;
+    private string _relativeFilePath = null!;
+    private string _originalPath = null!;
+    private string _cacheRoot = null!;
+    private string _cacheDirectory = null!;
+    private string _defaultCachePath = null!;
+    private string _largeCachePath = null!;
+    
     [SetUp]
     public void SetUp()
     {
@@ -38,6 +39,33 @@ public class ThumbnailServiceTest
         _files = new Mock<IFiles>();
         _thumbnailGenerator = new Mock<IThumbnailGenerator>();
         _logger = new Mock<ILogger<ThumbnailService>>();
+        
+        _testRoot = Path.Combine(Path.GetTempPath(), "PictureProjectTests", Guid.NewGuid().ToString());
+
+        _projectPath = Path.Combine(_testRoot, "Projects", "Test");
+
+        _relativeFilePath = Path.Combine("Original", "DSC_1234.JPG");
+
+        _originalPath = Path.Combine(
+            _projectPath,
+            "Original",
+            "DSC_1234.JPG");
+
+        _cacheRoot = Path.Combine(_testRoot, "ThumbnailCache");
+
+        _cacheDirectory = Path.Combine(
+            _cacheRoot,
+            "default");
+
+        _defaultCachePath = Path.Combine(
+            _cacheRoot,
+            "default",
+            "5_300_q80.jpg");
+
+        _largeCachePath = Path.Combine(
+            _cacheRoot,
+            "large",
+            "5_1200_q80.jpg");
 
         Dictionary<string, string?> configurationValues = new()
         {
