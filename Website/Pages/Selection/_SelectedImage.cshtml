@@ -32,7 +32,8 @@
         {
             <img src="@Url.Page("/Selection/Thumbnail", new
                       {
-                          imageId = Model.Image.Id
+                          imageId = Model.Image.Id,
+                          size = "Large"
                       })"
                  alt="@Model.Image.FileName"
                  class="img-fluid rounded"
