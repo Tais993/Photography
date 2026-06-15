@@ -1,5 +1,6 @@
 ﻿using Application.interfaces;
 using Application.services;
+using Application.services.imageviewers;
 using Application.services.interfaces;
 using Domain.entities;
 using Domain.entities.search;
@@ -14,14 +15,14 @@ public class IndexModel : PageModel
 {
     private readonly IImageSelectionService _imageSelectionService;
     private readonly ISearchService _searchService;
-    private readonly IIrfanViewService _irfanViewService;
+    private readonly IImageViewerService _irfanViewService;
     private readonly IProjectService _projectService;
     private readonly IImageService _imageService;
     private readonly ILogger<IndexModel> _logger;
     private readonly IFiles _fileService;
 
     public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService, IImageService imageService,
-        IProjectService projectService, IIrfanViewService irfanViewService, IFiles fileService, ILogger<IndexModel> logger)
+        IProjectService projectService, IImageViewerService irfanViewService, IFiles fileService, ILogger<IndexModel> logger)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;

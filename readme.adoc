@@ -143,8 +143,8 @@ Example configuration values:
 ----
 {
   "ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=photography;Username=postgres;Password=password"
-},
+    "Default": "Host=localhost;Port=5432;Database=photography;Username=postgres;Password=password"
+  },
   "Thumbnails": {
     "DefaultSize": 300,
     "LargeSize": 1200,

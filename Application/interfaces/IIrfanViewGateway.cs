@@ -1,7 +1,8 @@
 ﻿namespace Application.interfaces;
 
-public interface IIrfanViewRepository
+public interface IIrfanViewGateway
 {
     bool IsOpen();
     string? GetOpenedFile();
+    void OpenFile(string filePath);
 }

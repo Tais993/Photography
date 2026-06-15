@@ -1,4 +1,5 @@
-﻿using Application.interfaces;
+﻿using Application;
+using Application.interfaces;
 using Infrastructure.database;
 using Infrastructure.database.repositories;
 using Infrastructure.filesystem;
@@ -32,9 +33,11 @@ public static class DependencyInjection
 
             services.AddScoped<IFiles, Files>();
 
-            services.AddScoped<IIrfanViewRepository, IrfanViewRepository>();
+            services.AddScoped<IIrfanViewGateway, IrfanViewGateway>();
 
             services.AddScoped<IThumbnailGenerator, MagickThumbnailGenerator>();
+
+            services.AddImageViewer(config);
             return services;
         }
     }
