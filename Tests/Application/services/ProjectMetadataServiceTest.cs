@@ -3,7 +3,7 @@ using Application.services;
 using Domain.entities;
 using Moq;
 
-namespace Tests.services;
+namespace Tests.Application.services;
 
 [TestFixture]
 [TestOf(typeof(ProjectMetadataService))]

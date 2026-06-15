@@ -2,7 +2,7 @@
 using Application.services.imageviewers;
 using Moq;
 
-namespace Tests.services.imageviewers;
+namespace Tests.Application.services.imageviewers;
 
 [TestFixture]
 [TestOf(typeof(IrfanViewService))]

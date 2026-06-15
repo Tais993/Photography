@@ -1,6 +1,6 @@
 ﻿using Application.services.imageviewers;
 
-namespace Tests.services.imageviewers;
+namespace Tests.Application.services.imageviewers;
 
 [TestFixture]
 [TestOf(typeof(UnavailableImageViewerService))]
