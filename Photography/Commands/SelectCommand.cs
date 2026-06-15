@@ -88,7 +88,7 @@ public class SelectCommand : CommandBase
             FileType = fileType,
             FolderName = originFolder,
             ProjectId = project.Id
-        });
+        }).Items;
 
         SelectionSession selectionSession = _imageSelectionService.GetOrStartSession(project);
 

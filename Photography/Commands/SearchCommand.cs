@@ -84,7 +84,7 @@ public class SearchCommand : CommandBase
             FolderName = originFolder,
         };
 
-        List<Image> images = _searchService.SearchImages(settings);
+        List<Image> images = _searchService.SearchImages(settings).Items;
 
         foreach (Image image in images)
         {
