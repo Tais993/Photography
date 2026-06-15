@@ -1,5 +1,4 @@
 ﻿using System.CommandLine;
-using Application.interfaces;
 using Application.services.imageviewers;
 using Application.services.interfaces;
 using Domain.entities;
@@ -14,19 +13,17 @@ public class SelectCommand : CommandBase
     private readonly ISearchService _searchService;
     private readonly IProjectService _projectService;
     private readonly IImageSelectionService _imageSelectionService;
-    private readonly IImageViewerService _irfanView;
+    private readonly IImageViewerService _imageViewer;
     private readonly ILogger<SelectCommand> _logger;
-    private readonly IFiles _files;
 
 
     public SelectCommand(ISearchService searchService, IImageSelectionService imageSelectionService,
-        IImageViewerService irfanView, ILogger<SelectCommand> logger, IFiles files, IProjectService projectService)
+        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectService projectService)
     {
         _searchService = searchService;
         _imageSelectionService = imageSelectionService;
-        _irfanView = irfanView;
+        _imageViewer = imageViewer;
         _logger = logger;
-        _files = files;
         _projectService = projectService;
     }
 
@@ -72,12 +69,13 @@ public class SelectCommand : CommandBase
             return 1;
         }
 
-        string? fileName = _irfanView.GetOpenedFileName(parseResult.GetValue<string>(_fileName));
+        string? fileName = GetFileName(parseResult);
         string? fileNumber = parseResult.GetValue<string>(_fileNumber);
 
         if (fileName == null && fileNumber == null)
         {
-            Console.WriteLine("No file name was given and Irfanview had no file opened.");
+            Console.WriteLine("No file name was given.");
+            return 1;
         }
 
         string? fileType = parseResult.GetValue<string>(_fileType);
@@ -96,9 +94,25 @@ public class SelectCommand : CommandBase
 
         foreach (Image image in images)
         {
-            _imageSelectionService.AddImageToSelection((int) selectionSession.Id, (int) image.Id);
+            _imageSelectionService.AddImageToSelection((int)selectionSession.Id, (int)image.Id);
         }
 
         return 0;
+    }
+
+    private string? GetFileName(ParseResult parseResult)
+    {
+        string? fileName;
+
+        if (_imageViewer.IsAvailable())
+        {
+            fileName = _imageViewer.GetOpenedFileName(parseResult.GetValue<string>(_fileName));
+        }
+        else
+        {
+            fileName = parseResult.GetValue<string>(_fileName);
+        }
+
+        return fileName;
     }
 }

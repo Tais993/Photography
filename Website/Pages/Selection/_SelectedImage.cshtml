@@ -1,10 +1,10 @@
 ﻿@using Application
-@model Domain.entities.Image
+@model Domain.website.SelectedImageViewModel
 
 <div class="card">
     <div class="card-header">
         <div>
-            <h3 class="card-title">@Model.FileName</h3>
+            <h3 class="card-title">@Model.Image.FileName</h3>
             <p class="card-subtitle">Selected image</p>
         </div>
 
@@ -21,20 +21,20 @@
             <div class="datagrid-item">
                 <div class="datagrid-title">Path</div>
                 <div class="datagrid-content text-break">
-                    @Model.RelationalFilePath
+                    @Model.Image.RelationalFilePath
                 </div>
             </div>
         </div>
     </div>
 
     <div class="card-img position-relative">
-        @if (Constants.ImageFileTypes.Contains(Model.FileType))
+        @if (Constants.ImageFileTypes.Contains(Model.Image.FileType))
         {
             <img src="@Url.Page("/Selection/Thumbnail", new
                       {
-                          imageId = Model.Id
+                          imageId = Model.Image.Id
                       })"
-                 alt="@Model.FileName"
+                 alt="@Model.Image.FileName"
                  class="img-fluid rounded"
                  style="max-height: 100%; object-fit: contain;"/>
         }
@@ -46,14 +46,18 @@
             </div>
         }
     </div>
-    <div class="card-footer">
-        <div class="d-grid gap-2">
-            <button type="button"
-                    class="btn btn-primary"
-                    onclick="openImageInIrfanView()">
-                <i class="ti ti-photo me-2"></i>
-                Open image in Irfanview
-            </button>
+    
+    @if (@Model.CanOpenInImageViewer)
+    {
+        <div class="card-footer">
+            <div class="d-grid gap-2">
+                <button type="button"
+                        class="btn btn-primary"
+                        onclick="openImageInImageViewer()">
+                    <i class="ti ti-photo me-2"></i>
+                    Open image in @Model.ImageViewerName
+                </button>
+            </div>
         </div>
-    </div>
+    }
 </div>

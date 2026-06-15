@@ -4,6 +4,7 @@ using Application.services.imageviewers;
 using Application.services.interfaces;
 using Domain.entities;
 using Domain.entities.search;
+using Domain.website;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static Application.Constants;
@@ -15,19 +16,19 @@ public class IndexModel : PageModel
 {
     private readonly IImageSelectionService _imageSelectionService;
     private readonly ISearchService _searchService;
-    private readonly IImageViewerService _irfanViewService;
+    private readonly IImageViewerService _imageViewerService;
     private readonly IProjectService _projectService;
     private readonly IImageService _imageService;
     private readonly ILogger<IndexModel> _logger;
     private readonly IFiles _fileService;
 
     public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService, IImageService imageService,
-        IProjectService projectService, IImageViewerService irfanViewService, IFiles fileService, ILogger<IndexModel> logger)
+        IProjectService projectService, IImageViewerService imageViewerService, IFiles fileService, ILogger<IndexModel> logger)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;
         _imageService = imageService;
-        _irfanViewService = irfanViewService;
+        _imageViewerService = imageViewerService;
         _fileService = fileService;
         _logger = logger;
         _projectService = projectService;
@@ -101,7 +102,7 @@ public class IndexModel : PageModel
 
     public IActionResult OnGetOpenImage()
     {
-        OpenImageInIrfanView();
+        OpenImageInImageViewer();
 
         return new NoContentResult();
     }
@@ -117,7 +118,14 @@ public class IndexModel : PageModel
             return NotFound();
         }
 
-        return Partial("_SelectedImage", image);
+        SelectedImageViewModel selectedImageModel = new()
+        {
+            CanOpenInImageViewer = _imageViewerService.IsAvailable(),
+            ImageViewerName = _imageViewerService.GetImageViewerName(),
+            Image = image
+        };
+
+        return Partial("_SelectedImage", selectedImageModel);
     }
 
     public PartialViewResult OnGetImage(Image image)
@@ -163,14 +171,14 @@ public class IndexModel : PageModel
         return Partial("_ImageView", imageView);
     }
 
-    public void OpenImageInIrfanView()
+    public void OpenImageInImageViewer()
     {
         SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
         SelectedImage = _imageService.GetImageById((int)SelectedImageId);
 
         string imagePath = _fileService.Combine(SelectedProject.Path, SelectedImage.RelationalFilePath);
 
-        _irfanViewService.OpenImage(imagePath);
+        _imageViewerService.OpenImage(imagePath);
     }
 
     public int GetProjectImageCount()
