@@ -1,0 +1,26 @@
+﻿namespace Application.services.imageviewers;
+
+public class UnavailableImageViewerService : IImageViewerService
+{
+        private readonly string _reason;
+
+        public UnavailableImageViewerService(string reason)
+        {
+            _reason = reason;
+        }
+
+        public bool IsAvailable()
+        {
+            return false;
+        }
+
+        public void OpenImage(string imagePath)
+        {
+            throw new InvalidOperationException(_reason);
+        }
+
+        public string? GetOpenedFileName(string? givenFileName)
+        {
+            return givenFileName ?? throw new InvalidOperationException(_reason);
+        }
+    }   

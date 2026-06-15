@@ -1,15 +1,18 @@
 ﻿using System.Diagnostics;
 using Application.interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.irfanview;
 
-public class IrfanViewRepository : IIrfanViewRepository
+public class IrfanViewGateway : IIrfanViewGateway
 {
-    private readonly ILogger<IrfanViewRepository> _logger;
+    private readonly ILogger<IrfanViewGateway> _logger;
+    private readonly string? _irfanViewPath;
 
-    public IrfanViewRepository(ILogger<IrfanViewRepository> logger)
+    public IrfanViewGateway(ILogger<IrfanViewGateway> logger, IConfiguration configuration)
     {
+        _irfanViewPath = configuration.GetValue<string>("ImageViewer:IrfanViewPath");
         _logger = logger;
     }
 
@@ -37,6 +40,17 @@ public class IrfanViewRepository : IIrfanViewRepository
 
         return null;
     }
+    
+    public void OpenFile(string filePath)
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = _irfanViewPath,
+            Arguments = $"\"{filePath}\"",
+            UseShellExecute = false
+        });
+    }
+    
 
     private string? ExtractFileNameFromTitle(string? title)
     {

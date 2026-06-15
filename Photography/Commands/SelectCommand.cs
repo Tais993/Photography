@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Application.interfaces;
+using Application.services.imageviewers;
 using Application.services.interfaces;
 using Domain.entities;
 using Domain.entities.search;
@@ -13,13 +14,13 @@ public class SelectCommand : CommandBase
     private readonly ISearchService _searchService;
     private readonly IProjectService _projectService;
     private readonly IImageSelectionService _imageSelectionService;
-    private readonly IIrfanViewService _irfanView;
+    private readonly IImageViewerService _irfanView;
     private readonly ILogger<SelectCommand> _logger;
     private readonly IFiles _files;
 
 
     public SelectCommand(ISearchService searchService, IImageSelectionService imageSelectionService,
-        IIrfanViewService irfanView, ILogger<SelectCommand> logger, IFiles files, IProjectService projectService)
+        IImageViewerService irfanView, ILogger<SelectCommand> logger, IFiles files, IProjectService projectService)
     {
         _searchService = searchService;
         _imageSelectionService = imageSelectionService;
@@ -71,7 +72,7 @@ public class SelectCommand : CommandBase
             return 1;
         }
 
-        string? fileName = _irfanView.GetFileName(parseResult.GetValue<string>(_fileName));
+        string? fileName = _irfanView.GetOpenedFileName(parseResult.GetValue<string>(_fileName));
         string? fileNumber = parseResult.GetValue<string>(_fileNumber);
 
         if (fileName == null && fileNumber == null)

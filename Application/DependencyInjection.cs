@@ -18,7 +18,6 @@ public static class DependencyInjection
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
             services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
 
-            services.AddScoped<IIrfanViewService, IrfanViewService>();
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
             services.AddScoped<IThumbnailService, ThumbnailService>();
