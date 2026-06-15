@@ -1,6 +1,7 @@
 ﻿using Application.services.imageviewers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static Application.Constants;
 
 namespace Application;
 
@@ -10,13 +11,13 @@ public static class ImageViewerExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        string mode = configuration["ImageViewer:Mode"] ?? "Disabled";
+        string mode = configuration[ImageViewerMode] ?? "Disabled";
 
         switch (mode.ToLowerInvariant())
         {
             case "irfanview":
             {
-                string? path = configuration["ImageViewer:IrfanViewPath"];
+                string? path = configuration[ImageViewerPath];
 
                 if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
                 {

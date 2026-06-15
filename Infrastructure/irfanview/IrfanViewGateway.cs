@@ -12,7 +12,7 @@ public class IrfanViewGateway : IIrfanViewGateway
 
     public IrfanViewGateway(ILogger<IrfanViewGateway> logger, IConfiguration configuration)
     {
-        _irfanViewPath = configuration.GetValue<string>("ImageViewer:IrfanViewPath");
+        _irfanViewPath = configuration.GetValue<string>("ImageViewer:ImageViewerPath");
         _logger = logger;
     }
 
