@@ -11,39 +11,51 @@ public static class ImageViewerExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        string mode = configuration[ImageViewerMode] ?? "Disabled";
+        string? mode = configuration[ImageViewerMode] ?? "default";
+        string? path = configuration[ImageViewerPath];
+
 
         switch (mode.ToLowerInvariant())
         {
             case "irfanview":
-            {
-                string? path = configuration[ImageViewerPath];
-
-                if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
-                {
-                    services.AddSingleton<IImageViewerService>(
-                        new UnavailableImageViewerService(
-                            $"IrfanView is configured, but the executable was not found: {path}"));
-
-                    break;
-                }
-
-                services.AddScoped<IImageViewerService, IrfanViewService>();
+                AddIrfanView(services, path);
                 break;
-            }
-
 
             case "disabled":
-                services.AddSingleton<IImageViewerService>(
-                    new UnavailableImageViewerService("Image viewer is disabled in configuration."));
+                AddUnavailable(services, "Image viewer is disabled in configuration.");
                 break;
 
             default:
-                services.AddSingleton<IImageViewerService>(
-                    new UnavailableImageViewerService($"Unknown image viewer mode: {mode}"));
+                AddUnavailable(services, $"Unknown image viewer mode: {mode}");
                 break;
         }
 
         return services;
     }
+
+    private static void AddIrfanView(IServiceCollection services, string? path)
+    {
+        if (!ExecutableExists(path))
+        {
+            AddUnavailable(
+                services,
+                $"IrfanView is configured, but the executable was not found: {path}");
+
+            return;
+        }
+
+        services.AddScoped<IImageViewerService, IrfanViewService>();
+    }
+
+    private static void AddUnavailable(IServiceCollection services, string reason)
+    {
+        services.AddSingleton<IImageViewerService>(
+            new UnavailableImageViewerService(reason));
+    }
+
+    private static bool ExecutableExists(string? path)
+    {
+        return !string.IsNullOrWhiteSpace(path) && File.Exists(path);
+    }
+
 }

@@ -1,16 +1,20 @@
 ﻿using Application.interfaces;
+using Application.interfaces.imageviewers;
+using Microsoft.Extensions.Logging;
 
 namespace Application.services.imageviewers;
 
 public class IrfanViewService : IImageViewerService
 {
     private readonly IFiles _files;
-    private readonly IIrfanViewGateway _irfanViewGateway;
+    private readonly IIrfanviewGateway _irfanViewGateway;
+    private readonly ILogger<IrfanViewService> _logger;
 
-    public IrfanViewService(IIrfanViewGateway irfanViewGateway, IFiles files)
+    public IrfanViewService(IIrfanviewGateway irfanViewGateway, IFiles files, ILogger<IrfanViewService> logger)
     {
         _irfanViewGateway = irfanViewGateway;
         _files = files;
+        _logger = logger;
     }
 
 
@@ -31,14 +35,16 @@ public class IrfanViewService : IImageViewerService
             return givenFileName;
         }
 
-        if (_irfanViewGateway.IsOpen())
+        if (!_irfanViewGateway.IsOpen())
         {
-            string? openedFile = _irfanViewGateway.GetOpenedFile();
-
-            return _files.GetFileNameWithoutExtension(openedFile);
+            return null;
         }
 
-        return null;
+        _logger.LogInformation("Checking IrfanView for an opened image");
+        string? openedFile = _irfanViewGateway.GetOpenedFile();
+
+        return _files.GetFileNameWithoutExtension(openedFile);
+
     }
 
     public void OpenImage(string imagePath)
