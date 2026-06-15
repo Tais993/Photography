@@ -1,5 +1,7 @@
 ﻿using Application.interfaces;
+using Application.interfaces.imageviewers;
 using Application.services.imageviewers;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Tests.Application.services.imageviewers;
@@ -8,19 +10,22 @@ namespace Tests.Application.services.imageviewers;
 [TestOf(typeof(IrfanViewService))]
 public class IrfanViewServiceTest
 {
-    private Mock<IIrfanViewGateway> _irfanViewGateway = null!;
+    private Mock<IIrfanviewGateway> _irfanViewGateway = null!;
     private Mock<IFiles> _files = null!;
+    private Mock<ILogger<IrfanViewService>> _logger = null!;
     private IrfanViewService _irfanViewService = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _irfanViewGateway = new Mock<IIrfanViewGateway>();
+        _irfanViewGateway = new Mock<IIrfanviewGateway>();
+        _logger = new Mock<ILogger<IrfanViewService>>();
         _files = new Mock<IFiles>();
 
         _irfanViewService = new IrfanViewService(
             _irfanViewGateway.Object,
-            _files.Object
+            _files.Object,
+            _logger.Object
         );
     }
 

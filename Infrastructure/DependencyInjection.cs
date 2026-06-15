@@ -1,10 +1,11 @@
 ﻿using Application;
 using Application.interfaces;
+using Application.interfaces.imageviewers;
 using Infrastructure.database;
 using Infrastructure.database.repositories;
 using Infrastructure.filesystem;
 using Infrastructure.images;
-using Infrastructure.irfanview;
+using Infrastructure.imageviewers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -30,11 +31,12 @@ public static class DependencyInjection
             services.AddScoped<IProjectMetadataRepository, ProjectMetadataRepository>();
             services.AddScoped<ISelectionRepository, SelectionRepository>();
 
-
+            
             services.AddScoped<IFiles, Files>();
 
-            services.AddScoped<IIrfanViewGateway, IrfanViewGateway>();
-
+            services.AddScoped<ImageViewerGatewayHelper>();
+            services.AddScoped<IIrfanviewGateway, IrfanViewGateway>();
+            
             services.AddScoped<IThumbnailGenerator, MagickThumbnailGenerator>();
 
             services.AddImageViewer(config);
