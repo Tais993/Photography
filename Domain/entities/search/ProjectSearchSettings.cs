@@ -1,6 +1,6 @@
 ﻿namespace Domain.entities.search;
 
-public class ProjectSearchSettings
+public class ProjectSearchSettings : SearchSettings
 {
     public DateOnly? EventDate;
     public int? ProjectId { get; set; }
