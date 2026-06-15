@@ -9,6 +9,9 @@ public class Constants
 
     public const string ProjectInfoFile = "project.info";
     
+    public const string ImageViewerMode = "ImageViewer:Mode";
+    public const string ImageViewerPath = "ImageViewer:ImageViewerPath";
+    
     public static readonly HashSet<string> ImageFileTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg",
