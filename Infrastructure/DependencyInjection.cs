@@ -31,12 +31,12 @@ public static class DependencyInjection
             services.AddScoped<IProjectMetadataRepository, ProjectMetadataRepository>();
             services.AddScoped<ISelectionRepository, SelectionRepository>();
 
-            
-            services.AddScoped<IFiles, Files>();
-
             services.AddScoped<ImageViewerGatewayHelper>();
             services.AddScoped<IIrfanviewGateway, IrfanViewGateway>();
-            
+            services.AddScoped<IWindowsPhotoGateway, WindowsPhotoGateway>();
+
+            services.AddScoped<IFiles, Files>();
+
             services.AddScoped<IThumbnailGenerator, MagickThumbnailGenerator>();
 
             services.AddImageViewer(config);
