@@ -1,0 +1,40 @@
+﻿@startuml
+title Photography Project Tool - Architecture
+
+top to bottom direction
+skinparam packageStyle rectangle
+skinparam componentStyle rectangle
+
+package "Presentation Layer" {
+    component "CLI"
+    component "Website"
+}
+
+package "Application / Logic Layer" {
+    component "Services"
+    component "Infrastructure Contracts"
+}
+
+package "Domain Layer" {
+    component "Entities"
+}
+
+package "Infrastructure Layer" {
+    component "Repositories"
+    component "File System"
+    component "External Tools"
+}
+
+"CLI" --> "Services"
+"Website" --> "Services"
+
+"Services" --> "Entities"
+"Services" --> "Infrastructure Contracts"
+
+"Repositories" ..|> "Infrastructure Contracts"
+"File System" ..|> "Infrastructure Contracts"
+"External Tools" ..|> "Infrastructure Contracts"
+
+"Repositories" --> "Entities"
+
+@enduml
