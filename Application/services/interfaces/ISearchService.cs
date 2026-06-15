@@ -10,7 +10,7 @@ public interface ISearchService
     /// </summary>
     /// <param name="imageSearchSettings">The settings for the search</param>
     /// <returns></returns>
-    public List<Image> SearchImages(ImageSearchSettings imageSearchSettings);
+    public PaginatedResult<Image> SearchImages(ImageSearchSettings imageSearchSettings);
     
     /// <summary>
     ///     Based on the given list, filters all RAW files that ALSO have a JPG in the list

@@ -13,21 +13,22 @@ public class SearchService : ISearchService
     private readonly IImageRepository _imagesRepository;
     private readonly ILogger<SearchService> _logger;
 
-    public SearchService(IImageRepository imagesRepository, IProjectRepository projectRepository, ILogger<SearchService> logger)
+    public SearchService(IImageRepository imagesRepository, IProjectRepository projectRepository,
+        ILogger<SearchService> logger)
     {
         _imagesRepository = imagesRepository;
         _projectRepository = projectRepository;
         _logger = logger;
     }
 
-    public List<Image> SearchImages(ImageSearchSettings imageSearchSettings)
+    public PaginatedResult<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
         imageSearchSettings.FileNameOrNumber = ValidateStringValue(imageSearchSettings.FileNameOrNumber);
         imageSearchSettings.FileName = ValidateStringValue(imageSearchSettings.FileName);
         imageSearchSettings.FileNumber = ValidateStringValue(imageSearchSettings.FileNumber);
         imageSearchSettings.FolderName = ValidateStringValue(imageSearchSettings.FolderName);
         imageSearchSettings.FileType = ValidateStringValue(imageSearchSettings.FileType);
-        
+
         if (imageSearchSettings.FileNameOrNumber != null)
         {
             if (int.TryParse(imageSearchSettings.FileNameOrNumber, out _))
@@ -39,8 +40,15 @@ public class SearchService : ISearchService
                 imageSearchSettings.FileName = imageSearchSettings.FileNameOrNumber;
             }
         }
-        
-        return _imagesRepository.SearchImages(imageSearchSettings);
+
+        IEnumerable<Image> searchImages = _imagesRepository.SearchImages(imageSearchSettings);
+
+        if (imageSearchSettings.HideRawImagesWhenJpgExists)
+        {
+            searchImages = HideRawFilesWhenNonRawExists(searchImages);
+        }
+
+        return PaginationService.Paginate(searchImages, imageSearchSettings);
     }
 
     public IEnumerable<Image> HideRawFilesWhenNonRawExists(IEnumerable<Image> images)
