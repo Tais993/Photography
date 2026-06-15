@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Image = Domain.entities.Image;
 
-namespace Tests.services;
+namespace Tests.Application.services;
 
 [TestFixture]
 [TestOf(typeof(ThumbnailService))]
@@ -22,13 +22,13 @@ public class ThumbnailServiceTest
 
     private ThumbnailService _thumbnailService = null!;
 
-    private const string ProjectPath = @"C:\Projects\Test";
-    private const string RelativeFilePath = @"Original\DSC_1234.JPG";
-    private const string OriginalPath = @"C:\Projects\Test\Original\DSC_1234.JPG";
-    private const string CacheRoot = @"C:\ThumbnailCache";
-    private const string CacheDirectory = @"C:\ThumbnailCache\default";
-    private const string DefaultCachePath = @"C:\ThumbnailCache\default\5_300_q80.jpg";
-    private const string LargeCachePath = @"C:\ThumbnailCache\large\5_1200_q80.jpg";
+    private readonly string _projectPath = @"C:" + Path.DirectorySeparatorChar + "Projects" + Path.DirectorySeparatorChar + "Test";
+    private readonly string _relativeFilePath = @"Original" + Path.DirectorySeparatorChar + "DSC_1234.JPG";
+    private readonly string _originalPath = @"C:" + Path.DirectorySeparatorChar + "Projects" + Path.DirectorySeparatorChar + "Test" + Path.DirectorySeparatorChar + "Original" + Path.DirectorySeparatorChar + "DSC_1234.JPG";
+    private readonly string _cacheRoot = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache";
+    private readonly string _cacheDirectory = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "default";
+    private readonly string _defaultCachePath = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "default" + Path.DirectorySeparatorChar + "5_300_q80.jpg";
+    private readonly string _largeCachePath = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "large" + Path.DirectorySeparatorChar + "5_1200_q80.jpg";
 
     [SetUp]
     public void SetUp()
@@ -44,7 +44,7 @@ public class ThumbnailServiceTest
             { "Thumbnails:DefaultSize", "300" },
             { "Thumbnails:LargeSize", "1200" },
             { "Thumbnails:JpegQuality", "80" },
-            { "Thumbnails:CachePath", CacheRoot }
+            { "Thumbnails:CachePath", _cacheRoot }
         };
 
         _configuration = new ConfigurationBuilder()
@@ -61,7 +61,7 @@ public class ThumbnailServiceTest
         );
     }
 
-    private static Image CreateImage()
+    private Image CreateImage()
     {
         return new Image(
             5,
@@ -69,16 +69,16 @@ public class ThumbnailServiceTest
             null,
             "DSC_1234.JPG",
             ".JPG",
-            RelativeFilePath
+            _relativeFilePath
         );
     }
 
-    private static Project CreateProject()
+    private Project CreateProject()
     {
         return new Project(
             10,
             "Test project",
-            ProjectPath,
+            _projectPath,
             DateOnly.FromDateTime(DateTime.Today),
             null
         );
@@ -168,11 +168,11 @@ public class ThumbnailServiceTest
             .Returns(project);
 
         _files
-            .Setup(files => files.Combine(ProjectPath, RelativeFilePath))
-            .Returns(OriginalPath);
+            .Setup(files => files.Combine(_projectPath, _relativeFilePath))
+            .Returns(_originalPath);
 
         _files
-            .Setup(files => files.Exists(OriginalPath))
+            .Setup(files => files.Exists(_originalPath))
             .Returns(false);
 
         // Execution
@@ -212,23 +212,23 @@ public class ThumbnailServiceTest
             .Returns(project);
 
         _files
-            .Setup(files => files.Combine(ProjectPath, RelativeFilePath))
-            .Returns(OriginalPath);
+            .Setup(files => files.Combine(_projectPath, _relativeFilePath))
+            .Returns(_originalPath);
 
         _files
-            .Setup(files => files.Exists(OriginalPath))
+            .Setup(files => files.Exists(_originalPath))
             .Returns(true);
 
         _files
-            .Setup(files => files.Exists(DefaultCachePath))
+            .Setup(files => files.Exists(_defaultCachePath))
             .Returns(true);
 
         _files
-            .Setup(files => files.GetLastWriteTimeUtc(OriginalPath))
+            .Setup(files => files.GetLastWriteTimeUtc(_originalPath))
             .Returns(originalModified);
 
         _files
-            .Setup(files => files.GetLastWriteTimeUtc(DefaultCachePath))
+            .Setup(files => files.GetLastWriteTimeUtc(_defaultCachePath))
             .Returns(cacheModified);
 
         // Execution
@@ -236,7 +236,7 @@ public class ThumbnailServiceTest
 
         // Asserts
         Assert.That(result.Found, Is.True);
-        Assert.That(result.FilePath, Is.EqualTo(DefaultCachePath));
+        Assert.That(result.FilePath, Is.EqualTo(_defaultCachePath));
         Assert.That(result.ContentType, Is.EqualTo("image/jpeg"));
 
         _files.Verify(
@@ -271,37 +271,37 @@ public class ThumbnailServiceTest
             .Returns(project);
 
         _files
-            .Setup(files => files.Combine(ProjectPath, RelativeFilePath))
-            .Returns(OriginalPath);
+            .Setup(files => files.Combine(_projectPath, _relativeFilePath))
+            .Returns(_originalPath);
 
         _files
-            .Setup(files => files.Exists(OriginalPath))
+            .Setup(files => files.Exists(_originalPath))
             .Returns(true);
 
         _files
-            .Setup(files => files.Exists(DefaultCachePath))
+            .Setup(files => files.Exists(_defaultCachePath))
             .Returns(false);
 
         _files
-            .Setup(files => files.GetDirectoryName(DefaultCachePath))
-            .Returns(CacheDirectory);
+            .Setup(files => files.GetDirectoryName(_defaultCachePath))
+            .Returns(_cacheDirectory);
 
         // Execution
         ThumbnailResult result = _thumbnailService.GetThumbnail(5);
 
         // Asserts
         Assert.That(result.Found, Is.True);
-        Assert.That(result.FilePath, Is.EqualTo(DefaultCachePath));
+        Assert.That(result.FilePath, Is.EqualTo(_defaultCachePath));
 
         _files.Verify(
-            files => files.FolderCreate(CacheDirectory),
+            files => files.FolderCreate(_cacheDirectory),
             Times.Once
         );
 
         _thumbnailGenerator.Verify(
             generator => generator.GenerateThumbnail(
-                OriginalPath,
-                DefaultCachePath,
+                _originalPath,
+                _defaultCachePath,
                 300,
                 80u
             ),
@@ -328,45 +328,45 @@ public class ThumbnailServiceTest
             .Returns(project);
 
         _files
-            .Setup(files => files.Combine(ProjectPath, RelativeFilePath))
-            .Returns(OriginalPath);
+            .Setup(files => files.Combine(_projectPath, _relativeFilePath))
+            .Returns(_originalPath);
 
         _files
-            .Setup(files => files.Exists(OriginalPath))
+            .Setup(files => files.Exists(_originalPath))
             .Returns(true);
 
         _files
-            .Setup(files => files.Exists(DefaultCachePath))
+            .Setup(files => files.Exists(_defaultCachePath))
             .Returns(true);
 
         _files
-            .Setup(files => files.GetLastWriteTimeUtc(OriginalPath))
+            .Setup(files => files.GetLastWriteTimeUtc(_originalPath))
             .Returns(originalModified);
 
         _files
-            .Setup(files => files.GetLastWriteTimeUtc(DefaultCachePath))
+            .Setup(files => files.GetLastWriteTimeUtc(_defaultCachePath))
             .Returns(cacheModified);
 
         _files
-            .Setup(files => files.GetDirectoryName(DefaultCachePath))
-            .Returns(CacheDirectory);
+            .Setup(files => files.GetDirectoryName(_defaultCachePath))
+            .Returns(_cacheDirectory);
 
         // Execution
         ThumbnailResult result = _thumbnailService.GetThumbnail(5);
 
         // Asserts
         Assert.That(result.Found, Is.True);
-        Assert.That(result.FilePath, Is.EqualTo(DefaultCachePath));
+        Assert.That(result.FilePath, Is.EqualTo(_defaultCachePath));
 
         _files.Verify(
-            files => files.FolderCreate(CacheDirectory),
+            files => files.FolderCreate(_cacheDirectory),
             Times.Once
         );
 
         _thumbnailGenerator.Verify(
             generator => generator.GenerateThumbnail(
-                OriginalPath,
-                DefaultCachePath,
+                _originalPath,
+                _defaultCachePath,
                 300,
                 80u
             ),
@@ -380,7 +380,7 @@ public class ThumbnailServiceTest
         Image image = CreateImage();
         Project project = CreateProject();
 
-        const string largeCacheDirectory = @"C:\ThumbnailCache\large";
+        string largeCacheDirectory = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "large";
 
         // Mocks
         _imageService
@@ -392,19 +392,19 @@ public class ThumbnailServiceTest
             .Returns(project);
 
         _files
-            .Setup(files => files.Combine(ProjectPath, RelativeFilePath))
-            .Returns(OriginalPath);
+            .Setup(files => files.Combine(_projectPath, _relativeFilePath))
+            .Returns(_originalPath);
 
         _files
-            .Setup(files => files.Exists(OriginalPath))
+            .Setup(files => files.Exists(_originalPath))
             .Returns(true);
 
         _files
-            .Setup(files => files.Exists(LargeCachePath))
+            .Setup(files => files.Exists(_largeCachePath))
             .Returns(false);
 
         _files
-            .Setup(files => files.GetDirectoryName(LargeCachePath))
+            .Setup(files => files.GetDirectoryName(_largeCachePath))
             .Returns(largeCacheDirectory);
 
         // Execution
@@ -412,12 +412,12 @@ public class ThumbnailServiceTest
 
         // Asserts
         Assert.That(result.Found, Is.True);
-        Assert.That(result.FilePath, Is.EqualTo(LargeCachePath));
+        Assert.That(result.FilePath, Is.EqualTo(_largeCachePath));
 
         _thumbnailGenerator.Verify(
             generator => generator.GenerateThumbnail(
-                OriginalPath,
-                LargeCachePath,
+                _originalPath,
+                _largeCachePath,
                 1200,
                 80u
             ),

@@ -11,12 +11,14 @@ public class FilesTest
 
     private const string FileExtension = ".txt";
     private const string FileName = "test.txt";
-    private const string FilePath = @"C:\Users\Tijs\test.txt";
+    
+    private readonly string _filePath = @"C:" + Path.DirectorySeparatorChar + "Users" + Path.DirectorySeparatorChar + 
+                                       "Tijs" + Path.DirectorySeparatorChar + "test.txt";
 
     private const string DirectoryEnd = "Tijs";
-    private const string DirectoryPath = @"C:\Users\Tijs\";
+    private readonly string _directoryPath = @"C:" + Path.DirectorySeparatorChar + "Users" + Path.DirectorySeparatorChar + "Tijs";
 
-    private const string SecondDirectoryPath = @"C:\Users\";
+    private readonly string _secondDirectoryPath = @"C:" + Path.DirectorySeparatorChar + "Users" + Path.DirectorySeparatorChar;
 
     [SetUp]
     public void SetUp()
@@ -27,19 +29,19 @@ public class FilesTest
     [Test]
     public void CombinesPaths_Correctly()
     {
-        const string firstPath = "C:\\Users";
-        const string secondPath = "Tijs\\test.txt";
+        string firstPath = "C:" + Path.DirectorySeparatorChar + "Users";
+        string secondPath = "Tijs" + Path.DirectorySeparatorChar +"test.txt";
 
         string combinedPaths = _files.Combine(firstPath, secondPath);
 
 
-        Assert.That(combinedPaths, Is.EqualTo(FilePath));
+        Assert.That(combinedPaths, Is.EqualTo(_filePath));
     }
 
     [Test]
     public void GetFileName_Correctly()
     {
-        string fileName = _files.GetFileName(FilePath);
+        string fileName = _files.GetFileName(_filePath);
 
         Assert.That(fileName, Is.EqualTo(FileName));
     }
@@ -47,7 +49,7 @@ public class FilesTest
     [Test]
     public void GetfileExtension_Correctly()
     {
-        string extension = _files.GetFileExtension(FilePath);
+        string extension = _files.GetFileExtension(_filePath);
 
         Assert.That(extension, Is.EqualTo(FileExtension));
     }
@@ -55,7 +57,7 @@ public class FilesTest
     [Test]
     public void GetPathEnd_File_Correctly()
     {
-        string pathEnd = _files.GetPathEnd(FilePath);
+        string pathEnd = _files.GetPathEnd(_filePath);
 
         Assert.That(pathEnd, Is.EqualTo(FileName));
     }
@@ -63,7 +65,7 @@ public class FilesTest
     [Test]
     public void GetPathEnd_Directory_Correctly()
     {
-        string pathEnd = _files.GetPathEnd(DirectoryPath);
+        string pathEnd = _files.GetPathEnd(_directoryPath);
 
         Assert.That(pathEnd, Is.EqualTo(DirectoryEnd));
     }
@@ -71,8 +73,8 @@ public class FilesTest
     [Test]
     public void GetRelativePath_File_Correctly()
     {
-        string relativePath = _files.GetRelativePath(SecondDirectoryPath, FilePath);
+        string relativePath = _files.GetRelativePath(_secondDirectoryPath, _filePath);
 
-        Assert.That(relativePath, Is.EqualTo("Tijs\\test.txt"));
+        Assert.That(relativePath, Is.EqualTo("Tijs" + Path.DirectorySeparatorChar + "test.txt"));
     }
 }
