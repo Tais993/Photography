@@ -24,7 +24,7 @@
             <div class="col-auto ms-auto">
                 <span class="badge bg-blue-lt">
                     <i class="ti ti-folders me-1"></i>
-                    @Model.Images.Count out of @Model.GetProjectImageCount() image(s)
+                    @Model.ImagePage.Items.Count out of @Model.GetProjectImageCount() image(s)
                 </span>
             </div>
         </div>
@@ -106,7 +106,7 @@
 
                 <div class="card-body">
 
-                    @if (Model.Images.Count == 0)
+                    @if (Model.ImagePage.Items.Count == 0)
                     {
                         <div class="empty">
                             <div class="empty-icon">
@@ -123,7 +123,7 @@
                     else
                     {
                         <div class="row row-cards">
-                            @foreach (Image image in Model.GetImages())
+                            @foreach (Image image in Model.ImagePage.Items)
                             {
                                 bool isSelected = Model.SelectedImageIds.Contains(image.Id!.Value);
 

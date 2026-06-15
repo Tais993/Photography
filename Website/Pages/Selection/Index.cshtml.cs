@@ -1,5 +1,4 @@
 ﻿using Application.interfaces;
-using Application.services;
 using Application.services.imageviewers;
 using Application.services.interfaces;
 using Domain.entities;
@@ -34,7 +33,8 @@ public class IndexModel : PageModel
         _projectService = projectService;
     }
 
-    public List<Image> Images = [];
+    public PaginatedResult<Image> ImagePage = PaginatedResult<Image>.Empty;
+
     public List<int> SelectedImageIds = [];
     public Project? SelectedProject { get; private set; }
     public Image SelectedImage { get; private set; }
@@ -48,6 +48,9 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)] public string? FolderName { get; set; }
 
     [BindProperty(SupportsGet = true)] public string? FileType { get; set; }
+    
+    [BindProperty(SupportsGet = true)] public int PageSize { get; set; } 
+    [BindProperty(SupportsGet = true)] public int PageNumber { get; set; }
 
     public PageResult OnGet()
     {
@@ -63,7 +66,7 @@ public class IndexModel : PageModel
         }
         else
         {
-            Images = [];
+            ImagePage = PaginatedResult<Image>.Empty;
             SelectedImageIds = [];
             return Page();
         }
@@ -81,19 +84,20 @@ public class IndexModel : PageModel
             ProjectId = SelectedProjectId,
             FileNameOrNumber = Search,
             FolderName = FolderName,
-            FileType = FileType
+            FileType = FileType,
+            HideRawImagesWhenJpgExists = true,
+            PageSize = PageSize,
+            PageNumber = PageNumber
         };
+        
 
-        Images = _searchService.SearchImages(settings);
+        ImagePage = _searchService.SearchImages(settings);
 
+        PageNumber = ImagePage.PageNumber;
+        PageSize = ImagePage.PageSize;
+        
         return Page();
     }
-
-    public IEnumerable<Image> GetImages()
-    {
-        return _searchService.HideRawFilesWhenNonRawExists(Images);
-    }
-
 
     private static bool IsRaw(string fileType)
     {
