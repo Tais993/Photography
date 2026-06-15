@@ -12,28 +12,52 @@ public class FilesTest
     private const string FileExtension = ".txt";
     private const string FileName = "test.txt";
     
-    private readonly string _filePath = @"C:" + Path.DirectorySeparatorChar + "Users" + Path.DirectorySeparatorChar + 
-                                       "Tijs" + Path.DirectorySeparatorChar + "test.txt";
+    private string _testRoot = null!;
+    private string _filePath = null!;
+    private string _directoryPath = null!;
+    private string _secondDirectoryPath = null!;
 
     private const string DirectoryEnd = "Tijs";
-    private readonly string _directoryPath = @"C:" + Path.DirectorySeparatorChar + "Users" + Path.DirectorySeparatorChar + "Tijs";
-
-    private readonly string _secondDirectoryPath = @"C:" + Path.DirectorySeparatorChar + "Users" + Path.DirectorySeparatorChar;
 
     [SetUp]
-    public void SetUp()
+    public void Setup()
     {
+        _testRoot = Path.Combine(
+            Path.GetTempPath(),
+            "PictureProjectTests",
+            Guid.NewGuid().ToString());
+
+        _secondDirectoryPath = Path.Combine(
+            _testRoot,
+            "Users");
+
+        _directoryPath = Path.Combine(
+            _secondDirectoryPath,
+            DirectoryEnd);
+
+        _filePath = Path.Combine(
+            _directoryPath,
+            FileName);
+        
         _files = new Files();
+    }
+
+    [TearDown]
+    public void TearDown()
+    {
+        if (Directory.Exists(_testRoot))
+        {
+            Directory.Delete(_testRoot, true);
+        }
     }
 
     [Test]
     public void CombinesPaths_Correctly()
     {
-        string firstPath = "C:" + Path.DirectorySeparatorChar + "Users";
-        string secondPath = "Tijs" + Path.DirectorySeparatorChar +"test.txt";
+        string firstPath = _secondDirectoryPath;
+        string secondPath = Path.Combine(DirectoryEnd, FileName);
 
         string combinedPaths = _files.Combine(firstPath, secondPath);
-
 
         Assert.That(combinedPaths, Is.EqualTo(_filePath));
     }
