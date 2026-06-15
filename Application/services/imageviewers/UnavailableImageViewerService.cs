@@ -14,6 +14,11 @@ public class UnavailableImageViewerService : IImageViewerService
             return false;
         }
 
+        public string GetImageViewerName()
+        {
+            return "Unavailable";
+        }
+        
         public void OpenImage(string imagePath)
         {
             throw new InvalidOperationException(_reason);

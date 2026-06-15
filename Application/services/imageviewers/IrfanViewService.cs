@@ -19,6 +19,11 @@ public class IrfanViewService : IImageViewerService
         return true;
     }
 
+    public string GetImageViewerName()
+    {
+        return "IrfanView";
+    }
+
     public string? GetOpenedFileName(string? givenFileName)
     {
         if (givenFileName != null)
