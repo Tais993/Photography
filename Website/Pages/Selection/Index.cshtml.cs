@@ -91,7 +91,7 @@ public class IndexModel : PageModel
 
     public IEnumerable<Image> GetImages()
     {
-        return _imageService.HideRawFilesWhenNonRawExists(Images);
+        return _searchService.HideRawFilesWhenNonRawExists(Images);
     }
 
 
