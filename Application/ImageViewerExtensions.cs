@@ -21,6 +21,10 @@ public static class ImageViewerExtensions
                 AddIrfanView(services, path);
                 break;
 
+            case "default":
+                AddWindowsPhotos(services);
+                break;
+
             case "disabled":
                 AddUnavailable(services, "Image viewer is disabled in configuration.");
                 break;
@@ -45,6 +49,20 @@ public static class ImageViewerExtensions
         }
 
         services.AddScoped<IImageViewerService, IrfanViewService>();
+    }
+
+    private static void AddWindowsPhotos(IServiceCollection services)
+    {
+        if (!OperatingSystem.IsWindows())
+        {
+            AddUnavailable(
+                services,
+                "Default viewer is configured, but Windows Photos is not found..");
+
+            return;
+        }
+
+        services.AddScoped<IImageViewerService, WindowsPhotosService>();
     }
 
     private static void AddUnavailable(IServiceCollection services, string reason)
