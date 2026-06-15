@@ -1,4 +1,6 @@
-﻿= Picture Project Maintenance Tool
+﻿image:https://github.com/Tais993/Photography/actions/workflows/unit-tests.yml/badge.svg[Unit tests]
+
+= Picture Project Maintenance Tool
 
 A local tool for managing folder-based photography projects.
 
