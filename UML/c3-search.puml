@@ -14,12 +14,14 @@ Container_Boundary(presentation, "Presentation Layer") {
 }
 
 Container_Boundary(application, "Application / Logic Layer") {
-    Component(projectService, "ProjectService", "C#", "Resolves the current project and project context")
-    Component(searchService, "SearchService", "C#", "Searches images by using project and image data")
+    Component(projectService, "ProjectService", "C#", "Resolves the current project")
+    Component(searchService, "SearchService", "C#", "Searches images based on the given search settings")
+    Component(paginationService, "PaginationService", "C#", "Splits search results into pages")
 }
 
 Container_Boundary(infra, "Infrastructure Layer") {
-    Component(repository, "Repository", "C#", "Retrieves project and image data")
+    Component(projectRepository, "ProjectRepository", "C#", "Retrieves project data")
+    Component(imageRepository, "ImageRepository", "C#", "Retrieves image data")
     Component(fileSystem, "File System Component", "C#", "Reads project.info and file system data")
 }
 
@@ -32,11 +34,14 @@ Rel(searchCommand, projectService, "Delegates project resolving")
 Rel(searchCommand, searchService, "Delegates search logic")
 
 Rel(projectService, fileSystem, "Reads project identification")
-Rel(projectService, repository, "Requests project")
+Rel(projectService, projectRepository, "Requests project")
 
-Rel(searchService, repository, "Requests project and image data")
+Rel(searchService, projectRepository, "Requests project data")
+Rel(searchService, imageRepository, "Requests image data")
+Rel_L(searchService, paginationService, "Paginates results")
 
-Rel(repository, database, "Reads")
+Rel(projectRepository, database, "Reads")
+Rel(imageRepository, database, "Reads")
 Rel(fileSystem, fs, "Reads")
 
 @enduml
