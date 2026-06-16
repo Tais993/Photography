@@ -5,6 +5,7 @@ using Application.website.interfaces;
 using Domain.entities;
 using Domain.entities.search;
 using Domain.website;
+using Microsoft.Extensions.Logging;
 
 namespace Application.website;
 
@@ -16,6 +17,7 @@ public class SelectionIndexService : ISelectionIndexService
     private readonly IProjectService _projectService;
     private readonly IImageService _imageService;
     private readonly IFiles _fileService;
+    private readonly ILogger<SelectionIndexService> _logger;
 
     public SelectionIndexService(
         IImageSelectionService imageSelectionService,
@@ -23,7 +25,8 @@ public class SelectionIndexService : ISelectionIndexService
         IImageService imageService,
         IProjectService projectService,
         IImageViewerService imageViewerService,
-        IFiles fileService)
+        IFiles fileService,
+        ILogger<SelectionIndexService> logger)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;
@@ -31,10 +34,13 @@ public class SelectionIndexService : ISelectionIndexService
         _projectService = projectService;
         _imageViewerService = imageViewerService;
         _fileService = fileService;
+        _logger = logger;
     }
 
     public SelectionIndexViewModel GetSelectionIndex(SelectionIndexRequest request)
     {
+        _logger.LogDebug("Creating selection index view model for project: {ProjectId}", request.SelectedProjectId);
+
         SelectionIndexViewModel viewModel = new()
         {
             SelectedProjectId = request.SelectedProjectId,
@@ -45,6 +51,7 @@ public class SelectionIndexService : ISelectionIndexService
 
         if (request.SelectedProjectId is null)
         {
+            _logger.LogDebug("Selection index requested without selected project");
             return viewModel;
         }
 
@@ -63,6 +70,11 @@ public class SelectionIndexService : ISelectionIndexService
         viewModel.SelectedImageIds = _imageSelectionService
             .GetSessionImages(selectedProject)
             .ImageIds;
+
+        _logger.LogInformation(
+            "Selection session loaded for project: {ProjectId}, selected images: {SelectedImageCount}",
+            request.SelectedProjectId,
+            viewModel.SelectedImageIds.Count);
 
         ImageSearchSettings settings = new()
         {
@@ -83,15 +95,24 @@ public class SelectionIndexService : ISelectionIndexService
             .Select(image => CreateImageViewModel(image, viewModel.SelectedImageIds))
             .ToList();
 
+        _logger.LogInformation(
+            "Created selection index for project: {ProjectId}, images on page: {Count}, selected images: {SelectedCount}",
+            request.SelectedProjectId,
+            viewModel.Images.Count,
+            viewModel.SelectedImageIds.Count);
+
         return viewModel;
     }
 
     public SelectedImageViewModel? GetSelectedImage(int imageId)
     {
+        _logger.LogDebug("Getting selected image view model for image: {ImageId}", imageId);
+
         Image? image = _imageService.GetImageById(imageId);
 
         if (image is null)
         {
+            _logger.LogWarning("Selected image was not found: {ImageId}", imageId);
             return null;
         }
 
@@ -105,11 +126,14 @@ public class SelectionIndexService : ISelectionIndexService
 
     public ImageViewModel? ToggleImageSelection(int imageId, int selectedProjectId)
     {
+        _logger.LogInformation("Toggling image selection from website, project: {ProjectId}, image: {ImageId}", selectedProjectId, imageId);
+
         Project? project = _projectService.GetProjectById(selectedProjectId);
         Image? image = _imageService.GetImageById(imageId);
 
         if (project is null || image is null)
         {
+            _logger.LogWarning("Could not toggle image selection, project or image was not found. Project: {ProjectId}, image: {ImageId}", selectedProjectId, imageId);
             return null;
         }
 
@@ -121,6 +145,8 @@ public class SelectionIndexService : ISelectionIndexService
 
     public void OpenImageInImageViewer(int selectedProjectId, int selectedImageId)
     {
+        _logger.LogInformation("Opening image in image viewer, project: {ProjectId}, image: {ImageId}", selectedProjectId, selectedImageId);
+
         Project selectedProject = _projectService.GetProjectById(selectedProjectId);
         Image selectedImage = _imageService.GetImageById(selectedImageId);
 
