@@ -26,6 +26,11 @@ public class UnavailableImageViewerService : IImageViewerService
 
         public string? GetOpenedFileName(string? givenFileName)
         {
-            return givenFileName ?? throw new InvalidOperationException(_reason);
+            if (givenFileName is not null)
+            {
+                return givenFileName;
+            }
+
+            throw new InvalidOperationException(_reason);
         }
     }   

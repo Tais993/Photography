@@ -18,7 +18,7 @@ public class RepositoryHelper
     public List<T> QueryMultiple<T>(string sql, Func<NpgsqlDataReader, T> resultConverter,
         params object[] parameterValues)
     {
-        _logger.LogDebug("QueryMultiple, with params: {ParameterValues}", (object?)parameterValues);
+        _logger.LogDebug("Executing query expecting multiple results with {ParameterCount} parameters", parameterValues.Length);
 
         try
         {
@@ -31,30 +31,34 @@ public class RepositoryHelper
                     results.Add(resultConverter(reader));
                 } while (reader.Read());
 
+                _logger.LogDebug("Query returned {Count} results", results.Count);
+
                 return results;
             }, parameterValues);
         }
         catch (InvalidOperationException ex)
         {
-            return new List<T>();
+            _logger.LogDebug(ex, "Query returned no results");
+            return [];
         }
     }
 
     public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
         params object?[] parameterValues)
     {
-        _logger.LogDebug("Executing {Sql}", sql);
+        _logger.LogTrace("Executing query with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
 
         using NpgsqlConnection cnx = _dataSource.OpenConnection();
 
         using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
-        SetParameters<TResult>(parameterValues, npgsqlCommand);
+        SetParameters(parameterValues, npgsqlCommand);
 
         using NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
 
         if (!reader.Read())
         {
+            _logger.LogTrace("Query returned no results: {Sql}", sql);
             throw new InvalidOperationException("Query returned no results");
         }
 
@@ -65,26 +69,25 @@ public class RepositoryHelper
 
     public void Execute(string sql, params object[] parameterValues)
     {
-        _logger.LogDebug("Executing {Sql}", sql);
+        _logger.LogTrace("Executing command with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
 
-        NpgsqlConnection cnx = _dataSource.OpenConnection();
+        using NpgsqlConnection cnx = _dataSource.OpenConnection();
 
+        using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
 
-        NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
+        SetParameters(parameterValues, npgsqlCommand);
 
-        SetParameters<object>(parameterValues, npgsqlCommand);
+        int affectedRows = npgsqlCommand.ExecuteNonQuery();
 
-        npgsqlCommand.ExecuteNonQuery();
-
-        cnx.CloseAsync();
+        _logger.LogDebug("Command executed. Affected rows: {AffectedRows}", affectedRows);
     }
 
 
-    private void SetParameters<TResult>(object?[] parameterValues, NpgsqlCommand npgsqlCommand)
+    private void SetParameters(object?[] parameterValues, NpgsqlCommand npgsqlCommand)
     {
         foreach (object? parameterValue in parameterValues)
         {
-            _logger.LogDebug("Param: {ParameterValue}", parameterValue);
+            _logger.LogTrace("Adding query parameter: {ParameterValue}", parameterValue);
 
             if (parameterValue == null)
             {
@@ -101,8 +104,8 @@ public class RepositoryHelper
     {
         return !reader.HasRows ? 0 : reader.GetInt32(0);
     }
-    
-    
+
+
     public bool MapToBool(NpgsqlDataReader reader)
     {
         return reader.HasRows && reader.GetBoolean(0);
