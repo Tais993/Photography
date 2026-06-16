@@ -39,6 +39,7 @@
                     <div class="row g-2">
                         <input type="hidden" asp-for="SelectedProjectId"/>
                         <input type="hidden" asp-for="SelectedImageId"/>
+                        <input type="hidden" asp-for="ImagePageNumber"/>
 
                         <div class="col">
                             <div class="input-icon">
@@ -73,14 +74,28 @@
                                 <option value=".raw">RAW</option>
                             </select>
                         </div>
+                        
+                        <div class="col-md-2">
+                            <select asp-for="ImagePageSize"
+                                    class="form-select"
+                                    onchange="document.querySelector('[name=ImagePageNumber]').value = 1; this.form.submit();">
+                                <option value="20">20 per page</option>
+                                <option value="40">40 per page</option>
+                                <option value="60">60 per page</option>
+                                <option value="120">120 per page</option>
+                            </select>
+                        </div>
 
                         <div class="col-auto">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit"
+                                    class="btn btn-primary"
+                                    onclick="document.querySelector('[name=ImagePageNumber]').value = 1">
                                 <i class="ti ti-search me-2"></i>
                                 Search
                             </button>
                         </div>
-
+                        
+                        
                         <div class="col-auto">
                             <div class="col-auto">
                                 <button type="button"
@@ -130,6 +145,14 @@
                         </div>
                     }
                 </div>
+                
+                <partial name="_Pagination"
+                         model="Model.ImagePage"
+                         view-data='new ViewDataDictionary(ViewData)
+                         {
+                             ["PageNumberParameter"] = "ImagePageNumber",
+                             ["PageSizeParameter"] = "ImagePageSize"
+                         }'/>
             </div>
         </div>
 
