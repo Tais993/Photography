@@ -7,7 +7,7 @@ skinparam nodesep 90
 skinparam ranksep 120
 
 entity "project" as project {
-  * project_id : int <<PK>>
+  * id : int <<PK>>
   --
   * name : varchar(255)
   * path : varchar(260)
@@ -17,7 +17,7 @@ entity "project" as project {
 }
 
 entity "image" as image {
-  * image_id : int <<PK>>
+  * id : int <<PK>>
   --
   * file_name : varchar(255)
   * file_type : varchar(20)
@@ -31,7 +31,7 @@ entity "metadata" as metadata {
   --
   * metadata_type : varchar(255)
   * display_name : varchar(255)
-  description : varchar(255)
+  * description : varchar(255)
 }
 
 entity "project_metadata" as project_metadata {

@@ -1,0 +1,56 @@
+﻿@startuml IrfanViewGateway_Setup
+allowmixing
+
+title IrfanView Gateway
+
+skinparam packageStyle rectangle
+
+package "Application / Logic Layer" {
+    interface IImageViewerService {
+        +OpenImage(...)
+        +GetCurrentImage(...)
+    }
+
+    class IrfanViewService {
+        +OpenImage(...)
+        +GetCurrentImage(...)
+    }
+
+    IrfanViewService ..|> IImageViewerService : implements service
+}
+
+package "Application Interfaces" {
+    interface IImageViewerGateway {
+        +OpenImage(...)
+        +GetCurrentImagePath()
+    }
+
+    interface IIrfanViewGateway
+
+    IIrfanViewGateway --|> IImageViewerGateway : extends gateway
+}
+
+package "Infrastructure Layer" {
+    class IrfanViewGateway {
+        +OpenImage(...)
+        +GetCurrentImagePath()
+    }
+
+    class ImageViewerGatewayHelper {
+        +OpenImage(...)
+        +GetActiveWindowTitle(...)
+        +GetCurrentImagePath(...)
+    }
+
+    IrfanViewGateway ..|> IIrfanViewGateway : implements gateway
+}
+
+package "External Tool" {
+    rectangle "IrfanView"
+}
+
+IrfanViewService --> IIrfanViewGateway : requests gateway
+IrfanViewGateway --> ImageViewerGatewayHelper : reuses helper
+ImageViewerGatewayHelper --> "IrfanView" : opens and checks viewer
+
+@enduml
