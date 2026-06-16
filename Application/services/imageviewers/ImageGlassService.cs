@@ -4,19 +4,18 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.services.imageviewers;
 
-public class IrfanViewService : IImageViewerService
+public class ImageGlassService : IImageViewerService
 {
     private readonly IFiles _files;
-    private readonly IIrfanviewGateway _irfanViewGateway;
-    private readonly ILogger<IrfanViewService> _logger;
+    private readonly IImageGlassGateway _imageGlassGateway;
+    private readonly ILogger<ImageGlassService> _logger;
 
-    public IrfanViewService(IIrfanviewGateway irfanViewGateway, IFiles files, ILogger<IrfanViewService> logger)
+    public ImageGlassService(IFiles files, ILogger<ImageGlassService> logger, IImageGlassGateway imageGlassGateway)
     {
-        _irfanViewGateway = irfanViewGateway;
-        _files = files;
+        _imageGlassGateway = imageGlassGateway;
         _logger = logger;
+        _files = files;
     }
-
 
     public bool IsAvailable()
     {
@@ -25,7 +24,7 @@ public class IrfanViewService : IImageViewerService
 
     public string GetImageViewerName()
     {
-        return "IrfanView";
+        return "ImageGlass";
     }
 
     public string? GetOpenedFileName(string? givenFileName)
@@ -35,20 +34,19 @@ public class IrfanViewService : IImageViewerService
             return givenFileName;
         }
 
-        if (!_irfanViewGateway.IsOpen())
+        if (!_imageGlassGateway.IsOpen())
         {
             return null;
         }
 
-        _logger.LogInformation("Checking IrfanView for an opened image");
-        string? openedFile = _irfanViewGateway.GetOpenedFile();
+        _logger.LogInformation("Checking Image Glass for an opened image");
+        string? openedFile = _imageGlassGateway.GetOpenedFile();
 
         return _files.GetFileNameWithoutExtension(openedFile);
 
     }
-
     public void OpenImage(string imagePath)
     {
-        _irfanViewGateway.OpenFile(imagePath);
+        _imageGlassGateway.OpenFile(imagePath);
     }
 }

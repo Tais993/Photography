@@ -22,7 +22,6 @@ public class ProjectRepository : IProjectRepository
 
     public Project GetById(int id)
     {
-        _logger.LogInformation("GetByKey, with params: {Id}", id);
         return _db.Query("""
                          SELECT id, name, path, event_date, parent_project_id FROM public.project 
                          WHERE id = $1

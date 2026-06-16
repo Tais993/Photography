@@ -1,5 +1,7 @@
 ﻿using Application.services;
 using Application.services.interfaces;
+using Application.website;
+using Application.website.interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
@@ -21,6 +23,10 @@ public static class DependencyInjection
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
             services.AddScoped<IThumbnailService, ThumbnailService>();
+            
+            // Website services
+            services.AddScoped<ISelectionIndexService, SelectionIndexService>();
+            services.AddScoped<IProjectIndexService, ProjectIndexService>();
             return services;
         }
     }

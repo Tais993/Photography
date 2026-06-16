@@ -1,5 +1,5 @@
 ﻿@page
-@using Domain.entities
+@using Domain.website
 @model IndexModel
 
 @{
@@ -24,7 +24,7 @@
             <div class="col-auto ms-auto">
                 <span class="badge bg-blue-lt">
                     <i class="ti ti-folders me-1"></i>
-                    @Model.ImagePage.Items.Count out of @Model.GetProjectImageCount() image(s)
+                    @Model.ImagePage.Items.Count out of @Model.ProjectImageCount image(s)
                 </span>
             </div>
         </div>
@@ -123,23 +123,12 @@
                     else
                     {
                         <div class="row row-cards">
-                            @foreach (Image image in Model.ImagePage.Items)
+                            @foreach (ImageViewModel image in Model.Images)
                             {
-                                bool isSelected = Model.SelectedImageIds.Contains(image.Id!.Value);
-
-                                _ImageView imageView = new _ImageView()
-                                {
-                                    Selected = isSelected,
-                                    ImageId = image.Id,
-                                    FileType = image.FileType,
-                                    FileName = image.FileName,
-                                    RelationalFilePath = image.RelationalFilePath
-                                };
-                                <partial name="_ImageView" model="imageView"/>
+                                <partial name="_ImageView" model="image"/>
                             }
                         </div>
                     }
-
                 </div>
             </div>
         </div>

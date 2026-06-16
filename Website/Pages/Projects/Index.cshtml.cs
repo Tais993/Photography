@@ -1,6 +1,7 @@
 ﻿using Application.services.interfaces;
+using Application.website.interfaces;
 using Domain.entities;
-using Domain.entities.search;
+using Domain.website;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using static Website.WebsiteConstants;
@@ -10,26 +11,26 @@ namespace Website.Pages.Projects;
 public class IndexModel : PageModel
 {
     private readonly IProjectService _projectService;
-    private readonly ISearchService _searchService;
-    private readonly ILogger<IndexModel> _logger;
+    private readonly IProjectIndexService _projectIndexService;
 
-    public IndexModel(IProjectService projectService, ISearchService searchService, ILogger<IndexModel> logger)
+    public IndexModel(IProjectService projectService, IProjectIndexService projectIndexService)
     {
         _projectService = projectService;
-        _searchService = searchService;
-        _logger = logger;
+        _projectIndexService = projectIndexService;
     }
 
     public List<Project> Projects { get; private set; } = [];
 
     public Project? SelectedProject { get; private set; }
 
-    [BindProperty(SupportsGet = true)] public int? SelectedProjectId { get; set; }
+    public int ProjectCount { get; private set; }
 
+    [BindProperty(SupportsGet = true)] public int? SelectedProjectId { get; set; }
 
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
 
     [BindProperty(SupportsGet = true)] public int? ProjectId { get; set; }
+
     [BindProperty(SupportsGet = true)] public int? ParentProjectId { get; set; }
 
     [BindProperty(SupportsGet = true)] public string? ProjectPath { get; set; }
@@ -38,41 +39,38 @@ public class IndexModel : PageModel
 
     public void OnGet()
     {
-        IEnumerable<Project> projects = _searchService.SearchProjects(new ProjectSearchSettings()
+        SelectedProjectId ??= GetLastProjectIdFromCookie();
+
+        ProjectIndexViewModel viewModel = _projectIndexService.GetProjectIndex(new ProjectIndexRequest()
         {
-            EventDate = this.EventDate,
-            ProjectName = this.Search,
-            ProjectPath = this.ProjectPath,
-            ProjectId = this.ProjectId,
-            ParentProjectId = this.ParentProjectId
+            SelectedProjectId = SelectedProjectId,
+            Search = Search,
+            ProjectId = ProjectId,
+            ParentProjectId = ParentProjectId,
+            ProjectPath = ProjectPath,
+            EventDate = EventDate
         });
-        
-        _logger.LogInformation($"Found {projects.Count()} projects");
 
-        Projects = projects
-            .OrderByDescending(project => project.EventDate)
-            .ThenBy(project => project.Name)
-            .ToList();
-
-        _logger.LogInformation($"Found {projects.Count()} projects");
+        Projects = viewModel.Projects;
+        SelectedProject = viewModel.SelectedProject;
+        SelectedProjectId = viewModel.SelectedProjectId;
+        ProjectCount = viewModel.ProjectCount;
 
         if (SelectedProjectId is not null)
         {
-            SelectedProject = _projectService.GetProjectById(SelectedProjectId.Value);
-
             UpdateProjectCookie();
         }
-        else if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText) &&
-                 int.TryParse(projectIdText, out int lastProjectId))
+    }
+
+    private int? GetLastProjectIdFromCookie()
+    {
+        if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText) &&
+            int.TryParse(projectIdText, out int lastProjectId))
         {
-            SelectedProjectId = lastProjectId;
-            SelectedProject = _projectService.GetProjectById(lastProjectId);
+            return lastProjectId;
         }
-        else
-        {
-            SelectedProject = Projects.FirstOrDefault();
-            SelectedProjectId = SelectedProject?.Id;
-        }
+
+        return null;
     }
 
     private void UpdateProjectCookie()
@@ -88,21 +86,9 @@ public class IndexModel : PageModel
             });
     }
 
-    internal _ProjectView CreateProjectView(Project project)
+    internal ProjectViewModel CreateProjectView(Project project)
     {
-        return new _ProjectView
-        {
-            Selected = project.Id == SelectedProjectId,
-            Id = project.Id,
-            Name = project.Name,
-            Path = project.Path,
-            EventDate = project.EventDate
-        };
-    }
-
-    public int GetProjectCount()
-    {
-        return _projectService.GetProjectCount();
+        return _projectIndexService.CreateProjectView(project, SelectedProjectId);
     }
     
     public IActionResult OnGetSelectedProjectView(int projectId)

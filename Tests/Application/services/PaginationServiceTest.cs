@@ -1,7 +1,7 @@
 ﻿using Application.services;
 using Domain.entities.search;
 
-namespace Tests.services;
+namespace Tests.Application.services;
 
 [TestFixture]
 [TestOf(typeof(PaginationService))]
