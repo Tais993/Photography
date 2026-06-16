@@ -17,17 +17,25 @@ public class MigrationService
 
     public void Migrate()
     {
-        var connection = _dataSource.OpenConnection();
+        NpgsqlConnection connection = _dataSource.OpenConnection();
 
 
-        var migrationPath = Path.Combine(AppContext.BaseDirectory, "database", "migrations");
-        _logger.LogInformation("Migration path: {MigrationPath}", migrationPath);
+        string migrationPath = Path.Combine(AppContext.BaseDirectory, "database", "migrations");
 
-        var evolve = new Evolve(connection, (msg) => { _logger.LogInformation(msg); })
+        Evolve evolve = new Evolve(connection, (msg) => { _logger.LogDebug(msg); })
         {
             Locations = [migrationPath]
         };
 
-        evolve.Migrate();
+        try
+        {
+            evolve.Migrate();
+            _logger.LogInformation("Database migration completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Database migration failed.");
+            throw;
+        }
     }
 }

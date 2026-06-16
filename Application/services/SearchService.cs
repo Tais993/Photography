@@ -23,6 +23,7 @@ public class SearchService : ISearchService
 
     public PaginatedResult<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
+        _logger.LogInformation("Searching for images");
         imageSearchSettings.FileNameOrNumber = ValidateStringValue(imageSearchSettings.FileNameOrNumber);
         imageSearchSettings.FileName = ValidateStringValue(imageSearchSettings.FileName);
         imageSearchSettings.FileNumber = ValidateStringValue(imageSearchSettings.FileNumber);
@@ -42,12 +43,14 @@ public class SearchService : ISearchService
         }
 
         IEnumerable<Image> searchImages = _imagesRepository.SearchImages(imageSearchSettings);
-
+        
         if (imageSearchSettings.HideRawImagesWhenJpgExists)
         {
             searchImages = HideRawFilesWhenNonRawExists(searchImages);
         }
 
+        _logger.LogInformation("Found {Count} images", searchImages.Count());
+        
         return PaginationService.Paginate(searchImages, imageSearchSettings);
     }
 
@@ -61,8 +64,7 @@ public class SearchService : ISearchService
             .Select(image => Path.GetFileNameWithoutExtension(image.FileName))
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-        // afbeelding is RAW en heeft GEEN raw variant, dan is ie goedgekeurd
-        // 
+        // Keep all non-RAW images, and only keep RAW images if no non-RAW version with the same filename exists.
         return imageList.Where(image =>
             !IsRaw(image.FileType) ||
             !nonRawFileNames.Contains(Path.GetFileNameWithoutExtension(image.FileName))

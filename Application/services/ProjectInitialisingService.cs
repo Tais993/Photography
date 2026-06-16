@@ -40,9 +40,8 @@ public class ProjectInitialisingService : IProjectInitialisingService
     public void InitialiseFolder(string folderDirectory)
     {
         string pathEnd = _files.GetPathEnd(folderDirectory);
-
-        _logger.LogInformation("folder name: {FolderName}", pathEnd);
-
+        _logger.LogInformation("initialising folder: {FolderName}", pathEnd);
+        
 
         if (pathEnd.StartsWith("."))
         {
@@ -65,6 +64,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
     private void InitialiseCollectionFolder(string subdirectory)
     {
+        _logger.LogInformation("initialising collection folder: {FolderName}", subdirectory);
         foreach (string directory in _files.GetDirectories(subdirectory))
         {
             InitialiseFolder(directory);
@@ -77,12 +77,13 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
     public void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject = null)
     {
+        _logger.LogInformation("initialising project folder: {FolderName}", projectDirectory);
         string projectInfoPath = _files.Combine(projectDirectory, ProjectInfoFile);
 
         if (_files.Exists(projectInfoPath))
         {
             _logger.LogInformation(
-                $"Project info file found:  name: {_files.ReadAllText(projectInfoPath)}");
+                $"Project already initialised, existing project info file found, id: {_files.ReadAllText(projectInfoPath)}");
             return;
         }
 
@@ -110,13 +111,15 @@ public class ProjectInitialisingService : IProjectInitialisingService
         foreach (string subDirectory in _files.GetDirectories(projectDirectory))
         {
             string pathEnd = _files.GetPathEnd(subDirectory);
-
+            
             if (SubProjectNameRegex.Match(pathEnd) is { Success: true } subProjectMatch)
             {
+                _logger.LogInformation("initialising project sub-project: {FolderName}", pathEnd);
                 InitialiseProjectFolder(subDirectory, subProjectMatch, project);
             }
             else
             {
+                _logger.LogInformation("initialising project sub-folder's images: {FolderName}", pathEnd);
                 InitializeImages(projectDirectory, subDirectory, project.Id.Value);
             }
         }
