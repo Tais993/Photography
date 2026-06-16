@@ -26,6 +26,7 @@ public static class DependencyInjection
             
             // Website services
             services.AddScoped<ISelectionIndexService, SelectionIndexService>();
+            services.AddScoped<IProjectIndexService, ProjectIndexService>();
             return services;
         }
     }
