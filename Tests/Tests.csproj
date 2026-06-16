@@ -28,8 +28,7 @@
         <Using Include="NUnit.Framework"/>
 
         <!-- Folder -->
-        <Folder Include="Application\"/>
-        <Folder Include="Infrastructure\"/>
+        <Folder Include="Unit\" />
     </ItemGroup>
 
 </Project>
