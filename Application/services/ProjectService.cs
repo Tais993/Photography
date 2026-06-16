@@ -12,16 +12,14 @@ namespace Application.services;
 public class ProjectService : IProjectService
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly IImageRepository _imageRepository;
     private readonly ILogger<ProjectService> _logger;
     private readonly IFiles _files;
 
 
-    public ProjectService(IProjectRepository projectRepository, IImageRepository imageRepository, IFiles files,
+    public ProjectService(IProjectRepository projectRepository, IFiles files,
         ILogger<ProjectService> logger)
     {
         _projectRepository = projectRepository;
-        _imageRepository = imageRepository;
         _files = files;
         _logger = logger;
     }
@@ -30,17 +28,18 @@ public class ProjectService : IProjectService
     {
         if (possibleEmptyProjectId == 0)
         {
-            _logger.LogInformation("Resolving project id for directory: {Directory}", directory);
+            _logger.LogDebug("Resolving project id for directory: {Directory}", directory);
             string projectInfoPath = _files.Combine(directory, Constants.ProjectInfoFile);
 
             if (!_files.Exists(projectInfoPath))
             {
+                _logger.LogWarning("Project info file was not found for directory: {Directory}", directory);
                 return 0;
             }
 
             int id = int.Parse(_files.ReadAllText(projectInfoPath));
 
-            _logger.LogInformation("project info file found:  id: {Id}", id);
+            _logger.LogDebug("Project info file found: id: {Id}", id);
 
             return id;
         }
@@ -51,21 +50,38 @@ public class ProjectService : IProjectService
 
     public Project? ResolveProject(string directory, int possibleEmptyProjectId = 0)
     {
-        return _projectRepository.GetById(ResolveProjectId(directory, possibleEmptyProjectId));
+        int projectId = ResolveProjectId(directory, possibleEmptyProjectId);
+
+        _logger.LogDebug("Resolving project: {ProjectId}", projectId);
+
+        return _projectRepository.GetById(projectId);
     }
 
     public int GetProjectCount()
     {
-        return _projectRepository.GetProjectCount();
+        _logger.LogDebug("Getting project count");
+
+        int count = _projectRepository.GetProjectCount();
+
+        _logger.LogDebug("Found {Count} projects", count);
+
+        return count;
     }
 
     public Project GetProjectById(int projectId)
     {
+        _logger.LogDebug("Getting project by id: {ProjectId}", projectId);
         return _projectRepository.GetById(projectId);
     }
 
     public List<Project> GetAllProjects()
     {
-        return _projectRepository.GetAll();
+        _logger.LogDebug("Getting all projects");
+
+        List<Project> projects = _projectRepository.GetAll();
+
+        _logger.LogDebug("Found {Count} projects", projects.Count);
+
+        return projects;
     }
 }
