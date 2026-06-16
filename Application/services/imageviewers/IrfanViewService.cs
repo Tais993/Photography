@@ -44,8 +44,8 @@ public class IrfanViewService : IImageViewerService
 
         _logger.LogDebug("Checking IrfanView for an opened image");
         string? openedFile = _irfanViewGateway.GetOpenedFile();
-
-        _logger.LogDebug("IrfanView opened file: {OpenedFile}", openedFile);
+        
+        _logger.LogInformation("IrfanView is running, and has: {OpenedFile} opened", openedFile);
 
         return _files.GetFileNameWithoutExtension(openedFile);
 

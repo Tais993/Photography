@@ -55,7 +55,7 @@ public class SearchService : ISearchService
 
         List<Image> images = searchImages.ToList();
 
-        _logger.LogDebug("Found {Count} images", images.Count);
+        _logger.LogInformation("Found {Count} images while searching", images.Count);
 
         return PaginationService.Paginate(images, imageSearchSettings);
     }

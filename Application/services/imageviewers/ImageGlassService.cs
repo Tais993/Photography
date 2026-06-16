@@ -44,7 +44,8 @@ public class ImageGlassService : IImageViewerService
         _logger.LogDebug("Checking ImageGlass for an opened image");
         string? openedFile = _imageGlassGateway.GetOpenedFile();
 
-        _logger.LogDebug("ImageGlass opened file: {OpenedFile}", openedFile);
+        _logger.LogInformation("ImageGlass is running, and has: {OpenedFile} opened", openedFile);
+        
         return _files.GetFileNameWithoutExtension(openedFile);
 
     }
