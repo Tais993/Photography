@@ -20,6 +20,10 @@ public static class ImageViewerExtensions
             case "irfanview":
                 AddIrfanView(services, path);
                 break;
+            
+            case "image-glass":
+                AddImageGlass(services, path);
+                break;
 
             case "default":
                 AddWindowsPhotos(services);
@@ -51,6 +55,20 @@ public static class ImageViewerExtensions
         services.AddScoped<IImageViewerService, IrfanViewService>();
     }
 
+    private static void AddImageGlass(IServiceCollection services, string? path)
+    {
+        if (!ExecutableExists(path))
+        {
+            AddUnavailable(
+                services,
+                $"Image-glass is configured, but the executable was not found: {path}");
+
+            return;
+        }
+
+        services.AddScoped<IImageViewerService, ImageGlassService>();
+    }
+    
     private static void AddWindowsPhotos(IServiceCollection services)
     {
         if (!OperatingSystem.IsWindows())
