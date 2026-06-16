@@ -1,8 +1,5 @@
 ﻿namespace Application.interfaces.imageviewers;
 
-public interface IIrfanviewGateway
+public interface IIrfanviewGateway : IImageViewerGateway
 {
-    bool IsOpen();
-    string? GetOpenedFile();
-    void OpenFile(string imagePath);
 }
