@@ -1,197 +1,121 @@
-﻿using Application.interfaces;
-using Application.services.imageviewers;
-using Application.services.interfaces;
+﻿using Application.website.interfaces;
 using Domain.entities;
 using Domain.entities.search;
 using Domain.website;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using static Application.Constants;
 using static Website.WebsiteConstants;
 
 namespace Website.Pages.Selection;
 
 public class IndexModel : PageModel
 {
-    private readonly IImageSelectionService _imageSelectionService;
-    private readonly ISearchService _searchService;
-    private readonly IImageViewerService _imageViewerService;
-    private readonly IProjectService _projectService;
-    private readonly IImageService _imageService;
-    private readonly ILogger<IndexModel> _logger;
-    private readonly IFiles _fileService;
+    private readonly ISelectionIndexService _selectionIndexService;
 
-    public IndexModel(IImageSelectionService imageSelectionService, ISearchService searchService, IImageService imageService,
-        IProjectService projectService, IImageViewerService imageViewerService, IFiles fileService, ILogger<IndexModel> logger)
+    public IndexModel(ISelectionIndexService selectionIndexService)
     {
-        _imageSelectionService = imageSelectionService;
-        _searchService = searchService;
-        _imageService = imageService;
-        _imageViewerService = imageViewerService;
-        _fileService = fileService;
-        _logger = logger;
-        _projectService = projectService;
+        _selectionIndexService = selectionIndexService;
     }
 
     public PaginatedResult<Image> ImagePage = PaginatedResult<Image>.Empty;
 
+    public List<ImageViewModel> Images = [];
+
     public List<int> SelectedImageIds = [];
+
     public Project? SelectedProject { get; private set; }
-    public Image SelectedImage { get; private set; }
+
+    public SelectedImageViewModel? SelectedImage { get; private set; }
+
+    public int ProjectImageCount { get; private set; }
 
     [BindProperty(SupportsGet = true)] public int? SelectedImageId { get; set; }
     [BindProperty(SupportsGet = true)] public int? SelectedProjectId { get; set; }
-
-
-    [BindProperty(SupportsGet = true)] public string? Search { get; set; }
-
-    [BindProperty(SupportsGet = true)] public string? FolderName { get; set; }
-
-    [BindProperty(SupportsGet = true)] public string? FileType { get; set; }
     
-    [BindProperty(SupportsGet = true)] public int PageSize { get; set; } 
+    [BindProperty(SupportsGet = true)] public string? Search { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FolderName { get; set; }
+    [BindProperty(SupportsGet = true)] public string? FileType { get; set; }
+
+    [BindProperty(SupportsGet = true)] public int PageSize { get; set; }
     [BindProperty(SupportsGet = true)] public int PageNumber { get; set; }
 
     public PageResult OnGet()
     {
-        if (SelectedProjectId is not null)
-        {
-            SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
-        }
-        else if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText) &&
-                 int.TryParse(projectIdText, out int lastProjectId))
-        {
-            SelectedProjectId = lastProjectId;
-            SelectedProject = _projectService.GetProjectById(lastProjectId);
-        }
-        else
-        {
-            ImagePage = PaginatedResult<Image>.Empty;
-            SelectedImageIds = [];
-            return Page();
-        }
+        SelectedProjectId ??= GetLastProjectIdFromCookie();
 
-        if (SelectedImageId is not null)
+        SelectionIndexViewModel viewModel = _selectionIndexService.GetSelectionIndex(new SelectionIndexRequest
         {
-            SelectedImage = _imageService.GetImageById(SelectedImageId.Value);
-        }
-
-        SelectionSession selectionSession = _imageSelectionService.GetOrStartSession(SelectedProject);
-        SelectedImageIds = _imageSelectionService.GetSessionImages(SelectedProject).ImageIds;
-
-        ImageSearchSettings settings = new()
-        {
-            ProjectId = SelectedProjectId,
-            FileNameOrNumber = Search,
+            SelectedProjectId = SelectedProjectId,
+            SelectedImageId = SelectedImageId,
+            Search = Search,
             FolderName = FolderName,
             FileType = FileType,
-            HideRawImagesWhenJpgExists = true,
             PageSize = PageSize,
             PageNumber = PageNumber
-        };
-        
+        });
 
-        ImagePage = _searchService.SearchImages(settings);
+        ImagePage = viewModel.ImagePage;
+        Images = viewModel.Images;
+        SelectedImageIds = viewModel.SelectedImageIds;
+        SelectedProject = viewModel.SelectedProject;
+        SelectedImage = viewModel.SelectedImage;
+        SelectedProjectId = viewModel.SelectedProjectId;
+        SelectedImageId = viewModel.SelectedImageId;
+        ProjectImageCount = viewModel.ProjectImageCount;
+        PageNumber = viewModel.PageNumber;
+        PageSize = viewModel.PageSize;
 
-        PageNumber = ImagePage.PageNumber;
-        PageSize = ImagePage.PageSize;
-        
         return Page();
-    }
-
-    private static bool IsRaw(string fileType)
-    {
-        return RawFileTypes.Contains(fileType);
     }
 
     public IActionResult OnGetOpenImage()
     {
-        OpenImageInImageViewer();
+        if (SelectedProjectId is null || SelectedImageId is null)
+        {
+            return NotFound();
+        }
+
+        _selectionIndexService.OpenImageInImageViewer(
+            SelectedProjectId.Value,
+            SelectedImageId.Value);
 
         return new NoContentResult();
     }
 
     public IActionResult OnGetSelectedImage(int imageId)
     {
-        Image? image = _imageService.GetImageById(imageId);
-        SelectedImage = image;
-        SelectedImageId = imageId;
+        SelectedImageViewModel? selectedImage = _selectionIndexService.GetSelectedImage(imageId);
 
-        if (image is null)
+        if (selectedImage is null)
         {
             return NotFound();
         }
 
-        SelectedImageViewModel selectedImageModel = new()
-        {
-            CanOpenInImageViewer = _imageViewerService.IsAvailable(),
-            ImageViewerName = _imageViewerService.GetImageViewerName(),
-            Image = image
-        };
-
-        return Partial("_SelectedImage", selectedImageModel);
-    }
-
-    public PartialViewResult OnGetImage(Image image)
-    {
-        bool isSelected = SelectedImageIds.Contains(image.Id!.Value);
-
-        _ImageView imageView = new _ImageView
-        {
-            Selected = isSelected,
-            ImageId = (int)image.Id,
-            FileType = image.FileType,
-            FileName = image.FileName,
-            RelationalFilePath = image.RelationalFilePath
-        };
-
-        return Partial("_ImageView", imageView);
+        return Partial("_SelectedImage", selectedImage);
     }
 
     public IActionResult OnGetToggleImageSelection(int imageId, int selectedProjectId)
     {
-        _logger.LogInformation("OnPostToggleImageSelection");
-        Project? project = _projectService.GetProjectById(selectedProjectId);
-        Image? image = _imageService.GetImageById(imageId);
+        ImageViewModel? imageView = _selectionIndexService.ToggleImageSelection(
+            imageId,
+            selectedProjectId);
 
-        if (project is null || image is null)
+        if (imageView is null)
         {
             return NotFound();
         }
 
-        int sessionId = _imageSelectionService.GetSessionId(selectedProjectId);
-        bool isSelected = _imageSelectionService.ToggleImageSelection(sessionId, imageId);
-
-        _ImageView imageView = new()
-        {
-            Selected = isSelected,
-            ImageId = image.Id,
-            FileType = image.FileType,
-            FileName = image.FileName,
-            RelationalFilePath = image.RelationalFilePath
-        };
-
-        _logger.LogInformation("ImageView");
         return Partial("_ImageView", imageView);
     }
 
-    public void OpenImageInImageViewer()
+    private int? GetLastProjectIdFromCookie()
     {
-        SelectedProject = _projectService.GetProjectById((int)SelectedProjectId);
-        SelectedImage = _imageService.GetImageById((int)SelectedImageId);
-
-        string imagePath = _fileService.Combine(SelectedProject.Path, SelectedImage.RelationalFilePath);
-
-        _imageViewerService.OpenImage(imagePath);
-    }
-
-    public int GetProjectImageCount()
-    {
-        if (SelectedProject is null)
+        if (Request.Cookies.TryGetValue(LastProjectCookie, out string? projectIdText) &&
+            int.TryParse(projectIdText, out int lastProjectId))
         {
-            return 0;
+            return lastProjectId;
         }
 
-        return _imageService.GetProjectImageCount((int)SelectedProjectId);
+        return null;
     }
 }
