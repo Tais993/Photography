@@ -34,6 +34,7 @@ public static class DependencyInjection
             services.AddScoped<ImageViewerGatewayHelper>();
             services.AddScoped<IIrfanviewGateway, IrfanViewGateway>();
             services.AddScoped<IWindowsPhotoGateway, WindowsPhotoGateway>();
+            services.AddScoped<IImageGlassGateway, ImageGlassGateway>();
 
             services.AddScoped<IFiles, Files>();
 
