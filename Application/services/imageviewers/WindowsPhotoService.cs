@@ -44,7 +44,7 @@ public class WindowsPhotosService : IImageViewerService
         _logger.LogInformation("Checking Windows Photos for an opened image");
         string? openedFile = _windowsPhotoGateway.GetOpenedFile();
         
-        _logger.LogDebug("Windows Photos opened file: {OpenedFile}", openedFile);
+        _logger.LogInformation("Windows Photos is running, and has: {OpenedFile} opened", openedFile);
 
         return _files.GetFileNameWithoutExtension(openedFile);
 
