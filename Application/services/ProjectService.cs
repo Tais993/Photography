@@ -26,12 +26,11 @@ public class ProjectService : IProjectService
         _logger = logger;
     }
 
-
-
     public int ResolveProjectId(string directory, int possibleEmptyProjectId = 0)
     {
         if (possibleEmptyProjectId == 0)
         {
+            _logger.LogInformation("Resolving project id for directory: {Directory}", directory);
             string projectInfoPath = _files.Combine(directory, Constants.ProjectInfoFile);
 
             if (!_files.Exists(projectInfoPath))
@@ -46,17 +45,13 @@ public class ProjectService : IProjectService
             return id;
         }
 
+        _logger.LogInformation("Project ID was provided by user: {Id}", possibleEmptyProjectId);
         return possibleEmptyProjectId;
     }
 
     public Project? ResolveProject(string directory, int possibleEmptyProjectId = 0)
     {
-        if (possibleEmptyProjectId == 0)
-        {
-            return _projectRepository.GetById(ResolveProjectId(directory));
-        }
-
-        return _projectRepository.GetById(possibleEmptyProjectId);
+        return _projectRepository.GetById(ResolveProjectId(directory, possibleEmptyProjectId));
     }
 
     public int GetProjectCount()
