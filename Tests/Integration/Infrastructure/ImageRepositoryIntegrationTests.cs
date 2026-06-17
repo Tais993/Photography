@@ -3,6 +3,7 @@ using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Integration.Fixtures;
+using static Tests.Integration.Utilities.IntegrationTestEntityFactory;
 
 namespace Tests.Integration.Infrastructure;
 
@@ -412,36 +413,5 @@ public class ImageRepositoryIntegrationTests : IntegrationTestBase
 
             Assert.That(retrievedImage.ProjectId, Is.EqualTo(project.Id));
         }
-    }
-
-    private static Project CreateProject(
-        string name = "Test Project",
-        string path = @"C:\Projects\Test Project",
-        DateOnly? eventDate = null,
-        int? parentProjectId = null)
-    {
-        return new Project(
-            null,
-            name,
-            path,
-            eventDate ?? new DateOnly(2026, 6, 17),
-            parentProjectId);
-    }
-
-    private static Image CreateImage(
-        int? imageId = null,
-        int projectId = 1,
-        string fileName = "TestImage",
-        string fileType = ".png",
-        string relationalFilePath = @"\Originals\TestImage.png")
-    {
-        return new Image(
-            imageId,
-            projectId,
-            null,
-            fileName,
-            fileType,
-            relationalFilePath
-        );
     }
 }

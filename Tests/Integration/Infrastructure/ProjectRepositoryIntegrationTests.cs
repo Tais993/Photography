@@ -3,6 +3,7 @@ using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Integration.Fixtures;
+using static Tests.Integration.Utilities.IntegrationTestEntityFactory;
 
 namespace Tests.Integration.Infrastructure;
 
@@ -233,19 +234,5 @@ public class ProjectRepositoryIntegrationTests : IntegrationTestBase
             Assert.That(projects, Has.Count.EqualTo(2));
             Assert.That(projectCount, Is.EqualTo(2));
         }
-    }
-
-    private static Project CreateProject(
-        string name = "Test Project",
-        string path = @"C:\Projects\Test Project",
-        DateOnly? eventDate = null,
-        int? parentProjectId = null)
-    {
-        return new Project(
-            null,
-            name,
-            path,
-            eventDate ?? new DateOnly(2026, 6, 17),
-            parentProjectId);
     }
 }
