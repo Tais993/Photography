@@ -75,7 +75,7 @@ public class ProjectMetadataService : IProjectMetadataService
     public void DeleteMetadata(string metadataKey)
     {
         _logger.LogInformation("Deleting metadata: {MetadataKey}", metadataKey);
-        _metadataRepository.DeleteById(metadataKey);
+        _metadataRepository.DeleteByKey(metadataKey);
     }
 
 
