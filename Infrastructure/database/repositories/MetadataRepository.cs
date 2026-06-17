@@ -78,7 +78,7 @@ public class MetadataRepository : IMetadataRepository
                     """, entity.MetadataType, entity.DisplayName, entity.Description, entity.MetadataKey);
     }
 
-    public void DeleteById(string metadataKey)
+    public void DeleteByKey(string metadataKey)
     {
         _logger.LogDebug("Deleting metadata: {MetadataKey}", metadataKey);
 

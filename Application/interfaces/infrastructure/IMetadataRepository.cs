@@ -8,5 +8,5 @@ public interface IMetadataRepository
     List<Metadata> GetAll();
     Metadata Insert(Metadata entity);
     void Update(Metadata entity);
-    void DeleteById(string key);
+    void DeleteByKey(string key);
 }
