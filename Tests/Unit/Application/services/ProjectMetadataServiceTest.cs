@@ -137,7 +137,7 @@ public class ProjectMetadataServiceTest
         _projectMetadataService.DeleteMetadata(metadata);
 
         // Asserts
-        _metadataRepository.Verify(r => r.DeleteById("location"), Times.Once);
+        _metadataRepository.Verify(r => r.DeleteByKey("location"), Times.Once);
     }
 
     [Test]
