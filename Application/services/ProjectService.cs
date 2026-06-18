@@ -54,8 +54,6 @@ public class ProjectService : IProjectService
 
         _logger.LogDebug("Resolving project: {ProjectId}", projectId);
 
-        if (projectId == 0) return null;
-        
         return _projectRepository.GetById(projectId);
     }
 
