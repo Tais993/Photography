@@ -48,7 +48,7 @@ public class SearchService : ISearchService
 
         IEnumerable<Image> searchImages = _imagesRepository.SearchImages(imageSearchSettings);
         
-        if (imageSearchSettings.HideRawImagesWhenJpgExists)
+        if (imageSearchSettings.HideRawFilesWhenImageExists)
         {
             _logger.LogDebug("Filtering RAW images when a non-RAW version exists");
             searchImages = HideRawFilesWhenNonRawExists(searchImages);

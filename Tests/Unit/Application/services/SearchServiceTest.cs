@@ -313,7 +313,7 @@ public class SearchServiceTests
     {
         ImageSearchSettings settings = new()
         {
-            HideRawImagesWhenJpgExists = true
+            HideRawFilesWhenImageExists = true
         };
 
         List<Image> images =

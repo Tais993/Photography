@@ -9,5 +9,5 @@ public class ImageSearchSettings : SearchSettings
     public string? FolderName = null;
     public string? FileType = null;
 
-    public bool HideRawImagesWhenJpgExists = false;
+    public bool HideRawFilesWhenImageExists = false;
 }

@@ -81,7 +81,7 @@ public class SelectionIndexService : ISelectionIndexService
             FileNameOrNumber = request.Search,
             FolderName = request.FolderName,
             FileType = request.FileType,
-            HideRawImagesWhenJpgExists = true,
+            HideRawFilesWhenImageExists = true,
             PageSize = request.PageSize,
             PageNumber = request.PageNumber
         };

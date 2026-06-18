@@ -11,18 +11,22 @@ public class Constants
     
     public const string ImageViewerMode = "ImageViewer:Mode";
     public const string ImageViewerPath = "ImageViewer:ImageViewerPath";
-    
-    public static readonly HashSet<string> ImageFileTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-    {
+
+
+    public static readonly string[] ImageFileTypesSql =
+    [
         ".jpg",
         ".jpeg",
-
         ".png",
-        "webp",
-    };
+        ".webp",
+    ];
+
+    public static readonly HashSet<string> ImageFileTypes = new(
+        ImageFileTypesSql,
+        StringComparer.OrdinalIgnoreCase);
     
-    public static readonly HashSet<string> RawFileTypes = new(StringComparer.OrdinalIgnoreCase)
-    {
+    public static readonly string[] RawFileTypesSql =
+    [
         // Adobe
         ".dng",
         // Arri Alexa
@@ -66,7 +70,8 @@ public class Constants
         // Mamiya
         ".mef",
         // Minolta
-        ".mdc", ".mrw",
+        ".mdc",
+        ".mrw",
         // Nikon
         ".nef",
         ".nrw",
@@ -94,7 +99,13 @@ public class Constants
         ".srf",
         ".sr2",
 
-        // Not Sure
-        ".data", ".obm", ".tif",
-    };
+        // Not sure
+        ".data",
+        ".obm",
+        ".tif",
+    ];
+
+    public static readonly HashSet<string> RawFileTypes = new(
+        RawFileTypesSql,
+        StringComparer.OrdinalIgnoreCase);
 }
