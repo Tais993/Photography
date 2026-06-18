@@ -12,7 +12,7 @@ public class ImageRepository : IImageRepository
     private readonly RepositoryHelper _db;
     private readonly ILogger<ImageRepository> _logger;
 
-    public ImageRepository(NpgsqlDataSource dataSource,
+    public ImageRepository(
         ILogger<ImageRepository> logger,
         RepositoryHelper db)
     {
@@ -20,9 +20,11 @@ public class ImageRepository : IImageRepository
         _db = db;
     }
 
-    public Image GetById(int id)
+    public Image? GetById(int id)
     {
-        return _db.Query("""
+        _logger.LogDebug("Getting image by id: {ImageId}", id);
+
+        return _db.QueryOrDefault("""
                          SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
                          WHERE id = ($1)
                          """, MapImage, id);
@@ -30,50 +32,86 @@ public class ImageRepository : IImageRepository
     
     public List<Image> GetAll()
     {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path 
-                                 FROM public.image 
-                                 """, MapImage);
+        _logger.LogDebug("Getting all images");
+
+        List<Image> images = _db.QueryMultiple("""
+                                               SELECT id, project_id, file_name, file_type, relational_file_path 
+                                               FROM public.image 
+                                               """, MapImage);
+
+        _logger.LogDebug("Found {Count} images", images.Count);
+
+        return images;
     }
 
     public List<Image> GetAllByIds(int[] imageIds)
     {
-        if (imageIds.Length == 0) return [];
+        _logger.LogDebug("Getting images by ids, count: {Count}", imageIds.Length);
+
+        if (imageIds.Length == 0)
+        {
+            return [];
+        }
         
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path
-                                 FROM public.image
-                                 WHERE id = any($1)
-                                 """, MapImage, imageIds);
-        // sql
+        List<Image> images = _db.QueryMultiple("""
+                                               SELECT id, project_id, file_name, file_type, relational_file_path
+                                               FROM public.image
+                                               WHERE id = any($1)
+                                               """, MapImage, imageIds);
+
+        _logger.LogDebug("Found {Count} images by ids", images.Count);
+
+        return images;
     }
 
     public List<Image> GetAllByProjectId(int projectId)
     {
-        return _db.QueryMultiple("""
-                                 SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
-                                 WHERE project_id = ($1)
-                                 """, MapImage, projectId);
+        _logger.LogDebug("Getting images for project: {ProjectId}", projectId);
+
+        List<Image> images = _db.QueryMultiple("""
+                                               SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
+                                               WHERE project_id = ($1)
+                                               """, MapImage, projectId);
+
+        _logger.LogDebug("Found {Count} images for project: {ProjectId}", images.Count, projectId);
+
+        return images;
     }
 
     public List<Image> GetAllByProject(Project project)
     {
-        if (project.Id is null) throw new ArgumentException("Project must have an ID", nameof(project));
+        if (project.Id is null)
+        {
+            _logger.LogWarning("Could not get images for project because project id was null");
+            throw new ArgumentException("Project must have an ID", nameof(project));
+        }
 
         return GetAllByProjectId((int)project.Id);
     }
 
     public Image Insert(Image image)
     {
-        return _db.Query("""
-                         INSERT INTO public.image(project_id, file_name, file_type, relational_file_path) 
-                         VALUES ($1, $2, $3, $4)
-                         RETURNING *
-                         """, MapImage, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath);
+        _logger.LogDebug(
+            "Inserting image for project: {ProjectId}, file: {FileName}{FileType}",
+            image.ProjectId,
+            image.FileName,
+            image.FileType);
+
+        Image insertedImage = _db.Query("""
+                                        INSERT INTO public.image(project_id, file_name, file_type, relational_file_path) 
+                                        VALUES ($1, $2, $3, $4)
+                                        RETURNING *
+                                        """, MapImage, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath);
+
+        _logger.LogTrace("Inserted image: {ImageId}", insertedImage.Id);
+
+        return insertedImage;
     }
 
     public void Update(Image image)
     {
+        _logger.LogDebug("Updating image: {ImageId}", image.Id);
+
         _db.Execute("""
                     UPDATE public.image
                     SET project_id = $1,
@@ -87,6 +125,8 @@ public class ImageRepository : IImageRepository
 
     public void DeleteById(int id)
     {
+        _logger.LogDebug("Deleting image: {ImageId}", id);
+
         _db.Execute("""
                     DELETE FROM public.image 
                     WHERE id = ($1)
@@ -95,16 +135,24 @@ public class ImageRepository : IImageRepository
 
     public int GetProjectImageCount(int projectId)
     {
-        return _db.Query("""
-                         SELECT COUNT(*)
-                         FROM public.image
-                         WHERE project_id = $1
-                         """, _db.MapToInt,
+        _logger.LogDebug("Getting image count for project: {ProjectId}", projectId);
+
+        int count = _db.Query("""
+                              SELECT COUNT(*)
+                              FROM public.image
+                              WHERE project_id = $1
+                              """, _db.MapToInt,
             projectId);
+
+        _logger.LogDebug("Project {ProjectId} has {Count} images", projectId, count);
+
+        return count;
     }
 
     public List<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
+        _logger.LogDebug("Searching images");
+
         StringBuilder sqlBuilder = new();
         List<string> whereClauses = [];
         List<object?> parameters = [];
@@ -150,9 +198,13 @@ public class ImageRepository : IImageRepository
         }
 
         sqlBuilder.AppendLine("\nORDER BY id DESC, file_name");
-        
-        return _db.QueryMultiple(sqlBuilder.ToString(),
+
+        List<Image> images = _db.QueryMultiple(sqlBuilder.ToString(),
             MapImage, parameters.ToArray());
+
+        _logger.LogDebug("Image search returned {Count} images", images.Count);
+
+        return images;
     }
 
 

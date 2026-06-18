@@ -31,16 +31,20 @@ public class WindowsPhotosService : IImageViewerService
     {
         if (givenFileName != null)
         {
+            _logger.LogDebug("Using provided file name: {FileName}", givenFileName);
             return givenFileName;
         }
 
         if (!_windowsPhotoGateway.IsOpen())
         {
+            _logger.LogInformation("Windows Photos is not open");
             return null;
         }
 
         _logger.LogInformation("Checking Windows Photos for an opened image");
         string? openedFile = _windowsPhotoGateway.GetOpenedFile();
+        
+        _logger.LogInformation("Windows Photos is running, and has: {OpenedFile} opened", openedFile);
 
         return _files.GetFileNameWithoutExtension(openedFile);
 
@@ -50,9 +54,11 @@ public class WindowsPhotosService : IImageViewerService
     {
         if (!IsAvailable())
         {
+            _logger.LogWarning("Windows Photos is not available on this operating system");
             throw new InvalidOperationException("Windows Photos is only available on Windows.");
         }
         
+        _logger.LogInformation("Opening image in Windows Photos: {ImagePath}", imagePath);
         _windowsPhotoGateway.OpenFile(imagePath);
     }
 }

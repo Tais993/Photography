@@ -31,22 +31,27 @@ public class ImageGlassService : IImageViewerService
     {
         if (givenFileName != null)
         {
+            _logger.LogDebug("Using provided file name: {FileName}", givenFileName);
             return givenFileName;
         }
 
         if (!_imageGlassGateway.IsOpen())
         {
+            _logger.LogDebug("ImageGlass is not open");
             return null;
         }
 
-        _logger.LogInformation("Checking Image Glass for an opened image");
+        _logger.LogDebug("Checking ImageGlass for an opened image");
         string? openedFile = _imageGlassGateway.GetOpenedFile();
 
+        _logger.LogInformation("ImageGlass is running, and has: {OpenedFile} opened", openedFile);
+        
         return _files.GetFileNameWithoutExtension(openedFile);
 
     }
     public void OpenImage(string imagePath)
     {
+        _logger.LogInformation("Opening image in ImageGlass: {ImagePath}", imagePath);
         _imageGlassGateway.OpenFile(imagePath);
     }
 }

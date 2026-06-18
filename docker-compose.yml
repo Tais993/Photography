@@ -1,0 +1,19 @@
+﻿services:
+  database:
+    image: postgres:17
+    container_name: photography-database
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: photography  
+      POSTGRES_USER: photography
+      POSTGRES_PASSWORD: photography
+
+    ports:
+      - "5433:5433"
+
+    volumes:
+      - photography-database-data:/var/lib/postgresql/data
+
+volumes:
+  photography-database-data:

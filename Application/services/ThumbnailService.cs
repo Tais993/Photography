@@ -38,10 +38,13 @@ public class ThumbnailService : IThumbnailService
 
     public ThumbnailResult GetThumbnail(int imageId, string size = "default")
     {
+        _logger.LogDebug("Getting thumbnail for image: {ImageId}, size: {Size}", imageId, size);
+
         Image? image = _imageService.GetImageById(imageId);
 
         if (image is null)
         {
+            _logger.LogWarning("Thumbnail could not be created, image was not found: {ImageId}", imageId);
             return ThumbnailResult.NotFound();
         }
 
@@ -49,6 +52,7 @@ public class ThumbnailService : IThumbnailService
 
         if (project is null)
         {
+            _logger.LogWarning("Thumbnail could not be created, project was not found: {ProjectId}", image.ProjectId);
             return ThumbnailResult.NotFound();
         }
 
@@ -65,8 +69,13 @@ public class ThumbnailService : IThumbnailService
 
         if (!ThumbnailCacheIsValid(fullPath, cachePath))
         {
+            _logger.LogInformation("Generating thumbnail for image: {ImageId}, cache path: {CachePath}", imageId, cachePath);
             _files.FolderCreate(_files.GetDirectoryName(cachePath)!);
             _thumbnailGenerator.GenerateThumbnail(fullPath, cachePath, maxSize, (uint) _jpegQuality);
+        }
+        else
+        {
+            _logger.LogDebug("Thumbnail cache is valid for image: {ImageId}, cache path: {CachePath}", imageId, cachePath);
         }
 
         return ThumbnailResult.Success(cachePath);
@@ -113,12 +122,20 @@ public class ThumbnailService : IThumbnailService
     {
         if (!_files.Exists(cachePath))
         {
+            _logger.LogDebug("Thumbnail cache does not exist: {CachePath}", cachePath);
             return false;
         }
 
         DateTime originalModified = _files.GetLastWriteTimeUtc(originalPath);
         DateTime cacheModified = _files.GetLastWriteTimeUtc(cachePath);
 
-        return cacheModified >= originalModified;
+        bool cacheIsValid = cacheModified >= originalModified;
+
+        if (!cacheIsValid)
+        {
+            _logger.LogDebug("Thumbnail cache is stale. Original: {OriginalPath}, cache: {CachePath}", originalPath, cachePath);
+        }
+
+        return cacheIsValid;
     }
 }
