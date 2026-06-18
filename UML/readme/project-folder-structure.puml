@@ -1,0 +1,25 @@
+﻿@startuml
+title Photography Project Folder Structure
+
+folder "2026-04-04-Kalkar" as project {
+    file "project.info" as projectInfo
+
+    folder "originals" as rootOriginals {
+        file "DSC_1234.JPG" as jpg1234
+        file "DSC_1234.NEF" as nef1234
+        file "DSC_1235.JPG" as jpg1235
+    }
+
+    folder "editing" as rootEditing {
+    }
+
+    folder "finals" as rootFinals {
+    }
+
+    folder ".saturday" as saturday {
+        folder "originals" as saturdayOriginals
+        folder "editing" as saturdayEditing
+        folder "finals" as saturdayFinals
+    }
+}
+@enduml

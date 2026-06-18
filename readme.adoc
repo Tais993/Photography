@@ -45,8 +45,16 @@ Website          Razor Pages website
 Tests            Unit tests
 ----
 
+The project uses a layered architecture.
+The CLI and Website are presentation layers and both depend on the application layer.
+Infrastructure functionality is accessed through interfaces defined by the application layer.
+
+This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or external image viewers.
+
 Both the CLI and Website use the same application services.
 This keeps the main logic reusable and prevents duplicated behaviour between frontends.
+
+image::UML/architecture.svg[Application architecture diagram]
 
 == Photography project structure
 
@@ -71,6 +79,7 @@ A project usually contains these folders:
 [source,text]
 ----
 2026-04-04-Kalkar/
+    project.info
     originals/
     editing/
     finals/
@@ -79,6 +88,8 @@ A project usually contains these folders:
 The `originals` folder contains the original image files.
 The `editing` folder is used for files that have been selected for editing.
 The `finals` folder is used for finished exports.
+
+image::UML/readme/project-folder-structure.svg[Photography project folder structure diagram]
 
 == Subprojects
 
@@ -89,14 +100,14 @@ Example:
 [source,text]
 ----
 2026-04-04-Kalkar/
+    project.info
     originals/
     editing/
     finals/
-        .saturday/
-            originals/
-            editing/
-            finals/
-
+    .saturday/
+        originals/
+        editing/
+        finals/
 ----
 
 A subproject uses the date from the parent project, but has its own name and folder structure.
@@ -222,22 +233,6 @@ dotnet test
 ----
 
 The tests mainly focus on application services, such as image handling, image selection, copying files and thumbnail caching.
-
-== Architecture
-
-The project uses a layered architecture:
-
-[source,text]
-----
-Presentation
-↓
-Application / Logic
-↓
-Infrastructure implementations
-----
-
-Infrastructure functionality is accessed through interfaces defined by the application layer.
-This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or IrfanView.
 
 == Documentation
 
