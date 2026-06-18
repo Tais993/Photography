@@ -13,6 +13,7 @@ namespace Tests.Application.services;
 public class ProjectServiceTest
 {
     private Mock<IProjectRepository> _projectRepository = null!;
+    private Mock<IImageRepository> _imageRepository = null!;
     private Mock<IFiles> _files = null!;
     private Mock<ILogger<ProjectService>> _logger = null!;
     private Mock<IProjectMetadataService> _metadataService = null!;
@@ -22,12 +23,14 @@ public class ProjectServiceTest
     public void SetUp()
     {
         _projectRepository = new Mock<IProjectRepository>();
+        _imageRepository = new Mock<IImageRepository>();
         _files = new Mock<IFiles>();
         _logger = new Mock<ILogger<ProjectService>>();
         _metadataService = new Mock<IProjectMetadataService>();
 
         _projectService = new ProjectService(
             _projectRepository.Object,
+            _imageRepository.Object,
             _files.Object,
             _logger.Object
         );

@@ -32,20 +32,16 @@ public class IrfanViewService : IImageViewerService
     {
         if (givenFileName != null)
         {
-            _logger.LogDebug("Using provided file name: {FileName}", givenFileName);
             return givenFileName;
         }
 
         if (!_irfanViewGateway.IsOpen())
         {
-            _logger.LogDebug("IrfanView is not open");
             return null;
         }
 
-        _logger.LogDebug("Checking IrfanView for an opened image");
+        _logger.LogInformation("Checking IrfanView for an opened image");
         string? openedFile = _irfanViewGateway.GetOpenedFile();
-
-        _logger.LogDebug("IrfanView opened file: {OpenedFile}", openedFile);
 
         return _files.GetFileNameWithoutExtension(openedFile);
 
@@ -53,7 +49,6 @@ public class IrfanViewService : IImageViewerService
 
     public void OpenImage(string imagePath)
     {
-        _logger.LogInformation("Opening image in IrfanView: {ImagePath}", imagePath);
         _irfanViewGateway.OpenFile(imagePath);
     }
 }
