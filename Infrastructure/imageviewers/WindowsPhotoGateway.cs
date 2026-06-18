@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using Application.interfaces.imageviewers;
+using Application.interfaces.infrastructure.imageviewers;
 using Microsoft.Extensions.Configuration;
 
 namespace Infrastructure.imageviewers;

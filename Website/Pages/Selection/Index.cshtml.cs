@@ -1,4 +1,4 @@
-﻿using Application.website.interfaces;
+﻿using Application.interfaces.website;
 using Domain.entities;
 using Domain.entities.search;
 using Domain.website;

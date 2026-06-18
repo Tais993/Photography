@@ -1,5 +1,5 @@
-﻿using Application.interfaces;
-using Application.services.interfaces;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.services;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;

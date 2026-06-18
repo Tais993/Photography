@@ -1,7 +1,7 @@
 ﻿using Domain.entities;
 using Domain.entities.search;
 
-namespace Application.interfaces;
+namespace Application.interfaces.infrastructure;
 
 public interface IImageRepository
 {

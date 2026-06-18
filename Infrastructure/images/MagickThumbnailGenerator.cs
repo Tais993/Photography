@@ -1,4 +1,4 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
 using ImageMagick;
 
 namespace Infrastructure.images;

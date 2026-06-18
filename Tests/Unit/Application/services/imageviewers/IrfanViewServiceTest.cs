@@ -1,10 +1,10 @@
-﻿using Application.interfaces;
-using Application.interfaces.imageviewers;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.imageviewers;
 using Application.services.imageviewers;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.Application.services.imageviewers;
+namespace Tests.Unit.Application.services.imageviewers;
 
 [TestFixture]
 [TestOf(typeof(IrfanViewService))]

@@ -1,6 +1,6 @@
-﻿using Application.services;
-using Application.services.interfaces;
-using Application.website.interfaces;
+﻿using Application.interfaces.services;
+using Application.interfaces.website;
+using Application.services;
 using Domain.entities;
 using Domain.entities.search;
 using Domain.website;

@@ -1,7 +1,7 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
 using Infrastructure.filesystem;
 
-namespace Tests.Infrastructure.filesystem;
+namespace Tests.Unit.Infrastructure.filesystem;
 
 [TestFixture]
 [TestOf(typeof(Files))]

@@ -1,6 +1,5 @@
 ﻿using System.CommandLine;
-using Application.services.imageviewers;
-using Application.services.interfaces;
+using Application.interfaces.services;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;

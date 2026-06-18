@@ -1,7 +1,7 @@
-﻿using Application.services;
-using Application.services.interfaces;
+﻿using Application.interfaces.services;
+using Application.interfaces.website;
+using Application.services;
 using Application.website;
-using Application.website.interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;

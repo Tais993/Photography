@@ -1,4 +1,4 @@
-﻿namespace Application.services.imageviewers;
+﻿namespace Application.interfaces.services;
 
 public interface IImageViewerService
 {

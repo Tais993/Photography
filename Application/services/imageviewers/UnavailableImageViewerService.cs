@@ -1,4 +1,6 @@
-﻿namespace Application.services.imageviewers;
+﻿using Application.interfaces.services;
+
+namespace Application.services.imageviewers;
 
 public class UnavailableImageViewerService : IImageViewerService
 {

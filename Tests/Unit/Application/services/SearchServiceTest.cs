@@ -1,11 +1,11 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
 using Application.services;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.Application.services;
+namespace Tests.Unit.Application.services;
 
 [TestFixture]
 public class SearchServiceTests

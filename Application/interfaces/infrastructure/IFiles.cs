@@ -1,4 +1,4 @@
-﻿namespace Application.interfaces;
+﻿namespace Application.interfaces.infrastructure;
 
 public interface IFiles
 {

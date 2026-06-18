@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using Application.services.interfaces;
+using Application.interfaces.services;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using static Cli.Commands.CommandOptions;

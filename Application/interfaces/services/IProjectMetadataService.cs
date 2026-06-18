@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.services.interfaces;
+namespace Application.interfaces.services;
 
 public interface IProjectMetadataService
 {

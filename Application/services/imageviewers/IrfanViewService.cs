@@ -1,5 +1,6 @@
-﻿using Application.interfaces;
-using Application.interfaces.imageviewers;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.imageviewers;
+using Application.interfaces.services;
 using Microsoft.Extensions.Logging;
 
 namespace Application.services.imageviewers;

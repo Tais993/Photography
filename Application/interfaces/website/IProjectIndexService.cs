@@ -1,7 +1,7 @@
 ﻿using Domain.entities;
 using Domain.website;
 
-namespace Application.website.interfaces;
+namespace Application.interfaces.website;
 
 public interface IProjectIndexService
 {

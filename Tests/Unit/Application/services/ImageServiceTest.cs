@@ -1,10 +1,10 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
 using Application.services;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.Application.services;
+namespace Tests.Unit.Application.services;
 
 [TestFixture]
 [TestOf(typeof(ImageService))]

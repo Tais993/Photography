@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using Application.services.interfaces;
+using Application.interfaces.services;
 using Domain.entities;
 
 namespace Cli.Commands;

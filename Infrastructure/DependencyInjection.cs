@@ -1,6 +1,6 @@
 ﻿using Application;
-using Application.interfaces;
-using Application.interfaces.imageviewers;
+using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.imageviewers;
 using Infrastructure.database;
 using Infrastructure.database.repositories;
 using Infrastructure.filesystem;

@@ -1,13 +1,13 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.services;
 using Application.services;
-using Application.services.interfaces;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Image = Domain.entities.Image;
 
-namespace Tests.Application.services;
+namespace Tests.Unit.Application.services;
 
 [TestFixture]
 [TestOf(typeof(ThumbnailService))]

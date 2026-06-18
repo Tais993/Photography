@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.interfaces;
+namespace Application.interfaces.infrastructure;
 
 public interface IMetadataRepository
 {

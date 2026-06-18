@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
-using Application.interfaces;
-using Application.services.interfaces;
+using Application.interfaces.infrastructure;
+using Application.interfaces.services;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using static Application.Constants;

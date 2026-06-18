@@ -1,11 +1,11 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.services;
 using Application.services;
-using Application.services.interfaces;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.Application.services;
+namespace Tests.Unit.Application.services;
 
 [TestFixture]
 public class ImageSelectionServiceTests

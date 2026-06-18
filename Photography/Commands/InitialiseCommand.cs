@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using Application.services.interfaces;
+using Application.interfaces.services;
 using Microsoft.Extensions.Logging;
 
 namespace Cli.Commands;

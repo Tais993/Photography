@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.services.interfaces;
+namespace Application.interfaces.services;
 
 /// <summary>
 ///     The project services handles with everything project related.

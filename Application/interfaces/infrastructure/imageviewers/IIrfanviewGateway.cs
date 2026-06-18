@@ -1,4 +1,4 @@
-﻿namespace Application.interfaces.imageviewers;
+﻿namespace Application.interfaces.infrastructure.imageviewers;
 
 public interface IIrfanviewGateway : IImageViewerGateway
 {

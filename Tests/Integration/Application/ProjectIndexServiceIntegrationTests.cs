@@ -1,5 +1,5 @@
-﻿using Application.interfaces;
-using Application.website.interfaces;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.website;
 using Domain.entities;
 using Domain.website;
 using Microsoft.Extensions.DependencyInjection;

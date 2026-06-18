@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Application.interfaces.imageviewers;
+namespace Infrastructure.imageviewers;
 
 public class ImageViewerGatewayHelper
 {

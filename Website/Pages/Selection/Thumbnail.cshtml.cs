@@ -1,4 +1,4 @@
-﻿using Application.services.interfaces;
+﻿using Application.interfaces.services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

@@ -1,4 +1,4 @@
-﻿namespace Application.services.interfaces;
+﻿namespace Application.interfaces.services;
 
 public interface ICopyService
 {

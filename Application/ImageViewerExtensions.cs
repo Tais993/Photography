@@ -1,4 +1,5 @@
-﻿using Application.services.imageviewers;
+﻿using Application.interfaces.services;
+using Application.services.imageviewers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using static Application.Constants;

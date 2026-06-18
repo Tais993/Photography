@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Application;
-using Application.interfaces.imageviewers;
+using Application.interfaces.infrastructure.imageviewers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 

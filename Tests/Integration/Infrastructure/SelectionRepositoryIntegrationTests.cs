@@ -1,4 +1,4 @@
-﻿using Application.interfaces;
+﻿using Application.interfaces.infrastructure;
 using Domain.entities;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Integration.Fixtures;
