@@ -5,7 +5,7 @@ namespace Application.interfaces;
 
 public interface IImageRepository
 {
-    public Image GetById(int id);
+    public Image? GetById(int id);
     public List<Image> GetAll();
     public List<Image> GetAllByIds(int[] imageIds);
     public List<Image> GetAllByProjectId(int projectId);
