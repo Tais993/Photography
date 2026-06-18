@@ -30,6 +30,7 @@ public static class DependencyInjection
             services.AddScoped<IMetadataRepository, MetadataRepository>();
             services.AddScoped<IProjectMetadataRepository, ProjectMetadataRepository>();
             services.AddScoped<ISelectionRepository, SelectionRepository>();
+            services.AddScoped<ISearchRepository, SearchRepository>();
 
             services.AddScoped<ImageViewerGatewayHelper>();
             services.AddScoped<IIrfanviewGateway, IrfanViewGateway>();

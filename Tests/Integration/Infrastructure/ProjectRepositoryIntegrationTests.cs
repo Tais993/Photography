@@ -1,6 +1,5 @@
 ﻿using Application.interfaces.infrastructure;
 using Domain.entities;
-using Domain.entities.search;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Integration.Fixtures;
 using static Tests.Integration.Utilities.IntegrationTestEntityFactory;
@@ -154,52 +153,6 @@ public class ProjectRepositoryIntegrationTests : IntegrationTestBase
             Assert.That(deletedProject, Is.Null);
             Assert.That(projectCountBeforeDeletion, Is.EqualTo(1));
             Assert.That(projectCountAfterDeletion, Is.EqualTo(0));
-        }
-    }
-
-    [Test]
-    public void SearchProjects_ByName_ReturnsMatchingProject()
-    {
-        using IServiceScope scope = CreateScope();
-        IProjectRepository projectRepository =
-            scope.ServiceProvider.GetRequiredService<IProjectRepository>();
-
-        // Setup
-        string projectName = "StillMarillion";
-        string projectPath = @"C:\Projects\StillMarillion";
-        DateOnly projectEventDate = new DateOnly(2026, 6, 17);
-
-        Project matchingProject = CreateProject(
-            name: projectName,
-            path: projectPath,
-            eventDate: projectEventDate);
-
-        Project differentProject = CreateProject(
-            name: "Narvik",
-            path: @"C:\Projects\Narvik",
-            eventDate: new DateOnly(2025, 8, 3));
-
-        Project insertedMatchingProject = projectRepository.Insert(matchingProject);
-        projectRepository.Insert(differentProject);
-
-        ProjectSearchSettings searchSettings = new ProjectSearchSettings
-        {
-            ProjectName = "marillion"
-        };
-
-        // Execution
-        List<Project> projects = projectRepository.SearchProjects(searchSettings);
-
-        // Asserts
-        using (Assert.EnterMultipleScope())
-        {
-            Assert.That(projects, Has.Count.EqualTo(1));
-
-            Assert.That(projects[0].Id, Is.EqualTo(insertedMatchingProject.Id));
-            Assert.That(projects[0].Name, Is.EqualTo(projectName));
-            Assert.That(projects[0].Path, Is.EqualTo(projectPath));
-            Assert.That(projects[0].EventDate, Is.EqualTo(projectEventDate));
-            Assert.That(projects[0].ParentProjectId, Is.Null);
         }
     }
 

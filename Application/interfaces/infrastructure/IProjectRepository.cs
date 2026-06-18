@@ -1,5 +1,4 @@
 ﻿using Domain.entities;
-using Domain.entities.search;
 
 namespace Application.interfaces.infrastructure;
 
@@ -10,8 +9,6 @@ public interface IProjectRepository
     Project Insert(Project project);
     void Update(Project project);
     void DeleteById(int id);
-    
+
     int GetProjectCount();
-    
-    public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings);
 }

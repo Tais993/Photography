@@ -1,7 +1,5 @@
-﻿using System.Text;
-using Application.interfaces.infrastructure;
+﻿using Application.interfaces.infrastructure;
 using Domain.entities;
-using Domain.entities.search;
 using Microsoft.Extensions.Logging;
 using static Infrastructure.database.repositories.DatabaseMappers;
 
@@ -102,63 +100,5 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Found {Count} projects", count);
 
         return count;
-    }
-
-    public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
-    {
-        _logger.LogDebug("Searching projects");
-
-        StringBuilder sqlBuilder = new();
-        List<string> whereClauses = [];
-        List<object?> parameters = [];
-
-        sqlBuilder.Append("""
-                          SELECT id, name, path, event_date, parent_project_id
-                          FROM public.project
-                          """);
-
-        if (projectSearchSettings.ProjectId is not null)
-        {
-            parameters.Add(projectSearchSettings.ProjectId);
-            whereClauses.Add($"id = ${parameters.Count}::int");
-        }
-
-        if (projectSearchSettings.ParentProjectId is not null)
-        {
-            parameters.Add(projectSearchSettings.ParentProjectId);
-            whereClauses.Add($"parent_project_id = ${parameters.Count}::int");
-        }
-
-        if (!string.IsNullOrWhiteSpace(projectSearchSettings.ProjectName))
-        {
-            parameters.Add(projectSearchSettings.ProjectName);
-            whereClauses.Add($"name ILIKE ('%' || ${parameters.Count}::text || '%')");
-        }
-
-        if (!string.IsNullOrWhiteSpace(projectSearchSettings.ProjectPath))
-        {
-            parameters.Add(projectSearchSettings.ProjectPath);
-            whereClauses.Add($"path ILIKE ('%' || ${parameters.Count}::text || '%')");
-        }
-
-        if (projectSearchSettings.EventDate is not null)
-        {
-            parameters.Add(projectSearchSettings.EventDate);
-            whereClauses.Add($"event_date = ${parameters.Count}::date");
-        }
-
-        if (whereClauses.Count > 0)
-        {
-            sqlBuilder.AppendLine("\nWHERE " + string.Join("\n  AND ", whereClauses));
-        }
-
-        sqlBuilder.AppendLine("\nORDER BY event_date DESC, name");
-
-        List<Project> projects = _db.QueryMultiple(sqlBuilder.ToString(),
-            MapProject, parameters.ToArray());
-
-        _logger.LogDebug("Project search returned {Count} projects", projects.Count);
-
-        return projects;
     }
 }
