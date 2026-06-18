@@ -7,11 +7,21 @@ public class Constants
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
     public static readonly Regex SubProjectNameRegex = new Regex("\\.([^.]*)");
 
+    
     public const string ProjectInfoFile = "project.info";
     
     public const string ImageViewerMode = "ImageViewer:Mode";
     public const string ImageViewerPath = "ImageViewer:ImageViewerPath";
+    
+    
+    public const string FolderNamesConfigKey = "FolderNames";
+    public const string FolderMetadataType = "Folder";
+    public const string FolderMetadataKeyPrefix = "folder.";
 
+    public const string OriginalsFolderRole = "Originals";
+    public const string EditingFolderRole = "Editing";
+    public const string FinalsFolderRole = "Finals";
+    
 
     public static readonly string[] ImageFileTypesSql =
     [

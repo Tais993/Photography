@@ -20,4 +20,5 @@ builder.Services.AddCli();
 using IHost app = builder.Build();
 
 app.MigrateDatabase();
+app.EnsureMetadataExists();
 app.RunCli(args);
