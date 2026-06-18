@@ -26,7 +26,7 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
         List<ProjectMetadata> projectMetadata = _db.QueryMultiple("""
                                                                   SELECT
                                                                   project_id,
-                                                                  m.metadata_key,
+                                                                  metadata_key,
                                                                   metadata_value,
                                                                   metadata_type,
                                                                   display_name,
@@ -70,13 +70,13 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
                          SELECT
                              project_id,
                              metadata_value,
+                             metadata_key,
                              metadata_type,
-                             m.metadata_key,
                              display_name,
                              description
                          FROM public.project_metadata pm
                          JOIN public.metadata m on m.metadata_key = pm.metadata_key
-                         WHERE project_id = $1 AND m.metadata_key = $2
+                         WHERE project_id = $1 AND metadata_key = $2
                          """, MapProjectMetadata, projectId, metadataKey);
     }
 
@@ -99,7 +99,7 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
                                                                   SELECT
                                                                       project_id,
                                                                       metadata_value,
-                                                                      m.metadata_key,
+                                                                      metadata_key,
                                                                       metadata_type,
                                                                       display_name,
                                                                       description
