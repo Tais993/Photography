@@ -2,23 +2,14 @@
 
 public class Image
 {
-
-    public Image(int? id, int projectId, Project? project, string fileName, string fileType, string relationalFilePath)
+    public Image(int projectId, string fileName, string fileType, string relationalFilePath, int? id = null, Project? project = null)
     {
-        Id = id;
         ProjectId = projectId;
+        FileName = fileName;
+        FileType = fileType;
+        RelationalFilePath = relationalFilePath;
         Project = project;
-        FileName = fileName;
-        FileType = fileType;
-        RelationalFilePath = relationalFilePath;
-    }
-
-    public Image(int projectId, string fileName, string fileType, string relationalFilePath)
-    {
-        ProjectId = projectId;
-        FileName = fileName;
-        FileType = fileType;
-        RelationalFilePath = relationalFilePath;
+        Id = id;
     }
 
     public int? Id { get; }

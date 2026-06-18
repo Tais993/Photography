@@ -125,7 +125,6 @@ public class MetadataCommand : CommandBase
             return -1;
         }
 
-        metadata.MetadataKey = metadataKey ?? metadata.MetadataKey;
         metadata.DisplayName = displayName ?? metadata.DisplayName;
         metadata.Description = description ?? metadata.Description;
         metadata.MetadataType = metadataType ?? metadata.MetadataType;

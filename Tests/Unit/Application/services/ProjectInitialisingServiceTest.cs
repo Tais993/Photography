@@ -57,11 +57,11 @@ public class ProjectInitialisingServiceTest
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>()))
             .Returns((Project project) => new Project(
-                2,
                 project.Name,
                 project.Path,
                 project.EventDate,
-                project.ParentProjectId
+                project.ParentProjectId,
+                2
             ));
 
         // Execution
@@ -100,11 +100,11 @@ public class ProjectInitialisingServiceTest
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>()))
             .Returns((Project project) => new Project(
-                2,
                 project.Name,
                 project.Path,
                 project.EventDate,
-                project.ParentProjectId
+                project.ParentProjectId,
+                2
             ));
 
         // Execution
@@ -141,11 +141,11 @@ public class ProjectInitialisingServiceTest
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>()))
             .Returns((Project project) => new Project(
-                2,
                 project.Name,
                 project.Path,
                 project.EventDate,
-                project.ParentProjectId
+                project.ParentProjectId,
+                2
             ));
 
         // Execution
@@ -219,11 +219,11 @@ public class ProjectInitialisingServiceTest
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>()))
             .Returns((Project project) => new Project(
-                2,
                 project.Name,
                 project.Path,
                 project.EventDate,
-                project.ParentProjectId
+                project.ParentProjectId,
+                2
             ));
 
         // Execution
@@ -321,11 +321,11 @@ public void InitialiseProjectFolder_WithSubProjectFolder_InitialisesSubProjectAu
     _projectRepository
         .Setup(r => r.Insert(It.IsAny<Project>()))
         .Returns((Project project) => new Project(
-            nextId++,
             project.Name,
             project.Path,
             project.EventDate,
-            project.ParentProjectId
+            project.ParentProjectId,
+            nextId++
         ));
 
     // Execution
@@ -378,11 +378,11 @@ public void InitialiseProjectFolder_WithSubProjectFolder_InitialisesSubProjectAu
 
         _projectRepository.Setup(r => r.Insert(It.IsAny<Project>()))
             .Returns((Project project) => new Project(
-                2,
                 project.Name,
                 project.Path,
                 project.EventDate,
-                project.ParentProjectId
+                project.ParentProjectId,
+                2
             ));
 
         // Execution

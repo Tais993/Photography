@@ -92,23 +92,21 @@ public class ThumbnailServiceTest
     private Image CreateImage()
     {
         return new Image(
-            5,
             10,
-            null,
             "DSC_1234.JPG",
             ".JPG",
-            _relativeFilePath
+            _relativeFilePath,
+            5
         );
     }
 
     private Project CreateProject()
     {
         return new Project(
-            10,
             "Test project",
             _projectPath,
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            10
         );
     }
     

@@ -40,10 +40,10 @@ public class ProjectServiceTest
         const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
 
         Project expectedProject = new Project(
-            2,
             "Merijn",
             projectDirectory,
-            new DateOnly(2024, 7, 4)
+            new DateOnly(2024, 7, 4),
+            2
         );
 
         // Mocks
@@ -78,10 +78,10 @@ public class ProjectServiceTest
         const string projectDirectory = @"C:\2024-07-04-Merijn";
 
         Project expectedProject = new Project(
-            2,
             "Merijn",
             projectDirectory,
-            new DateOnly(2024, 7, 4)
+            new DateOnly(2024, 7, 4),
+            2
         );
 
         // Mocks
@@ -190,10 +190,10 @@ public class ProjectServiceTest
     public void GetProjectById_ReturnsProject()
     {
         Project expectedProject = new Project(
-            2,
             "Merijn",
             @"C:\2024-07-04-Merijn",
-            new DateOnly(2024, 7, 4)
+            new DateOnly(2024, 7, 4),
+            2
         );
 
         // Mocks
@@ -213,8 +213,8 @@ public class ProjectServiceTest
     {
         List<Project> expectedProjects = new List<Project>
         {
-            new Project(1, "Ardennen", @"C:\2026-06-01-Ardennen", new DateOnly(2026, 6, 1)),
-            new Project(2, "Antwerpen", @"C:\2024-01-10-Antwerpen", new DateOnly(2026, 1, 10))
+            new Project("Ardennen", @"C:\2026-06-01-Ardennen", new DateOnly(2026, 6, 1), 0, 1),
+            new Project("Antwerpen", @"C:\2024-01-10-Antwerpen", new DateOnly(2026, 1, 10), 0, 2)
         };
 
         // Mocks

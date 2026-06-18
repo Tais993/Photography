@@ -2,12 +2,12 @@
 
 public class ImageSearchSettings : SearchSettings
 {
-    public int? ProjectId = null;
-    public string? FileNameOrNumber = null;
-    public string? FileName = null;
-    public string? FileNumber = null;
-    public string? FolderName = null;
-    public string? FileType = null;
+    public int? ProjectId { get; set; }
+    public string? FileNameOrNumber { get; set; }
+    public string? FileName { get; set; }
+    public string? FileNumber { get; set; }
+    public string? FolderName { get; set; }
+    public string? FileType { get; set; }
 
-    public bool HideRawFilesWhenImageExists = false;
+    public bool HideRawFilesWhenImageExists { get; set; }
 }

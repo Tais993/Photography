@@ -33,14 +33,13 @@ public class ImageSelectionServiceTests
     public void StartSession_WithProject_StartsSession()
     {
         Project project = new Project(
-            5,
             "Test project",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            0,
+            5
         );
-
-        SelectionSession expectedSession = new SelectionSession(0, 5, "test project", []);
+        SelectionSession expectedSession = new SelectionSession(5, "test project", [], 0);
 
         // Mocks
         _selectionRepository
@@ -62,7 +61,7 @@ public class ImageSelectionServiceTests
     [Test]
     public void StartSession_WithProjectIdAndSessionName_StartsSession()
     {
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Selection 1", []);
+        SelectionSession expectedSession = new SelectionSession(5, "Selection 1", [], 0);
 
         // Mocks
         _selectionRepository
@@ -85,14 +84,14 @@ public class ImageSelectionServiceTests
     public void StartSession_WithoutSessionName_UsesProjectName()
     {
         Project project = new Project(
-            5,
             "Project name from repository",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            0,
+            5
         );
 
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Project name from repository", []);
+        SelectionSession expectedSession = new SelectionSession(5, "Project name from repository", [], 0);
 
         // Mocks
         _projectRepository
@@ -124,14 +123,14 @@ public class ImageSelectionServiceTests
     public void GetOrStartSession_WithProject_GetsOrStartsSession()
     {
         Project project = new Project(
-            5,
             "Test project",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            null,
+            5
         );
 
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Test project", []);
+        SelectionSession expectedSession = new SelectionSession( 5, "Test project", [], 0);
 
         // Mocks
         _selectionRepository
@@ -153,7 +152,7 @@ public class ImageSelectionServiceTests
     [Test]
     public void GetOrStartSession_WithProjectIdAndSessionName_GetsOrStartsSession()
     {
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Selection 1", []);
+        SelectionSession expectedSession = new SelectionSession(5, "Selection 1", [], 0);
 
         // Mocks
         _selectionRepository
@@ -176,14 +175,14 @@ public class ImageSelectionServiceTests
     public void GetOrStartSession_WithoutSessionName_UsesProjectName()
     {
         Project project = new Project(
-            5,
             "Project name from repository",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            null,
+            5
         );
 
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Project name from repository", []);
+        SelectionSession expectedSession = new SelectionSession(5, "Project name from repository", [], 0);
 
         // Mocks
         _projectRepository
@@ -235,11 +234,11 @@ public class ImageSelectionServiceTests
     public void RemoveSession_WithProject_RemovesSession()
     {
         Project project = new Project(
-            5,
             "Test project",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            0,
+            5
         );
 
         // Execution
@@ -269,11 +268,11 @@ public class ImageSelectionServiceTests
     public void ClearSession_WithProject_ClearsSession()
     {
         Project project = new Project(
-            5,
             "Test project",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            null,
+            5
         );
 
         // Execution
@@ -303,12 +302,11 @@ public class ImageSelectionServiceTests
     public void SelectImage_AddsImageToSelection()
     {
         Image image = new Image(
-            10,
             5,
-            null,
             "DSC_1234",
             ".NEF",
-            @"Original\DSC_1234.NEF"
+            @"Original\DSC_1234.NEF",
+            10
         );
 
         // Execution
@@ -351,14 +349,14 @@ public class ImageSelectionServiceTests
     public void GetSessionImages_WithProject_ReturnsSession()
     {
         Project project = new Project(
-            5,
             "Test project",
             @"C:\Photography\TestProject",
             DateOnly.FromDateTime(DateTime.Today),
-            null
+            null,
+            5
         );
 
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Test project", [1, 2, 3]);
+        SelectionSession expectedSession = new SelectionSession(5, "Test project", [1, 2, 3], 0);
 
         // Mocks
         _selectionRepository
@@ -380,7 +378,7 @@ public class ImageSelectionServiceTests
     [Test]
     public void GetSessionImages_WithProjectId_ReturnsSession()
     {
-        SelectionSession expectedSession = new SelectionSession(0, 5, "Test project", [1, 2, 3]);
+        SelectionSession expectedSession = new SelectionSession(5, "Test project", [1, 2, 3], 0);
 
         // Mocks
         _selectionRepository
