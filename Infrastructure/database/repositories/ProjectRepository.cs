@@ -20,11 +20,11 @@ public class ProjectRepository : IProjectRepository
         _db = db;
     }
 
-    public Project GetById(int id)
+    public Project? GetById(int id)
     {
         _logger.LogDebug("Getting project by id: {ProjectId}", id);
 
-        return _db.Query("""
+        return _db.QueryOrDefault("""
                          SELECT id, name, path, event_date, parent_project_id FROM public.project 
                          WHERE id = $1
                          """, MapProject, id);

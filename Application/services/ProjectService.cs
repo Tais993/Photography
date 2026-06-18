@@ -68,7 +68,7 @@ public class ProjectService : IProjectService
         return count;
     }
 
-    public Project GetProjectById(int projectId)
+    public Project? GetProjectById(int projectId)
     {
         _logger.LogDebug("Getting project by id: {ProjectId}", projectId);
         return _projectRepository.GetById(projectId);
