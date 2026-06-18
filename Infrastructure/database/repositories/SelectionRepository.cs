@@ -70,12 +70,8 @@ public class SelectionRepository : ISelectionRepository
         _logger.LogDebug("Clearing selection session for project: {ProjectId}", projectId);
 
         _db.Execute("""
-                    DELETE FROM public.selection_session_image
-                    WHERE selection_session_id = (
-                        SELECT id
-                        FROM public.selection_session
-                        WHERE project_id = $1
-                    )
+                    DELETE FROM public.selection_session
+                    WHERE project_id = $1
                     """, projectId);
     }
 
