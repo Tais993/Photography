@@ -2,12 +2,12 @@
 
 public class SelectionSession
 {
-    public SelectionSession(int? id, int projectId, string name, List<int>? imageIds)
+    public SelectionSession(int projectId, string name, List<int>? imageIds = null, int? id = null)
     {
-        Id = id;
         ProjectId = projectId;
         Name = name;
         ImageIds = imageIds ?? [];
+        Id = id;
     }
 
     public int? Id { get; }

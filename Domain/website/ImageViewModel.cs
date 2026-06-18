@@ -2,9 +2,9 @@
 
 public class ImageViewModel
 {
-    public bool Selected { get; init; }
-    public int? ImageId { get; init; }
-    public string? FileType { get; init; }
-    public string? FileName { get; init; }
-    public string? RelationalFilePath { get; init; }
+    public bool Selected { get; set; }
+    public int? ImageId { get; set; }
+    public string? FileType { get; set; }
+    public string? FileName { get; set; }
+    public string? RelationalFilePath { get; set; }
 }

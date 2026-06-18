@@ -2,16 +2,16 @@
 
 public class ThumbnailResult
 {
-    public bool Found { get; }
-    public string? FilePath { get; }
-    public string ContentType { get; }
-
     private ThumbnailResult(bool found, string? filePath, string contentType)
     {
         Found = found;
         FilePath = filePath;
         ContentType = contentType;
     }
+
+    public bool Found { get; }
+    public string? FilePath { get; }
+    public string ContentType { get; }
 
     public static ThumbnailResult NotFound()
     {

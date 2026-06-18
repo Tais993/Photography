@@ -100,11 +100,11 @@ public class ProjectRepositoryIntegrationTests : IntegrationTestBase
 
         // Setup
         Project updatedProject = new Project(
-            insertedProject.Id,
             "New project name",
             projectPath,
             projectEventDate,
-            null);
+            null,
+            insertedProject.Id);
 
         // Execution
         projectRepository.Update(updatedProject);

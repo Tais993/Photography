@@ -2,7 +2,7 @@
 
 public class ProjectSearchSettings : SearchSettings
 {
-    public DateOnly? EventDate;
+    public DateOnly? EventDate { get; set; }
     public int? ProjectId { get; set; }
     public string? ProjectName { get; set; }
     public string? ProjectPath { get; set; }

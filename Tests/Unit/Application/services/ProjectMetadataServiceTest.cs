@@ -162,11 +162,11 @@ public class ProjectMetadataServiceTest
     public void GetProjectMetadata_WithProject_GetsMetadataByProjectId()
     {
         Project project = new(
-            1,
             "Holiday",
             @"C:\Photos\Holiday",
             new DateOnly(2024, 7, 4),
-            null
+            null,
+            1
         );
 
         List<ProjectMetadata> expectedProjectMetadata =
@@ -191,10 +191,10 @@ public class ProjectMetadataServiceTest
     public void GetProjectMetadata_WithProjectWithoutId_ThrowsArgumentNullException()
     {
         Project project = new(
-            null,
             "Holiday",
             @"C:\Photos\Holiday",
             new DateOnly(2024, 7, 4),
+            null,
             null
         );
 

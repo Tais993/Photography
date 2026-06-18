@@ -12,11 +12,12 @@ public static class IntegrationTestEntityFactory
         int? parentProjectId = null)
     {
         return new Project(
-            id,
             name,
             path,
             eventDate ?? new DateOnly(2026, 6, 17),
-            parentProjectId);
+            parentProjectId,
+            id
+            );
     }
 
     public static Image CreateImage(
@@ -27,12 +28,12 @@ public static class IntegrationTestEntityFactory
         string relationalFilePath = @"Originals\TestImage.png")
     {
         return new Image(
-            imageId,
             projectId,
-            null,
             fileName,
             fileType,
-            relationalFilePath);
+            relationalFilePath,
+            imageId
+            );
     }
 
     public static Metadata CreateMetadata(
@@ -83,9 +84,9 @@ public static class IntegrationTestEntityFactory
         List<int>? imageIds = null)
     {
         return new SelectionSession(
-            id,
             projectId,
             name,
-            imageIds ?? []);
+            imageIds ?? [],
+            id);
     }
 }

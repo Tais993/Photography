@@ -184,11 +184,11 @@ public class ProjectInitialisingService : IProjectInitialisingService
     {
         DateOnly dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
             int.Parse(match.Groups[3].Value));
-        return new Project(null, match.Groups[4].Value, subdirectory, dateOnly);
+        return new Project( match.Groups[4].Value, subdirectory, dateOnly);
     }
 
     private static Project ToSubProject(string directory, Match match, Project parentProject)
     {
-        return new Project(null, match.Groups[1].Value, directory, parentProject.EventDate, parentProject.Id);
+        return new Project( match.Groups[1].Value, directory, parentProject.EventDate, parentProject.Id);
     }
 }
