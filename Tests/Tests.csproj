@@ -10,19 +10,9 @@
 
     <ItemGroup>
         <!-- Project references -->
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
-        <PackageReference Include="Testcontainers.PostgreSql" Version="4.12.0" />
         <ProjectReference Include="..\Application\Application.csproj" />
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
-        
-        <!-- Outputs -->
-        <None Include="..\Infrastructure\database\migrations\*.sql">
-            <Link>database\migrations\%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-        
+
         <!-- Package references -->
         <PackageReference Include="coverlet.collector" Version="10.0.1">
           <PrivateAssets>all</PrivateAssets>
@@ -33,11 +23,6 @@
         <PackageReference Include="NUnit" Version="4.3.2"/>
         <PackageReference Include="NUnit.Analyzers" Version="4.7.0"/>
         <PackageReference Include="NUnit3TestAdapter" Version="5.0.0"/>
-        
-        <PackageReference Include="Testcontainers.PostgreSql" Version="4.12.0" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.9" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.9" />
         
         <!-- Using -->
         <Using Include="NUnit.Framework"/>
