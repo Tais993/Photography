@@ -2,45 +2,45 @@
 
 namespace Application.services;
 
-public static class PaginationService
+public class PaginationService
 {
-    private const int DefaultPageNumber = 1;
-    private const int DefaultPageSize = 20;
-
-    public static PaginatedResult<T> Paginate<T>(IEnumerable<T> items, SearchSettings settings)
+    public static PaginatedResult<T> Paginate<T>(IEnumerable<T> items, SearchSettings searchSettings)
     {
+        int pageNumber = searchSettings.PageNumber;
+        int pageSize = searchSettings.PageSize;
+
+        if (pageNumber < 1)
+        {
+            pageNumber = 1;
+        }
+
+        if (pageSize < 1)
+        {
+            pageSize = 60;
+        }
+
         List<T> itemList = items.ToList();
 
         int totalItems = itemList.Count;
+        int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
 
-        int pageSize = settings.PageSize <= 0
-            ? DefaultPageSize
-            : settings.PageSize;
-
-        int totalPages = pageSize <= 0
-            ? 0
-            : (int)Math.Ceiling(totalItems / (double)pageSize);
-
-        int pageNumber = settings.PageNumber <= 0
-            ? DefaultPageNumber
-            : settings.PageNumber;
-
-        if (totalPages > 0 && pageNumber > totalPages)
+        if (pageNumber > totalPages && totalPages > 0)
         {
             pageNumber = totalPages;
         }
 
-        List<T> paginatedItems = itemList
+        List<T> pagedItems = itemList
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToList();
 
         return new PaginatedResult<T>
         {
-            Items = paginatedItems,
+            Items = pagedItems,
             PageNumber = pageNumber,
             PageSize = pageSize,
-            TotalItems = totalItems
+            TotalItems = totalItems,
+            TotalPages = totalPages
         };
     }
 }

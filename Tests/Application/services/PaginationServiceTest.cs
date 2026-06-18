@@ -26,7 +26,7 @@ public class PaginationServiceTest
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PageNumber, Is.EqualTo(1));
-            Assert.That(result.PageSize, Is.EqualTo(20));
+            Assert.That(result.PageSize, Is.EqualTo(60));
             Assert.That(result.Items, Is.EqualTo(items));
         }
     }
