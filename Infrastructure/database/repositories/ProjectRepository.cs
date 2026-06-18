@@ -94,10 +94,10 @@ public class ProjectRepository : IProjectRepository
     {
         _logger.LogDebug("Getting project count");
 
-        int count = _db.Query("""
-                              SELECT COUNT(*) 
-                              FROM public.project
-                              """, _db.MapToInt);
+        int count = _db.QueryScalar<int>("""
+                                         SELECT COUNT(*) 
+                                         FROM public.project
+                                         """);
 
         _logger.LogDebug("Found {Count} projects", count);
 

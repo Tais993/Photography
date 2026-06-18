@@ -93,27 +93,26 @@ public class SelectionRepository : ISelectionRepository
     {
         _logger.LogDebug("Getting selection session id for project: {ProjectId}", projectId);
 
-        return _db.Query("""
-                         SELECT id FROM public.selection_session
-                         WHERE project_id = $1
-                         """, _db.MapToInt, projectId);
+        return _db.QueryScalar<int>("""
+                                    SELECT id FROM public.selection_session
+                                    WHERE project_id = $1
+                                    """, projectId);
     }
 
     public bool ImageIsSelected(int sessionId, int imageId)
     {
         _logger.LogDebug("Checking if image is selected, session: {SessionId}, image: {ImageId}", sessionId, imageId);
 
-        bool isSelected = _db.Query("""
+        bool isSelected = _db.QueryScalar<bool>("""
                                     SELECT EXISTS (
                                         SELECT 1
                                         FROM public.selection_session_image
                                         WHERE selection_session_id = $1 
                                         AND image_id = $2
                                     );
-                                    """, _db.MapToBool, sessionId, imageId);
+                                    """, sessionId, imageId);
 
         _logger.LogDebug("Image selected state is {IsSelected}, session: {SessionId}, image: {ImageId}", isSelected, sessionId, imageId);
-
         return isSelected;
     }
 
