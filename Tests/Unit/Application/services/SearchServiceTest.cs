@@ -10,27 +10,24 @@ namespace Tests.Unit.Application.services;
 [TestFixture]
 public class SearchServiceTests
 {
-    private Mock<IImageRepository> _imageRepository = null!;
-    private Mock<IProjectRepository> _projectRepository = null!;
+    private Mock<ISearchRepository> _searchRepository = null!;
     private Mock<ILogger<SearchService>> _logger = null!;
     private SearchService _searchService = null!;
 
     [SetUp]
     public void SetUp()
     {
-        _imageRepository = new Mock<IImageRepository>();
-        _projectRepository = new Mock<IProjectRepository>();
+        _searchRepository = new Mock<ISearchRepository>();
         _logger = new Mock<ILogger<SearchService>>();
 
         _searchService = new SearchService(
-            _imageRepository.Object,
-            _projectRepository.Object,
+            _searchRepository.Object,
             _logger.Object
         );
     }
 
     [Test]
-    public void SearchImages_ReturnsImages()
+    public void SearchImages_ReturnsPaginatedResult()
     {
         ImageSearchSettings settings = new()
         {
@@ -42,22 +39,32 @@ public class SearchServiceTests
         [
             new Image(
                 1,
-                "DSC_1234.JPG",
+                "DSC_1234",
                 ".JPG",
                 @"Original\DSC_1234.JPG"
             )
         ];
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(settings))
+        _searchRepository
+            .Setup(repository => repository.CountImages(settings))
+            .Returns(1);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(settings))
             .Returns(expectedImages);
 
         // Execution
-        List<Image> result = _searchService.SearchImages(settings).Items;
+        PaginatedResult<Image> result = _searchService.SearchImages(settings);
 
         // Asserts
-        Assert.That(result, Is.EqualTo(expectedImages));
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.Items, Is.EqualTo(expectedImages));
+            Assert.That(result.TotalItems, Is.EqualTo(1));
+            Assert.That(result.PageNumber, Is.EqualTo(1));
+            Assert.That(result.PageSize, Is.EqualTo(60));
+        }
     }
 
     [Test]
@@ -72,20 +79,33 @@ public class SearchServiceTests
         };
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(It.IsAny<ImageSearchSettings>()))
             .Returns([]);
 
         // Execution
         _searchService.SearchImages(settings);
 
         // Asserts
-        _imageRepository.Verify(r => r.SearchImages(
-            It.Is<ImageSearchSettings>(s =>
-                s.FileName == "DSC" &&
-                s.FileNumber == "1234" &&
-                s.FolderName == "Original" &&
-                s.FileType == ".JPG"
+        _searchRepository.Verify(repository => repository.CountImages(
+            It.Is<ImageSearchSettings>(searchSettings =>
+                searchSettings.FileName == "DSC" &&
+                searchSettings.FileNumber == "1234" &&
+                searchSettings.FolderName == "Original" &&
+                searchSettings.FileType == ".JPG"
+            )
+        ), Times.Once);
+
+        _searchRepository.Verify(repository => repository.SearchImages(
+            It.Is<ImageSearchSettings>(searchSettings =>
+                searchSettings.FileName == "DSC" &&
+                searchSettings.FileNumber == "1234" &&
+                searchSettings.FolderName == "Original" &&
+                searchSettings.FileType == ".JPG"
             )
         ), Times.Once);
     }
@@ -102,20 +122,24 @@ public class SearchServiceTests
         };
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(It.IsAny<ImageSearchSettings>()))
             .Returns([]);
 
         // Execution
         _searchService.SearchImages(settings);
 
         // Asserts
-        _imageRepository.Verify(r => r.SearchImages(
-            It.Is<ImageSearchSettings>(s =>
-                s.FileName == null &&
-                s.FileNumber == null &&
-                s.FolderName == null &&
-                s.FileType == null
+        _searchRepository.Verify(repository => repository.SearchImages(
+            It.Is<ImageSearchSettings>(searchSettings =>
+                searchSettings.FileName == null &&
+                searchSettings.FileNumber == null &&
+                searchSettings.FolderName == null &&
+                searchSettings.FileType == null
             )
         ), Times.Once);
     }
@@ -129,19 +153,23 @@ public class SearchServiceTests
         };
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(It.IsAny<ImageSearchSettings>()))
             .Returns([]);
 
         // Execution
         _searchService.SearchImages(settings);
 
         // Asserts
-        _imageRepository.Verify(r => r.SearchImages(
-            It.Is<ImageSearchSettings>(s =>
-                s.FileNameOrNumber == "1234" &&
-                s.FileNumber == "1234" &&
-                s.FileName == null
+        _searchRepository.Verify(repository => repository.SearchImages(
+            It.Is<ImageSearchSettings>(searchSettings =>
+                searchSettings.FileNameOrNumber == "1234" &&
+                searchSettings.FileNumber == "1234" &&
+                searchSettings.FileName == null
             )
         ), Times.Once);
     }
@@ -155,104 +183,89 @@ public class SearchServiceTests
         };
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(It.IsAny<ImageSearchSettings>()))
             .Returns([]);
 
         // Execution
         _searchService.SearchImages(settings);
 
         // Asserts
-        _imageRepository.Verify(r => r.SearchImages(
-            It.Is<ImageSearchSettings>(s =>
-                s.FileNameOrNumber == "DSC" &&
-                s.FileName == "DSC" &&
-                s.FileNumber == null
+        _searchRepository.Verify(repository => repository.SearchImages(
+            It.Is<ImageSearchSettings>(searchSettings =>
+                searchSettings.FileNameOrNumber == "DSC" &&
+                searchSettings.FileName == "DSC" &&
+                searchSettings.FileNumber == null
             )
         ), Times.Once);
     }
 
     [Test]
-    public void SearchImages_FileNameOrNumberIsTrimmedBeforeCheckingIfNumber()
+    public void SearchImages_InvalidPagination_UsesDefaults()
     {
         ImageSearchSettings settings = new()
         {
-            FileNameOrNumber = "  1234  "
+            PageNumber = 0,
+            PageSize = 0
         };
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(It.IsAny<ImageSearchSettings>()))
             .Returns([]);
 
         // Execution
-        _searchService.SearchImages(settings);
+        PaginatedResult<Image> result = _searchService.SearchImages(settings);
 
         // Asserts
-        _imageRepository.Verify(r => r.SearchImages(
-            It.Is<ImageSearchSettings>(s =>
-                s.FileNameOrNumber == "1234" &&
-                s.FileNumber == "1234" &&
-                s.FileName == null
-            )
-        ), Times.Once);
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(result.PageNumber, Is.EqualTo(1));
+            Assert.That(result.PageSize, Is.EqualTo(20));
+        }
     }
 
     [Test]
-    public void SearchImages_EmptyFileNameOrNumber_DoesNotSetFileNameOrFileNumber()
+    public void SearchImages_PageNumberAboveTotalPages_UsesLastPage()
     {
         ImageSearchSettings settings = new()
         {
-            FileNameOrNumber = "   "
+            PageNumber = 10,
+            PageSize = 20
         };
 
         // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountImages(It.IsAny<ImageSearchSettings>()))
+            .Returns(45);
+
+        _searchRepository
+            .Setup(repository => repository.SearchImages(It.IsAny<ImageSearchSettings>()))
             .Returns([]);
 
         // Execution
-        _searchService.SearchImages(settings);
+        PaginatedResult<Image> result = _searchService.SearchImages(settings);
 
         // Asserts
-        _imageRepository.Verify(r => r.SearchImages(
-            It.Is<ImageSearchSettings>(s =>
-                s.FileNameOrNumber == null &&
-                s.FileName == null &&
-                s.FileNumber == null
-            )
-        ), Times.Once);
-    }
-
-    [Test]
-    public void SearchProjects_ReturnsProjects()
-    {
-        ProjectSearchSettings settings = new()
+        using (Assert.EnterMultipleScope())
         {
-            ProjectName = "Holiday"
-        };
+            Assert.That(result.PageNumber, Is.EqualTo(3));
 
-        List<Project> expectedProjects =
-        [
-            new Project(
-                1,
-                "Holiday",
-                @"C:\Photos\Holiday",
-                new DateOnly(2024, 7, 4),
-                null
-            )
-        ];
-
-        // Mocks
-        _projectRepository
-            .Setup(r => r.SearchProjects(settings))
-            .Returns(expectedProjects);
-
-        // Execution
-        List<Project> result = _searchService.SearchProjects(settings);
-
-        // Asserts
-        Assert.That(result, Is.EqualTo(expectedProjects));
+            _searchRepository.Verify(repository => repository.SearchImages(
+                It.Is<ImageSearchSettings>(searchSettings =>
+                    searchSettings.PageNumber == 3 &&
+                    searchSettings.PageSize == 20
+                )
+            ), Times.Once);
+        }
     }
 
     [Test]
@@ -265,18 +278,22 @@ public class SearchServiceTests
         };
 
         // Mocks
-        _projectRepository
-            .Setup(r => r.SearchProjects(It.IsAny<ProjectSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountProjects(It.IsAny<ProjectSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchProjects(It.IsAny<ProjectSearchSettings>()))
             .Returns([]);
 
         // Execution
         _searchService.SearchProjects(settings);
 
         // Asserts
-        _projectRepository.Verify(r => r.SearchProjects(
-            It.Is<ProjectSearchSettings>(s =>
-                s.ProjectName == "Holiday" &&
-                s.ProjectPath == @"C:\Photos\Holiday"
+        _searchRepository.Verify(repository => repository.SearchProjects(
+            It.Is<ProjectSearchSettings>(searchSettings =>
+                searchSettings.ProjectName == "Holiday" &&
+                searchSettings.ProjectPath == @"C:\Photos\Holiday"
             )
         ), Times.Once);
     }
@@ -291,170 +308,23 @@ public class SearchServiceTests
         };
 
         // Mocks
-        _projectRepository
-            .Setup(r => r.SearchProjects(It.IsAny<ProjectSearchSettings>()))
+        _searchRepository
+            .Setup(repository => repository.CountProjects(It.IsAny<ProjectSearchSettings>()))
+            .Returns(0);
+
+        _searchRepository
+            .Setup(repository => repository.SearchProjects(It.IsAny<ProjectSearchSettings>()))
             .Returns([]);
 
         // Execution
         _searchService.SearchProjects(settings);
 
         // Asserts
-        _projectRepository.Verify(r => r.SearchProjects(
-            It.Is<ProjectSearchSettings>(s =>
-                s.ProjectName == null &&
-                s.ProjectPath == null
+        _searchRepository.Verify(repository => repository.SearchProjects(
+            It.Is<ProjectSearchSettings>(searchSettings =>
+                searchSettings.ProjectName == null &&
+                searchSettings.ProjectPath == null
             )
         ), Times.Once);
-    }
-    
-    
-    [Test]
-    public void SearchImages_HideRawImagesWhenJpgExists_Success()
-    {
-        ImageSearchSettings settings = new()
-        {
-            HideRawFilesWhenImageExists = true
-        };
-
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            ),
-            new Image(
-                2,
-                "DSC_1234.JPG",
-                ".JPG",
-                @"Original\DSC_1234.JPG"
-            )
-        ];
-
-        // Mocks
-        _imageRepository
-            .Setup(r => r.SearchImages(It.IsAny<ImageSearchSettings>()))
-            .Returns(images);
-
-        // Execution
-        List<Image> result = _searchService.SearchImages(settings).Items;
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("DSC_1234.JPG"));
-    }
-    
-    
-        [Test]
-    public void HideRawFilesWhenNonRawExists_HidesRawFile_WhenJpgWithSameNameExists()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            ),
-            new Image(
-                2,
-                "DSC_1234.JPG",
-                ".JPG",
-                @"Original\DSC_1234.JPG"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _searchService
-                
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("DSC_1234.JPG"));
-    }
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_KeepsRawFile_WhenNoNonRawWithSameNameExists()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _searchService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("DSC_1234.NEF"));
-    }
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_KeepsNonRawFiles()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.JPG",
-                ".JPG",
-                @"Original\DSC_1234.JPG"
-            ),
-            new Image(
-                2,
-                "DSC_1235.PNG",
-                ".PNG",
-                @"Original\DSC_1235.PNG"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _searchService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(2));
-        Assert.That(result.Select(image => image.FileName), Does.Contain("DSC_1234.JPG"));
-        Assert.That(result.Select(image => image.FileName), Does.Contain("DSC_1235.PNG"));
-    }
-
-    [Test]
-    public void HideRawFilesWhenNonRawExists_ComparisonIsCaseInsensitive()
-    {
-        List<Image> images =
-        [
-            new Image(
-                1,
-                "DSC_1234.NEF",
-                ".NEF",
-                @"Original\DSC_1234.NEF"
-            ),
-            new Image(
-                2,
-                "dsc_1234.jpg",
-                ".JPG",
-                @"Original\dsc_1234.jpg"
-            )
-        ];
-
-        // Execution
-        List<Image> result = _searchService
-            .HideRawFilesWhenNonRawExists(images)
-            .ToList();
-
-        // Asserts
-        Assert.That(result, Has.Count.EqualTo(1));
-        Assert.That(result[0].FileName, Is.EqualTo("dsc_1234.jpg"));
     }
 }

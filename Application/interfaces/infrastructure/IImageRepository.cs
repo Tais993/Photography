@@ -1,5 +1,4 @@
 ﻿using Domain.entities;
-using Domain.entities.search;
 
 namespace Application.interfaces.infrastructure;
 
@@ -13,8 +12,6 @@ public interface IImageRepository
     public Image Insert(Image image);
     public void Update(Image image);
     public void DeleteById(int id);
-    
-    int GetProjectImageCount(int projectId);
 
-    public List<Image> SearchImages(ImageSearchSettings imageSearchSettings);
+    int GetProjectImageCount(int projectId);
 }

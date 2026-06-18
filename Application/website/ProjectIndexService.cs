@@ -1,6 +1,5 @@
 ﻿using Application.interfaces.services;
 using Application.interfaces.website;
-using Application.services;
 using Domain.entities;
 using Domain.entities.search;
 using Domain.website;
@@ -28,29 +27,18 @@ public class ProjectIndexService : IProjectIndexService
     {
         _logger.LogDebug("Creating project index view model");
 
-        IEnumerable<Project> projects = _searchService.SearchProjects(new ProjectSearchSettings()
+        PaginatedResult<Project> projectPage = _searchService.SearchProjects(new ProjectSearchSettings
         {
             EventDate = request.EventDate,
             ProjectName = request.Search,
             ProjectPath = request.ProjectPath,
             ProjectId = request.ProjectId,
-            ParentProjectId = request.ParentProjectId
+            ParentProjectId = request.ParentProjectId,
+            PageNumber = request.ProjectPageNumber,
+            PageSize = request.ProjectPageSize
         });
 
-        List<Project> orderedProjects = projects
-            .OrderByDescending(project => project.EventDate)
-            .ThenBy(project => project.Name)
-            .ToList();
-
-        _logger.LogDebug("Found {Count} projects for project index", orderedProjects.Count);
-
-        PaginatedResult<Project> projectPage = PaginationService.Paginate(
-            orderedProjects,
-            new ProjectSearchSettings
-            {
-                PageNumber = request.ProjectPageNumber,
-                PageSize = request.ProjectPageSize
-            });
+        _logger.LogDebug("Found {Count} projects for project index", projectPage.TotalItems);
 
         _logger.LogInformation(
             "Created project page. Page number: {PageNumber}, page size: {PageSize}, total items: {TotalItems}",
