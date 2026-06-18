@@ -23,8 +23,7 @@ public class SearchService : ISearchService
 
     public PaginatedResult<Image> SearchImages(ImageSearchSettings imageSearchSettings)
     {
-        _logger.LogDebug("Searching for images");
-
+        _logger.LogInformation("Searching for images");
         imageSearchSettings.FileNameOrNumber = ValidateStringValue(imageSearchSettings.FileNameOrNumber);
         imageSearchSettings.FileName = ValidateStringValue(imageSearchSettings.FileName);
         imageSearchSettings.FileNumber = ValidateStringValue(imageSearchSettings.FileNumber);
@@ -36,12 +35,10 @@ public class SearchService : ISearchService
             if (int.TryParse(imageSearchSettings.FileNameOrNumber, out _))
             {
                 imageSearchSettings.FileNumber = imageSearchSettings.FileNameOrNumber;
-                _logger.LogDebug("Searching images by file number: {FileNumber}", imageSearchSettings.FileNumber);
             }
             else
             {
                 imageSearchSettings.FileName = imageSearchSettings.FileNameOrNumber;
-                _logger.LogDebug("Searching images by file name: {FileName}", imageSearchSettings.FileName);
             }
         }
 
@@ -49,15 +46,12 @@ public class SearchService : ISearchService
         
         if (imageSearchSettings.HideRawImagesWhenJpgExists)
         {
-            _logger.LogDebug("Filtering RAW images when a non-RAW version exists");
             searchImages = HideRawFilesWhenNonRawExists(searchImages);
         }
 
-        List<Image> images = searchImages.ToList();
-
-        _logger.LogDebug("Found {Count} images", images.Count);
-
-        return PaginationService.Paginate(images, imageSearchSettings);
+        _logger.LogInformation("Found {Count} images", searchImages.Count());
+        
+        return PaginationService.Paginate(searchImages, imageSearchSettings);
     }
 
     public IEnumerable<Image> HideRawFilesWhenNonRawExists(IEnumerable<Image> images)
@@ -84,8 +78,6 @@ public class SearchService : ISearchService
 
     public List<Project> SearchProjects(ProjectSearchSettings projectSearchSettings)
     {
-        _logger.LogDebug("Searching for projects");
-
         projectSearchSettings.ProjectName = ValidateStringValue(projectSearchSettings.ProjectName);
         projectSearchSettings.ProjectPath = ValidateStringValue(projectSearchSettings.ProjectPath);
 

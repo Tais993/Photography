@@ -1,7 +1,6 @@
 ﻿using Application.interfaces;
 using Application.services;
 using Domain.entities;
-using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Tests.Application.services;
@@ -13,19 +12,16 @@ public class ProjectMetadataServiceTest
     private Mock<IMetadataRepository> _metadataRepository = null!;
     private Mock<IProjectMetadataRepository> _projectMetadataRepository = null!;
     private ProjectMetadataService _projectMetadataService = null!;
-    private Mock<ILogger<ProjectMetadataService>> _logger = null!;
-    
+
     [SetUp]
     public void SetUp()
     {
         _metadataRepository = new Mock<IMetadataRepository>();
-        _logger = new Mock<ILogger<ProjectMetadataService>>();
         _projectMetadataRepository = new Mock<IProjectMetadataRepository>();
 
         _projectMetadataService = new ProjectMetadataService(
             _projectMetadataRepository.Object,
-            _metadataRepository.Object,
-            _logger.Object
+            _metadataRepository.Object
         );
     }
 

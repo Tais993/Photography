@@ -29,7 +29,7 @@ public class ImageViewerGatewayHelper
 
             if (fileName != null)
             {
-                _logger.LogDebug("Found an opened file: {fileName}", fileName);
+                _logger.LogInformation("Found an opened file: {fileName}", fileName);
                 return fileName;
             }
         }
