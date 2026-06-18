@@ -10,7 +10,7 @@
       POSTGRES_PASSWORD: photography
 
     ports:
-      - "5433:5433"
+      - "5433:5432"
 
     volumes:
       - photography-database-data:/var/lib/postgresql/data
