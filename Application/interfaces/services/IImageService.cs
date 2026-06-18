@@ -9,7 +9,7 @@ public interface IImageService
     /// </summary>
     /// <param name="imageId"></param>
     /// <returns></returns>
-    public Image? GetImageById(int imageId);
+    public Image GetImageById(int imageId);
     
     /// <summary>
     ///     Returns all images that are linked to the project

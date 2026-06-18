@@ -43,28 +43,6 @@ public class RepositoryHelper
         }
     }
 
-    public TResult? QueryOrDefault<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
-        params object?[] parameterValues)
-    {
-        _logger.LogTrace("Executing query with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
-
-        using NpgsqlConnection cnx = _dataSource.OpenConnection();
-
-        using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
-
-        SetParameters(parameterValues, npgsqlCommand);
-
-        using NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
-
-        if (!reader.Read())
-        {
-            _logger.LogTrace("Query returned no results: {Sql}", sql);
-            return default;
-        }
-
-        return resultConverter(reader);
-    }
-    
     public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
         params object?[] parameterValues)
     {
@@ -84,7 +62,9 @@ public class RepositoryHelper
             throw new InvalidOperationException("Query returned no results");
         }
 
-        return resultConverter(reader);
+        TResult tResult = resultConverter(reader);
+
+        return tResult;
     }
 
     public void Execute(string sql, params object[] parameterValues)

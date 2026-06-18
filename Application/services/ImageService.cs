@@ -18,7 +18,7 @@ public class ImageService : IImageService
         _logger = logger;
     }
 
-    public Image? GetImageById(int imageId)
+    public Image GetImageById(int imageId)
     {
         _logger.LogDebug("Getting image by id: {ImageId}", imageId);
         return _imageRepository.GetById(imageId);
