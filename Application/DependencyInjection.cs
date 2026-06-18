@@ -18,8 +18,11 @@ public static class DependencyInjection
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IImageService, ImageService>();
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
-            services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
 
+            services.AddSingleton<IMetadataInitialisationService, MetadataInitialisationService>();
+            services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
+            
+            
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
             services.AddScoped<IThumbnailService, ThumbnailService>();

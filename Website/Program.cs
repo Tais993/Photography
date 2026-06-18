@@ -18,4 +18,5 @@ WebApplication app = builder.Build();
 
 
 app.MigrateDatabase();
+app.EnsureMetadataExists();
 app.RunWeb();
