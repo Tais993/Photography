@@ -5,7 +5,7 @@ namespace Application.interfaces;
 
 public interface IProjectRepository
 {
-    Project? GetById(int id);
+    Project GetById(int id);
     List<Project> GetAll();
     Project Insert(Project project);
     void Update(Project project);

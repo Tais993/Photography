@@ -41,7 +41,7 @@ public interface IProjectService
     /// </summary>
     /// <param name="projectId"></param>
     /// <returns></returns>
-    public Project? GetProjectById(int projectId);
+    public Project GetProjectById(int projectId);
     
     /// <summary>
     ///     Returns a list of all existing projects, this doesn't look at categories yet.

@@ -20,11 +20,11 @@ public class ImageRepository : IImageRepository
         _db = db;
     }
 
-    public Image? GetById(int id)
+    public Image GetById(int id)
     {
         _logger.LogDebug("Getting image by id: {ImageId}", id);
 
-        return _db.QueryOrDefault("""
+        return _db.Query("""
                          SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
                          WHERE id = ($1)
                          """, MapImage, id);
