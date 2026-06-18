@@ -1,4 +1,4 @@
-﻿image:https://github.com/Tais993/Photography/actions/workflows/unit-tests.yml/badge.svg[Unit tests]
+﻿image:https://github.com/Tais993/Photography/actions/workflows/tests.yml/badge.svg[Tests]
 image:https://codecov.io/gh/Tais993/Photography/branch/main/graph/badge.svg[Code coverage]
 
 = Picture Project Maintenance Tool
@@ -42,11 +42,19 @@ Application      Services, use-cases and infrastructure contracts
 Infrastructure   Database, file system and external tool implementations
 Cli              Command-line interface
 Website          Razor Pages website
-Tests            Unit tests
+Tests            Unit tests and integration tests
 ----
+
+The project uses a layered architecture.
+The CLI and Website are presentation layers and both depend on the application layer.
+Infrastructure functionality is accessed through interfaces defined by the application layer.
+
+This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or external image viewers.
 
 Both the CLI and Website use the same application services.
 This keeps the main logic reusable and prevents duplicated behaviour between frontends.
+
+image::UML/architecture.svg[Application architecture diagram]
 
 == Photography project structure
 
@@ -71,6 +79,7 @@ A project usually contains these folders:
 [source,text]
 ----
 2026-04-04-Kalkar/
+    project.info
     originals/
     editing/
     finals/
@@ -79,6 +88,8 @@ A project usually contains these folders:
 The `originals` folder contains the original image files.
 The `editing` folder is used for files that have been selected for editing.
 The `finals` folder is used for finished exports.
+
+image::UML/readme/project-folder-structure.svg[Photography project folder structure diagram]
 
 == Subprojects
 
@@ -89,14 +100,14 @@ Example:
 [source,text]
 ----
 2026-04-04-Kalkar/
+    project.info
     originals/
     editing/
     finals/
-        .saturday/
-            originals/
-            editing/
-            finals/
-
+    .saturday/
+        originals/
+        editing/
+        finals/
 ----
 
 A subproject uses the date from the parent project, but has its own name and folder structure.
@@ -124,7 +135,7 @@ Example:
 === Prerequisites
 
 * .NET SDK
-* PostgreSQL
+* Docker Desktop, or a local PostgreSQL installation
 * Valid configuration file
 * IrfanView, if IrfanView-related features are used
 
@@ -146,7 +157,7 @@ Example configuration values:
 ----
 {
   "ConnectionStrings": {
-    "Default": "Host=localhost;Port=5432;Database=photography;Username=postgres;Password=password"
+    "Default": "Host=localhost;Port=5433;Database=photography;Username=photography;Password=photography"
   },
   "Thumbnails": {
     "DefaultSize": 300,
@@ -159,13 +170,35 @@ Example configuration values:
 
 Do not commit real passwords or personal configuration values.
 
+=== Database with Docker
+
+The PostgreSQL database can be started with Docker Compose.
+
+[source,bash]
+docker compose up -d
+
+The application itself still runs locally.
+This is intentional, because the CLI and website need access to local photography folders and external Windows applications such as IrfanView, Windows Photos or ImageGlass.
+
+The Docker container only provides the PostgreSQL database.
+The default development connection string uses port `5433` on the host machine.
+
+[source,json]
+{
+    "ConnectionStrings": {
+        "Default": "Host=localhost;Port=5433;Database=photography;Username=photography;Password=photography"
+    }
+}
+
+In `docker-compose.yml`, port `5433` on the host is mapped to port `5432` inside the PostgreSQL container.
+
 === CLI
 
 Run the CLI with:
 
 [source,bash]
 ----
-dotnet run --project Cli
+dotnet run --project Photography
 ----
 
 The CLI is intended for fast workflows, such as initialising projects, searching images, selecting images and copying files.
@@ -223,22 +256,6 @@ dotnet test
 
 The tests mainly focus on application services, such as image handling, image selection, copying files and thumbnail caching.
 
-== Architecture
-
-The project uses a layered architecture:
-
-[source,text]
-----
-Presentation
-↓
-Application / Logic
-↓
-Infrastructure implementations
-----
-
-Infrastructure functionality is accessed through interfaces defined by the application layer.
-This keeps the core logic testable and prevents it from depending directly on PostgreSQL, the file system, ImageMagick or IrfanView.
-
 == Documentation
 
 More detailed documentation is available in the project portfolio:
@@ -255,6 +272,7 @@ More detailed documentation is available in the project portfolio:
 * .NET
 * ASP.NET Razor Pages
 * System.CommandLine
+* Docker Desktop
 * PostgreSQL
 * Npgsql
 * ImageMagick / Magick.NET

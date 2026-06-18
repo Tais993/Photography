@@ -1,1 +1,56 @@
 ﻿comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        target: auto
+        threshold: 1%
+
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+        threshold: 1%
+      - type: patch
+        target: auto
+        threshold: 1%
+
+  individual_components:
+    - component_id: domain
+      name: Domain
+      paths:
+        - Domain/**
+
+    - component_id: application
+      name: Application
+      paths:
+        - Application/**
+
+    - component_id: infrastructure
+      name: Infrastructure
+      paths:
+        - Infrastructure/**
+
+    - component_id: cli
+      name: CLI
+      paths:
+        - Photography/**
+
+    - component_id: website
+      name: Website
+      paths:
+        - Website/**
+
+ignore:
+  - Tests/**
+  - UML/**
+  - Website/wwwroot/**
+  - Infrastructure/database/migrations/**
+  - "**/bin/**"
+  - "**/obj/**"
