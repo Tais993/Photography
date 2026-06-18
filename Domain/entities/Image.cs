@@ -22,9 +22,9 @@ public class Image
     }
 
     public int? Id { get; }
-    public int ProjectId { get; set; }
+    public int ProjectId { get; }
     public Project? Project { get; set; }
-    public string FileName { get; set; }
-    public string FileType { get; set; }
-    public string RelationalFilePath { get; set; }
+    public string FileName { get; }
+    public string FileType { get; }
+    public string RelationalFilePath { get; }
 }
