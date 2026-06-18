@@ -24,7 +24,7 @@
             <div class="col-auto ms-auto">
                 <span class="badge bg-blue-lt">
                     <i class="ti ti-folders me-1"></i>
-                    @Model.ProjectPage.TotalItems out of @Model.ProjectCount project(s)
+                    @Model.Projects.Count out of @Model.ProjectCount project(s)
                 </span>
             </div>
         </div>
@@ -43,8 +43,6 @@
                             <input type="hidden" asp-for="SelectedProjectId"/>
                         }
 
-                        <input type="hidden" asp-for="ProjectPageNumber"/>
-
                         <div class="col-md-2">
                             <div class="input-icon">
                                 <span class="input-icon-addon">
@@ -57,7 +55,7 @@
                             </div>
                         </div>
 
-                        <div class="col-md-2">
+                        <div class="col-md-4">
                             <div class="input-icon">
                                 <span class="input-icon-addon">
                                     <i class="ti ti-search"></i>
@@ -84,7 +82,7 @@
                                        placeholder="ID"/>
                             </div>
                         </div>
-
+                        
                         <div class="col-auto">
                             <div class="input-icon">
                                 <span class="input-icon-addon">
@@ -109,20 +107,7 @@
                         </div>
 
                         <div class="col-auto">
-                            <select asp-for="ProjectPageSize"
-                                    class="form-select"
-                                    onchange="document.querySelector('[name=ProjectPageNumber]').value = 1; this.form.submit();">
-                                <option value="20">20 per page</option>
-                                <option value="60">60 per page</option>
-                                <option value="120">120 per page</option>
-                                <option value="240">240 per page</option>
-                            </select>
-                        </div>
-
-                        <div class="col-auto">
-                            <button type="submit"
-                                    class="btn btn-primary"
-                                    onclick="document.querySelector('[name=ProjectPageNumber]').value = 1">
+                            <button type="submit" class="btn btn-primary">
                                 <i class="ti ti-search me-2"></i>
                                 Search
                             </button>
@@ -172,14 +157,6 @@
                         }
                     </div>
                 }
-
-                <partial name="_Pagination"
-                         model="Model.ProjectPage"
-                         view-data='new ViewDataDictionary(ViewData)
-                         {
-                             ["PageNumberParameter"] = "ProjectPageNumber",
-                             ["PageSizeParameter"] = "ProjectPageSize"
-                         }'/>
             </div>
         </div>
 
@@ -215,13 +192,13 @@
 
     <script>
         let initialProjectId = "@Model.SelectedProjectId";
-
+        
         window.selectProject = async function selectProject(projectId) {
             const panel = document.getElementById("selected-project-panel");
             const url = new URL(window.location);
 
             const oldProjectId = url.searchParams.get("SelectedProjectId");
-
+            
             panel.classList.add("opacity-50");
 
             const response = await fetch(`?handler=SelectedProjectView&projectId=${projectId}`, {
@@ -255,7 +232,7 @@
                 await reloadProjectView(initialProjectId, projectId);
             } else if (oldProjectId && oldProjectId !== projectId.toString()) {
                 await reloadProjectView(oldProjectId, projectId);
-            }
+            } 
 
             await reloadProjectView(projectId, projectId);
 
@@ -285,3 +262,4 @@
         }
     </script>
 }
+

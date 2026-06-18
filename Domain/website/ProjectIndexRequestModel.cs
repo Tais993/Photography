@@ -8,7 +8,4 @@ public class ProjectIndexRequest
     public int? ParentProjectId;
     public string? ProjectPath;
     public DateOnly? EventDate;
-    
-    public int ProjectPageNumber;
-    public int ProjectPageSize;
 }
