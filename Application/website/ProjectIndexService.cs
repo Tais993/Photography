@@ -1,5 +1,4 @@
-﻿using Application.services;
-using Application.services.interfaces;
+﻿using Application.services.interfaces;
 using Application.website.interfaces;
 using Domain.entities;
 using Domain.entities.search;
@@ -34,22 +33,11 @@ public class ProjectIndexService : IProjectIndexService
             .ThenBy(project => project.Name)
             .ToList();
 
-        PaginatedResult<Project> projectPage = PaginationService.Paginate(
-            orderedProjects,
-            new ProjectSearchSettings
-            {
-                PageNumber = request.ProjectPageNumber,
-                PageSize = request.ProjectPageSize
-            });
-
         ProjectIndexViewModel viewModel = new()
         {
-            ProjectPage = projectPage,
-            Projects = projectPage.Items,
+            Projects = orderedProjects,
             SelectedProjectId = request.SelectedProjectId,
-            ProjectCount = _projectService.GetProjectCount(),
-            ProjectPageNumber = projectPage.PageNumber,
-            ProjectPageSize = projectPage.PageSize
+            ProjectCount = _projectService.GetProjectCount()
         };
 
         if (request.SelectedProjectId is not null)
@@ -59,7 +47,7 @@ public class ProjectIndexService : IProjectIndexService
             return viewModel;
         }
 
-        viewModel.SelectedProject = projectPage.Items.FirstOrDefault();
+        viewModel.SelectedProject = orderedProjects.FirstOrDefault();
         viewModel.SelectedProjectId = viewModel.SelectedProject?.Id;
 
         return viewModel;

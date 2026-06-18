@@ -1,7 +1,6 @@
 ﻿using Application.services.interfaces;
 using Application.website.interfaces;
 using Domain.entities;
-using Domain.entities.search;
 using Domain.website;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,8 +19,6 @@ public class IndexModel : PageModel
         _projectIndexService = projectIndexService;
     }
 
-    public PaginatedResult<Project> ProjectPage = PaginatedResult<Project>.Empty;
-
     public List<Project> Projects { get; private set; } = [];
 
     public Project? SelectedProject { get; private set; }
@@ -31,13 +28,14 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)] public int? SelectedProjectId { get; set; }
 
     [BindProperty(SupportsGet = true)] public string? Search { get; set; }
-    [BindProperty(SupportsGet = true)] public int? ProjectId { get; set; }
-    [BindProperty(SupportsGet = true)] public int? ParentProjectId { get; set; }
-    [BindProperty(SupportsGet = true)] public string? ProjectPath { get; set; }
-    [BindProperty(SupportsGet = true)] public DateOnly? EventDate { get; set; }
 
-    [BindProperty(SupportsGet = true)] public int ProjectPageNumber { get; set; } = 1;
-    [BindProperty(SupportsGet = true)] public int ProjectPageSize { get; set; } = 60;
+    [BindProperty(SupportsGet = true)] public int? ProjectId { get; set; }
+
+    [BindProperty(SupportsGet = true)] public int? ParentProjectId { get; set; }
+
+    [BindProperty(SupportsGet = true)] public string? ProjectPath { get; set; }
+
+    [BindProperty(SupportsGet = true)] public DateOnly? EventDate { get; set; }
 
     public void OnGet()
     {
@@ -50,18 +48,13 @@ public class IndexModel : PageModel
             ProjectId = ProjectId,
             ParentProjectId = ParentProjectId,
             ProjectPath = ProjectPath,
-            EventDate = EventDate,
-            ProjectPageNumber = ProjectPageNumber,
-            ProjectPageSize = ProjectPageSize
+            EventDate = EventDate
         });
 
-        ProjectPage = viewModel.ProjectPage;
         Projects = viewModel.Projects;
         SelectedProject = viewModel.SelectedProject;
         SelectedProjectId = viewModel.SelectedProjectId;
         ProjectCount = viewModel.ProjectCount;
-        ProjectPageNumber = viewModel.ProjectPageNumber;
-        ProjectPageSize = viewModel.ProjectPageSize;
 
         if (SelectedProjectId is not null)
         {
@@ -97,7 +90,7 @@ public class IndexModel : PageModel
     {
         return _projectIndexService.CreateProjectView(project, SelectedProjectId);
     }
-
+    
     public IActionResult OnGetSelectedProjectView(int projectId)
     {
         Project? project = _projectService.GetProjectById(projectId);
@@ -108,12 +101,12 @@ public class IndexModel : PageModel
         {
             return NotFound();
         }
-
+        
         UpdateProjectCookie();
 
         return Partial("_SelectedProjectView", project);
     }
-
+    
     public IActionResult OnGetProjectView(int projectId, int selectedProjectId)
     {
         Project? project = _projectService.GetProjectById(projectId);
