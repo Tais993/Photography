@@ -94,7 +94,6 @@ public class SelectCommand : CommandBase
 
         foreach (Image image in images)
         {
-            _logger.LogInformation("Adding image to selection: {ImageFileName}", image.FileName);
             _imageSelectionService.AddImageToSelection((int)selectionSession.Id, (int)image.Id);
         }
 
