@@ -1,7 +1,7 @@
 ﻿using Application.interfaces.infrastructure;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
-using Npgsql;
+using static Infrastructure.database.repositories.DatabaseMappers;
 
 namespace Infrastructure.database.repositories;
 
@@ -86,15 +86,5 @@ public class MetadataRepository : IMetadataRepository
                     DELETE FROM public.metadata
                     WHERE metadata_key = $1
                     """, metadataKey);
-    }
-
-    private static Metadata MapMetadata(NpgsqlDataReader reader)
-    {
-        return new Metadata(
-            (string)reader["metadata_key"],
-            (string)reader["metadata_type"],
-            (string)reader["display_name"],
-            (string)reader["description"]
-        );
     }
 }

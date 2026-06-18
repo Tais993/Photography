@@ -1,10 +1,9 @@
 ﻿using System.Text;
-using Application.interfaces;
 using Application.interfaces.infrastructure;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
-using Npgsql;
+using static Infrastructure.database.repositories.DatabaseMappers;
 
 namespace Infrastructure.database.repositories;
 
@@ -26,9 +25,9 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Getting project by id: {ProjectId}", id);
 
         return _db.QueryOrDefault("""
-                         SELECT id, name, path, event_date, parent_project_id FROM public.project 
-                         WHERE id = $1
-                         """, MapProject, id);
+                                  SELECT id, name, path, event_date, parent_project_id FROM public.project 
+                                  WHERE id = $1
+                                  """, MapProject, id);
     }
 
     public List<Project> GetAll()
@@ -49,10 +48,11 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Inserting project: {ProjectName}", project.Name);
 
         Project insertedProject = _db.Query("""
-                                           INSERT INTO public.project(name, path, event_date, parent_project_id) 
-                                           VALUES ($1, $2, $3, $4)
-                                           RETURNING *
-                                           """, MapProject, project.Name, project.Path, project.EventDate, project.ParentProjectId);
+                                            INSERT INTO public.project(name, path, event_date, parent_project_id) 
+                                            VALUES ($1, $2, $3, $4)
+                                            RETURNING *
+                                            """, MapProject, project.Name, project.Path, project.EventDate,
+            project.ParentProjectId);
 
         _logger.LogDebug("Inserted project: {ProjectId}", insertedProject.Id);
 
@@ -116,13 +116,13 @@ public class ProjectRepository : IProjectRepository
                           SELECT id, name, path, event_date, parent_project_id
                           FROM public.project
                           """);
-    
+
         if (projectSearchSettings.ProjectId is not null)
         {
             parameters.Add(projectSearchSettings.ProjectId);
             whereClauses.Add($"id = ${parameters.Count}::int");
         }
-    
+
         if (projectSearchSettings.ParentProjectId is not null)
         {
             parameters.Add(projectSearchSettings.ParentProjectId);
@@ -153,29 +153,12 @@ public class ProjectRepository : IProjectRepository
         }
 
         sqlBuilder.AppendLine("\nORDER BY event_date DESC, name");
-    
+
         List<Project> projects = _db.QueryMultiple(sqlBuilder.ToString(),
             MapProject, parameters.ToArray());
 
         _logger.LogDebug("Project search returned {Count} projects", projects.Count);
 
         return projects;
-    }
-
-    private static Project MapProject(NpgsqlDataReader reader)
-    {
-        if (!reader.HasRows) return null!;
-    
-        int? parentProjectId = reader["parent_project_id"] == DBNull.Value
-            ? null
-            : (int)reader["parent_project_id"];
-
-
-        return new Project(
-            (int)reader["id"],
-            (string)reader["name"],
-            (string)reader["path"],
-            (DateOnly)reader["event_date"],
-            parentProjectId);
     }
 }

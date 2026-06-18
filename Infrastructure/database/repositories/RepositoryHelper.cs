@@ -16,7 +16,7 @@ public class RepositoryHelper
 
 
     public List<T> QueryMultiple<T>(string sql, Func<NpgsqlDataReader, T> resultConverter,
-        params object[] parameterValues)
+        params object?[] parameterValues)
     {
         _logger.LogDebug("Executing query expecting multiple results with {ParameterCount} parameters", parameterValues.Length);
 
@@ -109,14 +109,7 @@ public class RepositoryHelper
         {
             _logger.LogTrace("Adding query parameter: {ParameterValue}", parameterValue);
 
-            if (parameterValue == null)
-            {
-                npgsqlCommand.Parameters.AddWithValue(DBNull.Value);
-            }
-            else
-            {
-                npgsqlCommand.Parameters.AddWithValue(parameterValue);
-            }
+            npgsqlCommand.Parameters.AddWithValue(parameterValue ?? DBNull.Value);
         }
     }
 

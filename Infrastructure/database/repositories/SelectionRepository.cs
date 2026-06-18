@@ -1,7 +1,7 @@
 ﻿using Application.interfaces.infrastructure;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
-using Npgsql;
+using static Infrastructure.database.repositories.DatabaseMappers;
 
 namespace Infrastructure.database.repositories;
 
@@ -174,25 +174,4 @@ public class SelectionRepository : ISelectionRepository
                     """
         );
     }
-
-    private static SelectionSession MapSelection(NpgsqlDataReader reader)
-    {
-        return new SelectionSession(
-            (int)reader["id"],
-            (int)reader["project_id"],
-            (string)reader["name"],
-            ((int[])reader["image_ids"]).ToList()
-        );
-    }
-
-    private static SelectionSession MapSelectionWithoutImages(NpgsqlDataReader reader)
-    {
-        return new SelectionSession(
-            (int)reader["id"],
-            (int)reader["project_id"],
-            (string)reader["name"],
-            []
-        );
-    }
-
 }

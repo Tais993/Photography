@@ -1,7 +1,7 @@
 ﻿using Application.interfaces.infrastructure;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
-using Npgsql;
+using static Infrastructure.database.repositories.DatabaseMappers;
 
 namespace Infrastructure.database.repositories;
 
@@ -111,17 +111,5 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
         _logger.LogDebug("Found {Count} metadata records for project: {ProjectId}", projectMetadata.Count, projectId);
 
         return projectMetadata;
-    }
-
-    private static ProjectMetadata MapProjectMetadata(NpgsqlDataReader reader)
-    {
-        return new ProjectMetadata(
-            (int)reader["project_id"],
-            (string)reader["metadata_value"],
-            (string)reader["metadata_key"],
-            (string)reader["metadata_type"],
-            (string)reader["display_name"],
-            (string)reader["description"]
-        );
     }
 }

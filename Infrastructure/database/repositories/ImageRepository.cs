@@ -1,9 +1,10 @@
 ﻿using System.Text;
-using Application.interfaces;
+using Application.interfaces.infrastructure;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
-using Npgsql;
+using static Application.Constants;
+using static Infrastructure.database.repositories.DatabaseMappers;
 
 namespace Infrastructure.database.repositories;
 
