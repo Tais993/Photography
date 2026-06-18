@@ -3,8 +3,7 @@ using Application.interfaces.infrastructure;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
-using static Application.Constants;
-using static Infrastructure.database.repositories.DatabaseMappers;
+using Npgsql;
 
 namespace Infrastructure.database.repositories;
 
@@ -138,15 +137,13 @@ public class ImageRepository : IImageRepository
     {
         _logger.LogDebug("Getting image count for project: {ProjectId}", projectId);
 
-        int count = _db.Query("""
+        int count = _db.QueryScalar<int>("""
                               SELECT COUNT(*)
                               FROM public.image
                               WHERE project_id = $1
-                              """, _db.MapToInt,
-            projectId);
+                              """, projectId);
 
         _logger.LogDebug("Project {ProjectId} has {Count} images", projectId, count);
-
         return count;
     }
 

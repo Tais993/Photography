@@ -86,6 +86,27 @@ public class RepositoryHelper
 
         return resultConverter(reader);
     }
+    
+    public TResult? QueryScalar<TResult>(string sql, params object?[] parameterValues)
+    {
+        _logger.LogTrace("Executing scalar query with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
+
+        using NpgsqlConnection cnx = _dataSource.OpenConnection();
+
+        using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
+
+        SetParameters(parameterValues, npgsqlCommand);
+
+        object? result = npgsqlCommand.ExecuteScalar();
+
+        if (result is null || result == DBNull.Value)
+        {
+            _logger.LogTrace("Scalar query returned no result: {Sql}", sql);
+            throw new InvalidOperationException("Query returned no results");
+        }
+
+        return (TResult)Convert.ChangeType(result, typeof(TResult));
+    }
 
     public void Execute(string sql, params object[] parameterValues)
     {
