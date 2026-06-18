@@ -36,8 +36,8 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)] public string? FolderName { get; set; }
     [BindProperty(SupportsGet = true)] public string? FileType { get; set; }
 
-    [BindProperty(SupportsGet = true)] public int ImagePageSize { get; set; }
-    [BindProperty(SupportsGet = true)] public int ImagePageNumber { get; set; }
+    [BindProperty(SupportsGet = true)] public int PageSize { get; set; }
+    [BindProperty(SupportsGet = true)] public int PageNumber { get; set; }
 
     public PageResult OnGet()
     {
@@ -50,8 +50,8 @@ public class IndexModel : PageModel
             Search = Search,
             FolderName = FolderName,
             FileType = FileType,
-            PageSize = ImagePageSize,
-            PageNumber = ImagePageNumber
+            PageSize = PageSize,
+            PageNumber = PageNumber
         });
 
         ImagePage = viewModel.ImagePage;
@@ -62,8 +62,8 @@ public class IndexModel : PageModel
         SelectedProjectId = viewModel.SelectedProjectId;
         SelectedImageId = viewModel.SelectedImageId;
         ProjectImageCount = viewModel.ProjectImageCount;
-        ImagePageNumber = viewModel.PageNumber;
-        ImagePageSize = viewModel.PageSize;
+        PageNumber = viewModel.PageNumber;
+        PageSize = viewModel.PageSize;
 
         return Page();
     }
