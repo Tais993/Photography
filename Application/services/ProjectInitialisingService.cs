@@ -2,6 +2,7 @@
 using Application.interfaces.infrastructure;
 using Application.interfaces.services;
 using Domain.entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static Application.Constants;
 
@@ -11,23 +12,28 @@ public class ProjectInitialisingService : IProjectInitialisingService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IImageRepository _imageRepository;
+    private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IConfiguration _configuration;
     private readonly ILogger<ProjectInitialisingService> _logger;
     private readonly IFiles _files;
 
     public ProjectInitialisingService(
         IProjectRepository projectRepository,
         IImageRepository imageRepository,
+        IProjectMetadataService projectMetadataService,
+        IConfiguration configuration,
         ILogger<ProjectInitialisingService> logger,
         IFiles files)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
+        _projectMetadataService = projectMetadataService;
+        _configuration = configuration;
         _logger = logger;
         _files = files;
     }
 
-
-
+    
     /// <summary>
     /// Initialises the given projects directory into the database,
     /// additionally this adds a file to the filesystem to remember the projects ID.
@@ -42,7 +48,6 @@ public class ProjectInitialisingService : IProjectInitialisingService
     {
         string pathEnd = _files.GetPathEnd(folderDirectory);
         _logger.LogInformation("Initialising folder: {FolderName}", pathEnd);
-        
 
         if (pathEnd.StartsWith("."))
         {
@@ -76,9 +81,9 @@ public class ProjectInitialisingService : IProjectInitialisingService
             InitialiseFolder(directory);
         }
 
-        // TODO
-        // This is a collection folder for example all concerts photographed at De Pul
-        // For now this has no additional functionality and we will ignore it
+        // TODO:
+        // This is a collection folder, for example all concerts photographed at De Pul.
+        // For now this has no additional functionality.
     }
 
     public void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject = null)
@@ -93,18 +98,9 @@ public class ProjectInitialisingService : IProjectInitialisingService
             return;
         }
 
-        _logger.LogInformation("Initialising project: {ProjectDirectory}", projectDirectory);
-
-        Project project;
-
-        if (parentProject is null)
-        {
-            project = ToProject(projectDirectory, match);
-        }
-        else
-        {
-            project = ToSubProject(projectDirectory, match, parentProject);
-        }
+        Project project = parentProject is null
+            ? ToProject(projectDirectory, match)
+            : ToSubProject(projectDirectory, match, parentProject);
 
         project = _projectRepository.Insert(project);
         _logger.LogInformation("Created project: {ProjectId}, name: {ProjectName}", project.Id, project.Name);
@@ -112,7 +108,94 @@ public class ProjectInitialisingService : IProjectInitialisingService
         _files.WriteAllText(project.Id + "", projectInfoPath);
         _logger.LogInformation("Wrote project info file: {ProjectInfoPath}", projectInfoPath);
 
+        InitialiseProjectFolderMetadata(projectDirectory, project);
         InitialiseProjectSubFolders(projectDirectory, project);
+    }
+
+    private void InitialiseProjectFolderMetadata(string projectDirectory, Project project)
+    {
+        if (project.Id is null)
+        {
+            _logger.LogWarning("Could not initialise project folder metadata because project id was null");
+            throw new ArgumentNullException(nameof(project.Id));
+        }
+
+        Dictionary<string, string[]> folderNamesByRole = GetConfiguredFolderNames();
+
+        if (folderNamesByRole.Count == 0)
+        {
+            _logger.LogDebug("No configured folder names found for project folder mapping");
+            return;
+        }
+
+        string[] folderNames = _files.GetDirectories(projectDirectory)
+            .Select(directory => _files.GetPathEnd(directory))
+            .ToArray();
+
+        foreach ((string folderRole, string[] possibleFolderNames) in folderNamesByRole)
+        {
+            string[] matchingFolderNames = CompareFolderNames(folderNames, possibleFolderNames);
+            string metadataKey = ToFolderMetadataKey(folderRole);
+
+            if (matchingFolderNames.Length == 0)
+            {
+                _logger.LogDebug(
+                    "No folder found for role {FolderRole} in project {ProjectId}",
+                    folderRole,
+                    project.Id);
+
+                continue;
+            }
+
+            if (matchingFolderNames.Length > 1)
+            {
+                _logger.LogWarning(
+                    "Multiple folders found for role {FolderRole} in project {ProjectId}: {FolderNames}",
+                    folderRole,
+                    project.Id,
+                    string.Join(", ", matchingFolderNames));
+
+                continue;
+            }
+
+            _projectMetadataService.AddMetadataToProject(
+                project.Id.Value,
+                metadataKey,
+                matchingFolderNames[0]);
+
+            _logger.LogInformation(
+                "Mapped project folder role {FolderRole} to folder {FolderName} for project {ProjectId}",
+                folderRole,
+                matchingFolderNames[0],
+                project.Id);
+        }
+    }
+
+    private Dictionary<string, string[]> GetConfiguredFolderNames()
+    {
+        return _configuration
+            .GetSection(FolderNamesConfigKey)
+            .GetChildren()
+            .ToDictionary(
+                section => section.Key,
+                section => section.GetChildren()
+                    .Select(child => child.Value)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Select(value => value!)
+                    .ToArray());
+    }
+
+    public static string[] CompareFolderNames(string[] folderNames, string[] possibleFolderNames)
+    {
+        return folderNames
+            .Where(folderName => possibleFolderNames.Contains(folderName, StringComparer.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    public static string ToFolderMetadataKey(string folderRole)
+    {
+        return FolderMetadataKeyPrefix + folderRole.ToLowerInvariant();
     }
 
     private void InitialiseProjectSubFolders(string projectDirectory, Project project)
@@ -123,7 +206,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         foreach (string subDirectory in subDirectories)
         {
             string pathEnd = _files.GetPathEnd(subDirectory);
-            
+
             if (SubProjectNameRegex.Match(pathEnd) is { Success: true } subProjectMatch)
             {
                 _logger.LogDebug("Initialising project sub-project: {FolderName}", pathEnd);
@@ -132,18 +215,18 @@ public class ProjectInitialisingService : IProjectInitialisingService
             else
             {
                 _logger.LogDebug("Initialising project sub-folder's images: {FolderName}", pathEnd);
-                InitializeImages(projectDirectory, subDirectory, project.Id.Value);
+                InitializeImages(projectDirectory, subDirectory, project.Id!.Value);
             }
         }
     }
 
 
     /// <summary>
-    /// This method expects a project's subfolder already, and this also
+    /// This method expects a project's subfolder already.
     /// </summary>
-    /// <param name="projectDirectory">a subfolder from within a project that contains images</param>
-    /// <param name="projectSubDirectory">a subfolder from within a project that contains images</param>
-    /// <param name="projectId"></param>
+    /// <param name="projectDirectory">The project root directory.</param>
+    /// <param name="projectSubDirectory">A subfolder from within a project that contains images.</param>
+    /// <param name="projectId">The project id.</param>
     public void InitializeImages(string projectDirectory, string projectSubDirectory, int projectId)
     {
         string[] files = _files.GetFiles(projectSubDirectory);
@@ -157,7 +240,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
             Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
 
-            Image insertedImage = _imageRepository.Insert(image);
+            _imageRepository.Insert(image);
             _logger.LogTrace("Inserted image file: {RelativeFilePath}", relativeFilePath);
         }
 
@@ -182,13 +265,14 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
     private static Project ToProject(string subdirectory, Match match)
     {
-        DateOnly dateOnly = new DateOnly(int.Parse(match.Groups[1].Value), int.Parse(match.Groups[2].Value),
-            int.Parse(match.Groups[3].Value));
-        return new Project( match.Groups[4].Value, subdirectory, dateOnly);
+        DateOnly dateOnly = new DateOnly(int.Parse(match.Groups[1].Value),
+            int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
+
+        return new Project(match.Groups[4].Value, subdirectory, dateOnly);
     }
 
     private static Project ToSubProject(string directory, Match match, Project parentProject)
     {
-        return new Project( match.Groups[1].Value, directory, parentProject.EventDate, parentProject.Id);
+        return new Project(match.Groups[1].Value, directory, parentProject.EventDate, parentProject.Id);
     }
 }
