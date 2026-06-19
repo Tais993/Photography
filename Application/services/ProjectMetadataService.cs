@@ -97,8 +97,25 @@ public class ProjectMetadataService : IProjectMetadataService
         List<ProjectMetadata> metadata = _projectMetadataRepository.GetAllByProjectId(projectId);
 
         _logger.LogDebug("Found {Count} metadata values for project: {ProjectId}", metadata.Count, projectId);
-
         return metadata;
+    }
+
+    public ProjectMetadata GetProjectMetadata(Project project, string metadataKey)
+    {
+        if (project.Id == null)
+        {
+            _logger.LogWarning("Could not get project metadata because project id was null");
+            throw new ArgumentNullException("project.Id");
+        }
+
+        return GetProjectMetadata((int)project.Id, metadataKey);
+    }
+
+    public ProjectMetadata? GetProjectMetadata(int projectId, string metadataKey)
+    {
+        _logger.LogDebug("Getting metadata for project: {ProjectId}, and key {MetadataKey}", projectId, metadataKey);
+
+        return _projectMetadataRepository.GetByKey(projectId, metadataKey);
     }
 
     public void AddMetadataToProject(int projectId, string metadataKey, string? value)
