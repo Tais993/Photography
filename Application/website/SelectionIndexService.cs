@@ -136,8 +136,8 @@ public class SelectionIndexService : ISelectionIndexService
             return null;
         }
 
-        int sessionId = _imageSelectionService.GetSessionId(selectedProjectId);
-        bool isSelected = _imageSelectionService.ToggleImageSelection(sessionId, imageId);
+        SelectionSession selectionSession = _imageSelectionService.GetOrStartSession(project);
+        bool isSelected = _imageSelectionService.ToggleImageSelection((int) selectionSession.Id!, imageId);
 
         return CreateImageViewModel(image, isSelected);
     }
@@ -149,9 +149,7 @@ public class SelectionIndexService : ISelectionIndexService
         Project selectedProject = _projectService.GetProjectById(selectedProjectId);
         Image selectedImage = _imageService.GetImageById(selectedImageId);
 
-        string imagePath = _fileService.Combine(
-            selectedProject.Path,
-            selectedImage.RelationalFilePath);
+        string imagePath = _fileService.Combine(selectedProject.Path, selectedImage.RelationalFilePath);
 
         _imageViewerService.OpenImage(imagePath);
     }

@@ -89,11 +89,11 @@ public class SelectionRepository : ISelectionRepository
                          """, MapSelection, id);
     }
 
-    public int GetSessionIdByProjectId(int projectId)
+    public int? GetSessionIdByProjectId(int projectId)
     {
         _logger.LogDebug("Getting selection session id for project: {ProjectId}", projectId);
 
-        return _db.QueryScalar<int>("""
+        return _db.QueryScalarOrDefault<int>("""
                                     SELECT id FROM public.selection_session
                                     WHERE project_id = $1
                                     """, projectId);
@@ -138,11 +138,11 @@ public class SelectionRepository : ISelectionRepository
                     """, sessionId, imageId);
     }
 
-    public SelectionSession GetByProject(int projectId)
+    public SelectionSession? GetByProject(int projectId)
     {
         _logger.LogDebug("Getting selection session for project: {ProjectId}", projectId);
 
-        SelectionSession session = _db.Query(
+        SelectionSession? session = _db.QueryOrDefault(
             """
             SELECT ss.id, ss.project_id, ss.name,
             COALESCE(array_agg(ssi.image_id) FILTER (WHERE ssi.image_id IS NOT NULL), '{}') AS image_ids
@@ -154,6 +154,13 @@ public class SelectionRepository : ISelectionRepository
             GROUP BY ss.id, ss.project_id, ss.name
             """, MapSelection, projectId);
 
+
+        if (session == null)
+        {
+            _logger.LogDebug("No selection session found for project: {ProjectId}", projectId);
+            return null;
+        }
+        
         _logger.LogDebug(
             "Found selection session: {SessionId} for project: {ProjectId}, selected images: {SelectedImageCount}",
             session.Id,

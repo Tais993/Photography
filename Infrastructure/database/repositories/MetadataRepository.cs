@@ -22,7 +22,7 @@ public class MetadataRepository : IMetadataRepository
     {
         _logger.LogDebug("Getting metadata by key: {MetadataKey}", key);
 
-        return _db.Query("""
+        return _db.QueryOrDefault("""
                          SELECT metadata_key, metadata_type, display_name, description
                          FROM public.metadata
                          WHERE metadata_key = $1
