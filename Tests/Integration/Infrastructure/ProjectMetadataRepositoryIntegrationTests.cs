@@ -202,16 +202,15 @@ public class ProjectMetadataRepositoryIntegrationTests : IntegrationTestBase
         // Execution
         projectMetadataRepository.Insert(projectMetadata);
         projectMetadataRepository.DeleteByKey((int)project.Id!, metadataKey);
+        
+        ProjectMetadata? retrievedProjectMetadata = projectMetadataRepository.GetByKey((int)project.Id!, metadataKey);
         List<ProjectMetadata> projectMetadataList =
             projectMetadataRepository.GetAllByProjectId((int)project.Id!);
         
-        // Execution & Asserts
-        Assert.Throws<InvalidOperationException>(() =>
-            projectMetadataRepository.GetByKey((int)project.Id!, metadataKey));
-
         // Asserts
         using (Assert.EnterMultipleScope())
         {
+            Assert.That(retrievedProjectMetadata, Is.Null);
             Assert.That(projectMetadataList, Has.Count.EqualTo(0));
         }
     }
@@ -245,17 +244,15 @@ public class ProjectMetadataRepositoryIntegrationTests : IntegrationTestBase
         // Execution
         projectMetadataRepository.Insert(projectMetadata);
         projectRepository.DeleteById((int)project.Id!);
-
-        List<ProjectMetadata> allProjectMetadata = projectMetadataRepository.GetAll();
-
-        // Execution & Asserts
-        Assert.Throws<InvalidOperationException>(() =>
-            projectMetadataRepository.GetByKey((int)project.Id!, metadataKey));
+            
+        ProjectMetadata? retrievedMetadata = projectMetadataRepository.GetByKey((int) project.Id, metadata.MetadataKey!);
+        List<ProjectMetadata> metadatas = projectMetadataRepository.GetAllByProjectId((int) project.Id);
 
         // Asserts
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(allProjectMetadata, Has.Count.EqualTo(0));
+            Assert.That(retrievedMetadata, Is.Null);
+            Assert.That(metadatas, Has.Count.EqualTo(0));
         }
     }
 
@@ -289,16 +286,14 @@ public class ProjectMetadataRepositoryIntegrationTests : IntegrationTestBase
         projectMetadataRepository.Insert(projectMetadata);
         metadataRepository.DeleteByKey(metadataKey);
 
-        List<ProjectMetadata> allProjectMetadata = projectMetadataRepository.GetAll();
-
-        // Execution & Asserts
-        Assert.Throws<InvalidOperationException>(() =>
-            projectMetadataRepository.GetByKey((int)project.Id!, metadataKey));
+        Metadata? retrievedMetadata = metadataRepository.GetByKey(metadata.MetadataKey!);
+        List<Metadata> metadatas = metadataRepository.GetAll();
 
         // Asserts
         using (Assert.EnterMultipleScope())
         {
-            Assert.That(allProjectMetadata, Has.Count.EqualTo(0));
+            Assert.That(retrievedMetadata, Is.Null);
+            Assert.That(metadatas, Has.Count.EqualTo(0));
         }
     }
 }

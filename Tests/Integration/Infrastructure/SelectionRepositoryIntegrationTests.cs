@@ -271,22 +271,20 @@ public class SelectionRepositoryIntegrationTests : IntegrationTestBase
         SelectionSession session =
             selectionRepository.StartSession((int)project.Id!, "Test Selection");
 
-        int sessionIdBeforeRemoval =
+        int? sessionIdBeforeRemoval =
             selectionRepository.GetSessionIdByProjectId((int)project.Id!);
 
         // Execution
         selectionRepository.RemoveSession((int)project.Id!);
+        SelectionSession? retrievedSession = selectionRepository.GetByProject((int)project.Id!);
+        int? retrievedSessionId = selectionRepository.GetSessionIdByProjectId((int)project.Id!);
 
         // Asserts
         using (Assert.EnterMultipleScope())
         {
             Assert.That(sessionIdBeforeRemoval, Is.EqualTo(session.Id));
-
-            Assert.Throws<InvalidOperationException>(() =>
-                selectionRepository.GetByProject((int)project.Id!));
-
-            Assert.Throws<InvalidOperationException>(() =>
-                selectionRepository.GetSessionIdByProjectId((int)project.Id!));
+            Assert.That(retrievedSession, Is.Null);
+            Assert.That(retrievedSessionId, Is.EqualTo(0));
         }
     }
 

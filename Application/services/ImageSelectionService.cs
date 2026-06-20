@@ -47,7 +47,7 @@ public class ImageSelectionService : IImageSelectionService
         return _selectionRepository.GetOrStartSession(projectId, sessionName);
     }
 
-    public int GetSessionId(int projectId)
+    public int? GetSessionId(int projectId)
     {
         _logger.LogDebug("Getting selection session id for project: {ProjectId}", projectId);
         return _selectionRepository.GetSessionIdByProjectId(projectId);
@@ -93,13 +93,13 @@ public class ImageSelectionService : IImageSelectionService
         _selectionRepository.RemoveImageFromProjectSelection(sessionId, imageId);
     }
 
-    public SelectionSession GetSessionImages(Project project)
+    public SelectionSession? GetSessionImages(Project project)
     {
         return GetSessionImages((int) project.Id);
     }
 
 
-    public SelectionSession GetSessionImages(int projectId)
+    public SelectionSession? GetSessionImages(int projectId)
     {
         _logger.LogDebug("Getting selected images for project: {ProjectId}", projectId);
         return _selectionRepository.GetByProject(projectId);

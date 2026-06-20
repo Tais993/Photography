@@ -136,13 +136,13 @@ public class MetadataRepositoryIntegrationTests : IntegrationTestBase
         metadataRepository.Insert(metadata);
         metadataRepository.DeleteByKey(metadataKey);
 
-        // Execution & Asserts
-        Assert.Throws<InvalidOperationException>(() => metadataRepository.GetByKey(metadata.MetadataKey!));
+        Metadata? retrievedMetadata = metadataRepository.GetByKey(metadata.MetadataKey!);
         List<Metadata> metadatas = metadataRepository.GetAll();
 
         // Asserts
         using (Assert.EnterMultipleScope())
         {
+            Assert.That(retrievedMetadata, Is.Null);
             Assert.That(metadatas, Has.Count.EqualTo(0));
         }
     }

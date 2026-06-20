@@ -219,7 +219,7 @@ public class ImageSelectionServiceTests
             .Returns(12);
 
         // Execution
-        int result = _imageSelectionService.GetSessionId(5);
+        int? result = _imageSelectionService.GetSessionId(5);
 
         // Asserts
         Assert.That(result, Is.EqualTo(12));

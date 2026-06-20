@@ -66,18 +66,18 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
     {
         _logger.LogDebug("Getting project metadata, project: {ProjectId}, metadata key: {MetadataKey}", projectId, metadataKey);
 
-        return _db.Query("""
-                         SELECT
-                             project_id,
-                             metadata_value,
-                             metadata_type,
-                             m.metadata_key,
-                             display_name,
-                             description
-                         FROM public.project_metadata pm
-                         JOIN public.metadata m on m.metadata_key = pm.metadata_key
-                         WHERE project_id = $1 AND m.metadata_key = $2
-                         """, MapProjectMetadata, projectId, metadataKey);
+        return _db.QueryOrDefault("""
+                                  SELECT
+                                      project_id,
+                                      metadata_value,
+                                      metadata_type,
+                                      m.metadata_key,
+                                      display_name,
+                                      description
+                                  FROM public.project_metadata pm
+                                  JOIN public.metadata m on m.metadata_key = pm.metadata_key
+                                  WHERE project_id = $1 AND m.metadata_key = $2
+                                  """, MapProjectMetadata, projectId, metadataKey);
     }
 
     public void DeleteByKey(int projectId, string metadataKey)
