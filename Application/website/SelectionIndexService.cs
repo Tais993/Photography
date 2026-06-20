@@ -11,9 +11,11 @@ namespace Application.website;
 public class SelectionIndexService : ISelectionIndexService
 {
     private readonly IImageSelectionService _imageSelectionService;
+    private readonly IProjectFolderService _folderService;
     private readonly ISearchService _searchService;
     private readonly IImageViewerService _imageViewerService;
     private readonly IProjectService _projectService;
+    private readonly IProjectFolderService _projectFolderService;
     private readonly IImageService _imageService;
     private readonly IFiles _fileService;
     private readonly ILogger<SelectionIndexService> _logger;
@@ -23,17 +25,21 @@ public class SelectionIndexService : ISelectionIndexService
         ISearchService searchService,
         IImageService imageService,
         IProjectService projectService,
+        IProjectFolderService projectFolderService,
         IImageViewerService imageViewerService,
         IFiles fileService,
-        ILogger<SelectionIndexService> logger)
+        ILogger<SelectionIndexService> logger, 
+        IProjectFolderService folderService)
     {
         _imageSelectionService = imageSelectionService;
         _searchService = searchService;
         _imageService = imageService;
         _projectService = projectService;
+        _projectFolderService = projectFolderService;
         _imageViewerService = imageViewerService;
         _fileService = fileService;
         _logger = logger;
+        _folderService = folderService;
     }
 
     public SelectionIndexViewModel GetSelectionIndex(SelectionIndexRequest request)
@@ -58,6 +64,11 @@ public class SelectionIndexService : ISelectionIndexService
 
         viewModel.SelectedProject = selectedProject;
         viewModel.ProjectImageCount = _imageService.GetProjectImageCount(request.SelectedProjectId.Value);
+        viewModel.FolderOptions = _projectFolderService.GetExistingProjectFolders(request.SelectedProjectId.Value);
+
+        string? folderName = GetVerifiedFolderName(
+            request.FolderName,
+            viewModel.FolderOptions);
 
         if (request.SelectedImageId is not null)
         {
@@ -79,7 +90,7 @@ public class SelectionIndexService : ISelectionIndexService
         {
             ProjectId = request.SelectedProjectId,
             FileNameOrNumber = request.Search,
-            FolderName = request.FolderName,
+            FolderName = folderName,
             FileType = request.FileType,
             HideRawFilesWhenImageExists = true,
             PageSize = request.PageSize,
@@ -152,6 +163,24 @@ public class SelectionIndexService : ISelectionIndexService
         string imagePath = _fileService.Combine(selectedProject.Path, selectedImage.RelationalFilePath);
 
         _imageViewerService.OpenImage(imagePath);
+    }
+
+    private static string? GetVerifiedFolderName(string? folderName, List<ProjectFolder> folderOptions)
+    {
+        if (string.IsNullOrWhiteSpace(folderName))
+        {
+            return null;
+        }
+
+        bool folderExists = folderOptions.Any(folder =>
+            string.Equals(folder.FolderName, folderName, StringComparison.OrdinalIgnoreCase));
+
+        if (!folderExists)
+        {
+            return null;
+        }
+
+        return folderName;
     }
 
     private static ImageViewModel CreateImageViewModel(Image image, List<int> selectedImageIds)
