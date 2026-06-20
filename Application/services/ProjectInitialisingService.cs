@@ -16,6 +16,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
     private readonly IConfiguration _configuration;
     private readonly ILogger<ProjectInitialisingService> _logger;
     private readonly IFiles _files;
+    private readonly ICollectionMetadataService _collectionMetadataService;
 
     public ProjectInitialisingService(
         IProjectRepository projectRepository,
@@ -23,7 +24,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         IProjectMetadataService projectMetadataService,
         IConfiguration configuration,
         ILogger<ProjectInitialisingService> logger,
-        IFiles files)
+        IFiles files, ICollectionMetadataService collectionMetadataService)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
@@ -31,6 +32,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         _configuration = configuration;
         _logger = logger;
         _files = files;
+        _collectionMetadataService = collectionMetadataService;
     }
 
     
@@ -46,6 +48,11 @@ public class ProjectInitialisingService : IProjectInitialisingService
     /// <param name="folderDirectory"></param>
     public void InitialiseFolder(string folderDirectory)
     {
+        InitialiseFolder(folderDirectory, null);
+    }
+
+    private void InitialiseFolder(string folderDirectory, CollectionMetadataConfiguration? collectionMetadataConfiguration)
+    {
         string pathEnd = _files.GetPathEnd(folderDirectory);
         _logger.LogInformation("Initialising folder: {FolderName}", pathEnd);
 
@@ -55,7 +62,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         }
         else if (ProjectNameRegex.Match(pathEnd) is { Success: true } match)
         {
-            InitialiseProjectFolder(folderDirectory, match);
+            InitialiseProjectFolder(folderDirectory, match, null, collectionMetadataConfiguration);
         }
         else
         {
@@ -64,7 +71,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
             foreach (string subdirectory in subdirectories)
             {
-                InitialiseFolder(subdirectory);
+                InitialiseFolder(subdirectory, collectionMetadataConfiguration);
             }
         }
     }
@@ -73,20 +80,36 @@ public class ProjectInitialisingService : IProjectInitialisingService
     {
         _logger.LogInformation("Initialising collection folder: {FolderName}", subdirectory);
 
+        CollectionMetadataConfiguration? collectionMetadataConfiguration = _collectionMetadataService.GetCollectionMetadataConfiguration(subdirectory);
+
+        if (collectionMetadataConfiguration is null)
+        {
+            _logger.LogDebug("No collection metadata configuration found for collection folder: {FolderName}", subdirectory);
+        }
+        else
+        {
+            _logger.LogDebug("Found collection metadata configuration: {MetadataKey}", collectionMetadataConfiguration.MetadataKey);
+        }
+
         string[] directories = _files.GetDirectories(subdirectory);
         _logger.LogInformation("Initialising {Count} folders in collection folder: {FolderName}", directories.Length, subdirectory);
 
         foreach (string directory in directories)
         {
-            InitialiseFolder(directory);
+            InitialiseFolder(directory, collectionMetadataConfiguration);
         }
-
-        // TODO:
-        // This is a collection folder, for example all concerts photographed at De Pul.
-        // For now this has no additional functionality.
     }
 
     public void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject = null)
+    {
+        InitialiseProjectFolder(projectDirectory, match, parentProject, null);
+    }
+
+    private void InitialiseProjectFolder(
+        string projectDirectory,
+        Match match,
+        Project? parentProject,
+        CollectionMetadataConfiguration? collectionMetadataConfiguration)
     {
         _logger.LogInformation("Initialising project folder: {FolderName}", projectDirectory);
         string projectInfoPath = _files.Combine(projectDirectory, ProjectInfoFile);
@@ -109,7 +132,8 @@ public class ProjectInitialisingService : IProjectInitialisingService
         _logger.LogInformation("Wrote project info file: {ProjectInfoPath}", projectInfoPath);
 
         InitialiseProjectFolderMetadata(projectDirectory, project);
-        InitialiseProjectSubFolders(projectDirectory, project);
+        InitialiseProjectCollectionMetadata(project, collectionMetadataConfiguration);
+        InitialiseProjectSubFolders(projectDirectory, project, collectionMetadataConfiguration);
     }
 
     private void InitialiseProjectFolderMetadata(string projectDirectory, Project project)
@@ -171,6 +195,33 @@ public class ProjectInitialisingService : IProjectInitialisingService
         }
     }
 
+    private void InitialiseProjectCollectionMetadata(Project project, CollectionMetadataConfiguration? collectionMetadataConfiguration)
+    {
+        if (collectionMetadataConfiguration is null)
+        {
+            return;
+        }
+
+        if (project.Id is null)
+        {
+            _logger.LogWarning("Could not initialise project collection metadata because project id was null");
+            throw new ArgumentNullException(nameof(project.Id));
+        }
+
+        if (string.IsNullOrWhiteSpace(collectionMetadataConfiguration.MetadataKey))
+        {
+            _logger.LogWarning("Could not initialise project collection metadata because metadata key was empty");
+            return;
+        }
+
+        _projectMetadataService.AddMetadataToProject(
+            project.Id.Value,
+            collectionMetadataConfiguration.MetadataKey,
+            collectionMetadataConfiguration.MetadataValue);
+        
+        _logger.LogInformation("Added collection metadata {MetadataKey} to project {ProjectId}", collectionMetadataConfiguration.MetadataKey, project.Id);
+    }
+
     private Dictionary<string, string[]> GetConfiguredFolderNames()
     {
         return _configuration
@@ -198,7 +249,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         return FolderMetadataKeyPrefix + folderRole.ToLowerInvariant();
     }
 
-    private void InitialiseProjectSubFolders(string projectDirectory, Project project)
+    private void InitialiseProjectSubFolders(string projectDirectory, Project project, CollectionMetadataConfiguration? collectionMetadataConfiguration)
     {
         string[] subDirectories = _files.GetDirectories(projectDirectory);
         _logger.LogDebug("Initialising {Count} subdirectories for project: {ProjectId}", subDirectories.Length, project.Id);
@@ -210,7 +261,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
             if (SubProjectNameRegex.Match(pathEnd) is { Success: true } subProjectMatch)
             {
                 _logger.LogDebug("Initialising project sub-project: {FolderName}", pathEnd);
-                InitialiseProjectFolder(subDirectory, subProjectMatch, project);
+                InitialiseProjectFolder(subDirectory, subProjectMatch, project, collectionMetadataConfiguration);
             }
             else
             {
@@ -247,6 +298,8 @@ public class ProjectInitialisingService : IProjectInitialisingService
         _logger.LogDebug("Finished initialising {Count} images for project: {ProjectId}, folder: {FolderName}", files.Length, projectId, projectSubDirectory);
     }
 
+    
+    
     public void CreateProjectFolder()
     {
         _logger.LogWarning("CreateProjectFolder is not implemented");
