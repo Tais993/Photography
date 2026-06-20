@@ -18,9 +18,9 @@ public class Constants
     public const string FolderMetadataType = "Folder";
     public const string FolderMetadataKeyPrefix = "folder.";
 
-    public const string OriginalsFolderRole = "Originals";
-    public const string EditingFolderRole = "Editing";
-    public const string FinalsFolderRole = "Finals";
+    public const string OriginalsFolderMetadataKey = "folder.originals";
+    public const string EditingFolderMetadataKey = "folder.editing";
+    public const string FinalsFolderMetadataKey = "folder.finals";
     
 
     public static readonly string[] ImageFileTypesSql =

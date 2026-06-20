@@ -13,17 +13,19 @@ public class SelectCommand : CommandBase
     private readonly IProjectService _projectService;
     private readonly IImageSelectionService _imageSelectionService;
     private readonly IImageViewerService _imageViewer;
+    private readonly IProjectFolderService _projectFolderService;
     private readonly ILogger<SelectCommand> _logger;
 
 
     public SelectCommand(ISearchService searchService, IImageSelectionService imageSelectionService,
-        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectService projectService)
+        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectService projectService, IProjectFolderService projectFolderService)
     {
         _searchService = searchService;
         _imageSelectionService = imageSelectionService;
         _imageViewer = imageViewer;
         _logger = logger;
         _projectService = projectService;
+        _projectFolderService = projectFolderService;
     }
 
     protected override string Name => "select";
@@ -79,6 +81,7 @@ public class SelectCommand : CommandBase
 
         string? fileType = parseResult.GetValue<string>(_fileType);
         string originFolder = parseResult.GetValue<string>(_originFolder)!;
+        originFolder = _projectFolderService.ResolveFolder(project, originFolder);
 
         IEnumerable<Image> images = _searchService.SearchImages(new ImageSearchSettings()
         {

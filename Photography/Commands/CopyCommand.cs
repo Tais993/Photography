@@ -13,19 +13,20 @@ public class CopyCommand : CommandBase
     private readonly ILogger<CopyCommand> _logger;
     private readonly IProjectService _projectService;
     private readonly ICopyService _copyService;
+    private readonly IProjectFolderService _projectFolderService;
 
 
-
-    public CopyCommand(IProjectService projectService, ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService)
+    public CopyCommand(IProjectService projectService, ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService, IProjectFolderService projectFolderService)
     {
         _projectService = projectService;
         _copyService = copyService;
         _logger = logger;
         _imageSelectionService = imageSelectionService;
+        _projectFolderService = projectFolderService;
     }
 
     protected override string Name => "copy";
-    protected override string Description => "Copy any opened files from irfanview to the editing folder";
+    protected override string Description => "Copy any opened files from your image viewer to the editing folder";
 
     private readonly string _destinationFolder = "-destination-folder";
 
@@ -48,18 +49,19 @@ public class CopyCommand : CommandBase
             parseResult.GetValue(ProjectOption));
 
         string destinationFolder = parseResult.GetValue<string>(_destinationFolder)!;
+        destinationFolder = _projectFolderService.ResolveFolder(project!, destinationFolder);
 
         
         SelectionSession selectionSession = _imageSelectionService.GetSessionImages(project);
 
         List<int> imageIds = selectionSession.ImageIds;
-
         IEnumerable<string> imagePaths = _copyService.ImageIdsToRelativePaths(imageIds.ToArray());
         
         _copyService.CopyFiles(imagePaths, project.Path, destinationFolder);
-
         _imageSelectionService.ClearSession(project);
         
         return 0;
     }
+
+
 }

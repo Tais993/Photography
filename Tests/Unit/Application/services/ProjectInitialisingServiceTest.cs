@@ -16,7 +16,6 @@ public class ProjectInitialisingServiceTest
     private Mock<IProjectRepository> _projectRepository = null!;
     private Mock<IImageRepository> _imageRepository = null!;
     private Mock<IProjectMetadataService> _projectMetadataService = null!;
-    private Mock<IConfiguration> _configuration = null!;
     private Mock<IFiles> _files = null!;
     private Mock<ILogger<ProjectInitialisingService>> _logger = null!;
     private Mock<IProjectMetadataService> _metadataService = null!;
@@ -29,7 +28,6 @@ public class ProjectInitialisingServiceTest
         _imageRepository = new Mock<IImageRepository>();
         _files = new Mock<IFiles>();
         _projectMetadataService = new Mock<IProjectMetadataService>();
-        _configuration = new Mock<IConfiguration>();
         _logger = new Mock<ILogger<ProjectInitialisingService>>();
         _metadataService = new Mock<IProjectMetadataService>();
 
@@ -37,7 +35,7 @@ public class ProjectInitialisingServiceTest
             _projectRepository.Object,
             _imageRepository.Object,
             _projectMetadataService.Object,
-            configuration: _configuration.Object,
+            configuration: CreateConfiguration(),
             _logger.Object,
             _files.Object
         );
@@ -461,5 +459,15 @@ public void InitialiseProjectFolder_WithSubProjectFolder_InitialisesSubProjectAu
         Assert.Throws<NotImplementedException>(() => _service.UpdateProjectFolder());
         
         // Asserts
+    }
+    
+    private static IConfiguration CreateConfiguration()
+    {
+        return new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                [$"{Constants.FolderNamesConfigKey}:CollectionFolders:0"] = ".Merijn"
+            })
+            .Build();
     }
 }
