@@ -15,19 +15,19 @@ public class MetadataInitialisationService : IMetadataInitialisationService
     public void EnsureRequiredMetadataExists()
     {
         EnsureMetadataExists(
-            (FolderMetadataKeyPrefix + OriginalsFolderRole).ToLowerInvariant(),
+            OriginalsFolderMetadataKey,
             "Folder",
             "Originals folder",
             "The mapped originals folder for this project.");
 
         EnsureMetadataExists(
-            (FolderMetadataKeyPrefix + EditingFolderRole).ToLowerInvariant(),
+            EditingFolderMetadataKey,
             "Folder",
             "Editing folder",
             "The mapped editing folder for this project.");
 
         EnsureMetadataExists(
-            (FolderMetadataKeyPrefix + FinalsFolderRole).ToLowerInvariant(),
+            FinalsFolderMetadataKey,
             "Folder",
             "Finals folder",
             "The mapped finals folder for this project.");
