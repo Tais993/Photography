@@ -15,6 +15,9 @@ public interface IProjectFolderService
     /// <param name="destinationFolder"></param>
     /// <returns></returns>
     string ResolveFolder(Project project, string destinationFolder);
+
+    public List<ProjectFolder> GetExistingProjectFolders(int projectId);
+    
     
     string GetRequiredFolderPath(int projectId, ProjectFolderRole role);
     string GetRequiredFolderName(int projectId, ProjectFolderRole role);

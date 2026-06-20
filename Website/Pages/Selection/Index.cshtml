@@ -1,4 +1,5 @@
 ﻿@page
+@using Domain.entities
 @using Domain.website
 @model IndexModel
 
@@ -56,11 +57,11 @@
                         <div class="col-md-2">
                             <select asp-for="FolderName" class="form-select">
                                 <option value="">All folders</option>
-                                <option value="Original">Original</option>
-                                <option value="Originals">Originals</option>
-                                <option value="Editing">Editing</option>
-                                <option value="Final">Final</option>
-                                <option value="Finals">Finals</option>
+
+                                @foreach (ProjectFolder folder in Model.FolderOptions)
+                                {
+                                    <option value="@folder.FolderName">@folder.FolderName</option>
+                                }
                             </select>
                         </div>
 

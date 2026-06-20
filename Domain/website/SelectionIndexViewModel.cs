@@ -8,6 +8,7 @@ public class SelectionIndexViewModel
     public PaginatedResult<Image> ImagePage = PaginatedResult<Image>.Empty;
     public List<ImageViewModel> Images = [];
     public List<int> SelectedImageIds  = [];
+    public List<ProjectFolder> FolderOptions = [];
     
     public Project? SelectedProject;
     public SelectedImageViewModel? SelectedImage;

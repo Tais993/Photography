@@ -78,6 +78,15 @@ public class ProjectFolderService : IProjectFolderService
 
         return GetRequiredFolderName((int)project.Id, folderRole);
     }
+    
+    public List<ProjectFolder> GetExistingProjectFolders(int projectId)
+    {
+        return Enum.GetValues<ProjectFolderRole>()
+            .Select(role => GetFolder(projectId, role))
+            .Where(folder => folder is not null && folder.Exists)
+            .Select(folder => folder!)
+            .ToList();
+    }
 
     public string GetRequiredFolderPath(int projectId, ProjectFolderRole role)
     {

@@ -23,6 +23,8 @@ public class IndexModel : PageModel
 
     public List<int> SelectedImageIds = [];
 
+    public List<ProjectFolder> FolderOptions = [];
+
     public Project? SelectedProject { get; private set; }
 
     public SelectedImageViewModel? SelectedImage { get; private set; }
@@ -57,6 +59,7 @@ public class IndexModel : PageModel
         ImagePage = viewModel.ImagePage;
         Images = viewModel.Images;
         SelectedImageIds = viewModel.SelectedImageIds;
+        FolderOptions = viewModel.FolderOptions;
         SelectedProject = viewModel.SelectedProject;
         SelectedImage = viewModel.SelectedImage;
         SelectedProjectId = viewModel.SelectedProjectId;
