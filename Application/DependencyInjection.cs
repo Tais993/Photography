@@ -22,6 +22,7 @@ public static class DependencyInjection
             services.AddSingleton<IMetadataInitialisationService, MetadataInitialisationService>();
             services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
             services.AddScoped<IProjectFolderService, ProjectFolderService>();
+            services.AddScoped<ICollectionMetadataService, CollectionMetadataService>();
             
             
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
