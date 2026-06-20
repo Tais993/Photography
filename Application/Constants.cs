@@ -14,13 +14,18 @@ public class Constants
     public const string ImageViewerPath = "ImageViewer:ImageViewerPath";
     
     
-    public const string FolderNamesConfigKey = "FolderNames";
+    public const string CollectionMetadataType = "Collection";
+    public const string CollectionsConfigKey = "Collections";
+    
     public const string FolderMetadataType = "Folder";
+    public const string FolderNamesConfigKey = "FolderNames";
     public const string FolderMetadataKeyPrefix = "folder.";
-
+    
     public const string OriginalsFolderMetadataKey = "folder.originals";
     public const string EditingFolderMetadataKey = "folder.editing";
     public const string FinalsFolderMetadataKey = "folder.finals";
+    
+
     
 
     public static readonly string[] ImageFileTypesSql =
