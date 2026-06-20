@@ -20,31 +20,39 @@ public class RepositoryHelper
     {
         _logger.LogDebug("Executing query expecting multiple results with {ParameterCount} parameters", parameterValues.Length);
 
-        try
+        List<T>? results = QueryInternal(sql, reader =>
         {
-            return Query(sql, reader =>
+            List<T> results = [];
+
+            do
             {
-                List<T> results = [];
+                results.Add(resultConverter(reader));
+            } while (reader.Read());
 
-                do
-                {
-                    results.Add(resultConverter(reader));
-                } while (reader.Read());
+            _logger.LogDebug("Query returned {Count} results", results.Count);
 
-                _logger.LogDebug("Query returned {Count} results", results.Count);
+            return results;
+        }, false, parameterValues);
 
-                return results;
-            }, parameterValues);
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogDebug(ex, "Query returned no results");
-            return [];
-        }
+        return results ?? [];
     }
 
     public TResult? QueryOrDefault<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
         params object?[] parameterValues)
+    {
+        return QueryInternal(sql, resultConverter, false, parameterValues);
+    }
+
+    public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
+        params object?[] parameterValues)
+    {
+        TResult? result = QueryInternal(sql, resultConverter, true, parameterValues);
+
+        return result!;
+    }
+
+    private TResult? QueryInternal<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
+        bool throwWhenNoResult, params object?[] parameterValues)
     {
         _logger.LogTrace("Executing query with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
 
@@ -59,35 +67,33 @@ public class RepositoryHelper
         if (!reader.Read())
         {
             _logger.LogTrace("Query returned no results: {Sql}", sql);
+
+            if (throwWhenNoResult)
+            {
+                throw new InvalidOperationException("Query returned no results");
+            }
+
             return default;
         }
 
         return resultConverter(reader);
     }
     
-    public TResult Query<TResult>(string sql, Func<NpgsqlDataReader, TResult> resultConverter,
-        params object?[] parameterValues)
+
+    public TResult? QueryScalarOrDefault<TResult>(string sql, params object?[] parameterValues)
     {
-        _logger.LogTrace("Executing query with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
-
-        using NpgsqlConnection cnx = _dataSource.OpenConnection();
-
-        using NpgsqlCommand npgsqlCommand = new NpgsqlCommand(sql, cnx);
-
-        SetParameters(parameterValues, npgsqlCommand);
-
-        using NpgsqlDataReader reader = npgsqlCommand.ExecuteReader();
-
-        if (!reader.Read())
-        {
-            _logger.LogTrace("Query returned no results: {Sql}", sql);
-            throw new InvalidOperationException("Query returned no results");
-        }
-
-        return resultConverter(reader);
+        return QueryScalarInternal<TResult>(sql, false, parameterValues);
     }
-    
-    public TResult? QueryScalar<TResult>(string sql, params object?[] parameterValues)
+
+    public TResult QueryScalar<TResult>(string sql, params object?[] parameterValues)
+    {
+        TResult? result = QueryScalarInternal<TResult>(sql, true, parameterValues);
+
+        return result!;
+    }
+
+    private TResult? QueryScalarInternal<TResult>(string sql, bool throwWhenNoResult,
+        params object?[] parameterValues)
     {
         _logger.LogTrace("Executing scalar query with {ParameterCount} parameters: {Sql}", parameterValues.Length, sql);
 
@@ -102,11 +108,18 @@ public class RepositoryHelper
         if (result is null || result == DBNull.Value)
         {
             _logger.LogTrace("Scalar query returned no result: {Sql}", sql);
-            throw new InvalidOperationException("Query returned no results");
+
+            if (throwWhenNoResult)
+            {
+                throw new InvalidOperationException("Scalar query returned no results");
+            }
+
+            return default;
         }
 
         return (TResult)Convert.ChangeType(result, typeof(TResult));
     }
+    
 
     public void Execute(string sql, params object[] parameterValues)
     {
@@ -123,6 +136,7 @@ public class RepositoryHelper
         _logger.LogDebug("Command executed. Affected rows: {AffectedRows}", affectedRows);
     }
 
+    
 
     private void SetParameters(object?[] parameterValues, NpgsqlCommand npgsqlCommand)
     {
