@@ -48,6 +48,22 @@ public interface IFiles
     public string GetDirectoryName(string path);
 
     /// <summary>
+    ///     Gets the parent directory from the given path.
+    ///     Returns null when the path has no parent directory.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    DirectoryInfo? GetParentDirectory(string path);
+
+
+    /// <summary>
+    ///     Resolves the full, absolute path based on the relative path it receives.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public string GetFullPath(string path);
+    
+    /// <summary>
     ///     Creates
     /// </summary>
     /// <param name="relativeTo"></param>
