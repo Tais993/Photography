@@ -7,12 +7,12 @@ namespace Cli.Commands.ProjectCommand;
 public class ProjectCommand : CommandBase
 {
     private readonly IProjectMetadataService _projectMetadataService;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
 
-    public ProjectCommand(IProjectService projectService, IProjectMetadataService projectMetadataService)
+    public ProjectCommand(IProjectMetadataService projectMetadataService, IProjectResolverService projectResolverService)
     {
-        _projectService = projectService;
         _projectMetadataService = projectMetadataService;
+        _projectResolverService = projectResolverService;
     }
 
 
@@ -34,8 +34,8 @@ public class ProjectCommand : CommandBase
         // command.Subcommands.Add(createCommand);
         // command.Subcommands.Add(editCommand);
         // command.Subcommands.Add(deleteCommand);
-        command.Subcommands.Add(new AddMetadataCommand(_projectService, _projectMetadataService).Build());
-        command.Subcommands.Add(new RemoveMetadataCommand(_projectService, _projectMetadataService).Build());
+        command.Subcommands.Add(new AddMetadataCommand(_projectResolverService, _projectMetadataService).Build());
+        command.Subcommands.Add(new RemoveMetadataCommand(_projectResolverService, _projectMetadataService).Build());
         // command.Subcommands.Add(verifyCommand);
     }
 

@@ -10,11 +10,11 @@ public class AddMetadataCommand : CommandBase
 {
 
     private readonly IProjectMetadataService _projectMetadataService;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
 
-    public AddMetadataCommand(IProjectService projectService, IProjectMetadataService projectMetadataService)
+    public AddMetadataCommand(IProjectResolverService projectResolverService, IProjectMetadataService projectMetadataService)
     {
-        _projectService = projectService;
+        _projectResolverService = projectResolverService;
         _projectMetadataService = projectMetadataService;
     }
 
@@ -43,7 +43,7 @@ public class AddMetadataCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        int projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
+        int projectId = _projectResolverService.ResolveProjectId(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
         Metadata? metadata = ResolveMetadata(parseResult);

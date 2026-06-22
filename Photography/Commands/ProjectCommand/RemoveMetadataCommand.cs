@@ -9,11 +9,11 @@ namespace Cli.Commands.ProjectCommand;
 public class RemoveMetadataCommand : CommandBase
 {
     private readonly IProjectMetadataService _projectMetadataService;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
 
-    public RemoveMetadataCommand(IProjectService projectService, IProjectMetadataService projectMetadataService)
+    public RemoveMetadataCommand(IProjectResolverService projectResolverService, IProjectMetadataService projectMetadataService)
     {
-        _projectService = projectService;
+        _projectResolverService = projectResolverService;
         _projectMetadataService = projectMetadataService;
     }
 
@@ -36,7 +36,7 @@ public class RemoveMetadataCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        int projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
+        int projectId = _projectResolverService.ResolveProjectId(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
         Metadata? metadata = ResolveMetadata(parseResult);

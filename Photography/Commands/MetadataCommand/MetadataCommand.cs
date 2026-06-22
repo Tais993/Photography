@@ -8,12 +8,12 @@ namespace Cli.Commands.MetadataCommand;
 public class MetadataCommand : CommandBase
 {
     private readonly IProjectMetadataService _projectMetadataService;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
 
-    public MetadataCommand(IProjectService projectService, IProjectMetadataService projectMetadataService)
+    public MetadataCommand(IProjectMetadataService projectMetadataService, IProjectResolverService projectResolverService)
     {
-        _projectService = projectService;
         _projectMetadataService = projectMetadataService;
+        _projectResolverService = projectResolverService;
     }
 
     protected override string Name => "metadata";
@@ -32,7 +32,7 @@ public class MetadataCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        Project project = _projectService.ResolveProject(Directory.GetCurrentDirectory());
+        Project project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory());
 
         Console.WriteLine(project);
 

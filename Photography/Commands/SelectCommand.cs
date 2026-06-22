@@ -11,7 +11,7 @@ namespace Cli.Commands;
 public class SelectCommand : CommandBase
 {
     private readonly ISearchService _searchService;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
     private readonly IImageSelectionService _imageSelectionService;
     private readonly IImageViewerService _imageViewer;
     private readonly IProjectFolderService _projectFolderService;
@@ -19,14 +19,14 @@ public class SelectCommand : CommandBase
 
 
     public SelectCommand(ISearchService searchService, IImageSelectionService imageSelectionService,
-        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectService projectService, IProjectFolderService projectFolderService)
+        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService)
     {
         _searchService = searchService;
         _imageSelectionService = imageSelectionService;
         _imageViewer = imageViewer;
         _logger = logger;
-        _projectService = projectService;
         _projectFolderService = projectFolderService;
+        _projectResolverService = projectResolverService;
     }
 
     protected override string Name => "select";
@@ -62,7 +62,7 @@ public class SelectCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        Project? project = _projectService.ResolveProject(Directory.GetCurrentDirectory(),
+        Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
         if (project is null)

@@ -6,11 +6,11 @@ namespace Cli.Commands;
 
 public class TestCommand : CommandBase
 {
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
 
-    public TestCommand(IProjectService projectService)
+    public TestCommand(IProjectResolverService projectResolverService)
     {
-        this._projectService = projectService;
+        _projectResolverService = projectResolverService;
     }
 
 
@@ -25,7 +25,7 @@ public class TestCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        Project? project = _projectService.ResolveProject(Directory.GetCurrentDirectory());
+        Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory());
         
         Console.WriteLine(project);
 
