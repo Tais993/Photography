@@ -1,8 +1,10 @@
 ﻿using Application;
 using Application.interfaces.infrastructure;
 using Application.interfaces.infrastructure.imageviewers;
+using Application.interfaces.infrastructure.services;
 using Infrastructure.database;
 using Infrastructure.database.repositories;
+using Infrastructure.database.services;
 using Infrastructure.filesystem;
 using Infrastructure.images;
 using Infrastructure.imageviewers;
@@ -23,6 +25,7 @@ public static class DependencyInjection
             services.AddSingleton(new NpgsqlDataSourceBuilder(connectionString).Build());
             services.AddTransient<MigrationService>();
             services.AddScoped<RepositoryHelper>();
+            services.AddScoped<IDatabaseResetService, DatabaseResetService>();
 
             // Repositories
             services.AddScoped<IImageRepository, ImageRepository>();
