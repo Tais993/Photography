@@ -18,13 +18,16 @@ public static class DependencyInjection
             services.AddScoped<ICopyService, CopyService>();
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<ILightroomService, LightroomService>();
-            services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IImageService, ImageService>();
+            
+            
+            services.AddScoped<IProjectService, ProjectService>();
+            services.AddScoped<IProjectResolverService, ProjectResolverService>();
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
-
-            services.AddScoped<IMetadataInitialisationService, MetadataInitialisationService>();
             services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
             services.AddScoped<IProjectFolderService, ProjectFolderService>();
+            
+            services.AddScoped<IMetadataInitialisationService, MetadataInitialisationService>();
             services.AddScoped<ICollectionMetadataService, CollectionMetadataService>();
             
             

@@ -10,7 +10,7 @@ namespace Cli.Commands;
 public class SearchCommand : CommandBase
 {
     private readonly ISearchService _searchService;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
  
     private const string QueryName = "query";
     private readonly Argument<string> _queryArgument = new Argument<string>(QueryName)
@@ -42,10 +42,10 @@ public class SearchCommand : CommandBase
         DefaultValueFactory = _ => "Originals"
     };
 
-    public SearchCommand(ISearchService searchService, IProjectService projectService)
+    public SearchCommand(ISearchService searchService, IProjectResolverService projectResolverService)
     {
         _searchService = searchService;
-        _projectService = projectService;
+        this._projectResolverService = projectResolverService;
     }
 
     protected override string Name => "search";
@@ -69,7 +69,7 @@ public class SearchCommand : CommandBase
         string? fileType = parseResult.GetValue<string>(FileTypeName);
         string? originFolder = parseResult.GetValue<string>(OriginFolderName);
 
-        int? projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
+        int? projectId = _projectResolverService.ResolveProjectId(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
         if (!shouldByGlobal || projectId == 0)

@@ -12,18 +12,18 @@ public class CopyCommand : CommandBase
 
     private readonly IImageSelectionService _imageSelectionService;
     private readonly ILogger<CopyCommand> _logger;
-    private readonly IProjectService _projectService;
+    private readonly IProjectResolverService _projectResolverService;
     private readonly ICopyService _copyService;
     private readonly IProjectFolderService _projectFolderService;
 
 
-    public CopyCommand(IProjectService projectService, ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService, IProjectFolderService projectFolderService)
+    public CopyCommand(ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService)
     {
-        _projectService = projectService;
         _copyService = copyService;
         _logger = logger;
         _imageSelectionService = imageSelectionService;
         _projectFolderService = projectFolderService;
+        _projectResolverService = projectResolverService;
     }
 
     protected override string Name => "copy";
@@ -46,7 +46,7 @@ public class CopyCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        Project? project = _projectService.ResolveProject(Directory.GetCurrentDirectory(),
+        Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
         if (project is null)
