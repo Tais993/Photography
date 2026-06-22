@@ -48,6 +48,10 @@ public class ProjectServiceTest
 
         // Mocks
         _files
+            .Setup(f => f.GetFullPath(projectDirectory))
+            .Returns(projectDirectory);
+        
+        _files
             .Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
             .Returns(projectInfoPath);
 
@@ -107,6 +111,10 @@ public class ProjectServiceTest
         const int projectId = 6;
 
         // Mocks
+        _files
+            .Setup(f => f.GetFullPath(projectDirectory))
+            .Returns(projectDirectory);
+        
         _files
             .Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
             .Returns(projectInfoPath);
