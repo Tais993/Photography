@@ -12,6 +12,8 @@ public static class DependencyInjection
     {
         public IServiceCollection AddLogic()
         {
+            services.AddScoped<IApplicationResetService, ApplicationResetService>();
+            
             services.AddScoped<ICopyService, CopyService>();
             services.AddScoped<ISearchService, SearchService>();
             services.AddScoped<ILightroomService, LightroomService>();
