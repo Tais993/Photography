@@ -3,6 +3,7 @@ using Application.interfaces.services;
 using Domain.entities;
 using Domain.entities.search;
 using static Cli.Commands.CommandOptions;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands;
 
@@ -68,12 +69,12 @@ public class SearchCommand : CommandBase
         string? fileType = parseResult.GetValue<string>(FileTypeName);
         string? originFolder = parseResult.GetValue<string>(OriginFolderName);
 
-        int? projectId = null;
+        int? projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
+            parseResult.GetValue(ProjectOption));
 
-        if (!shouldByGlobal)
+        if (!shouldByGlobal || projectId == 0)
         {
-            projectId = _projectService.ResolveProjectId(Directory.GetCurrentDirectory(),
-                parseResult.GetValue(ProjectOption));
+            projectId = null;
         }
 
         ImageSearchSettings settings = new ImageSearchSettings()
@@ -91,6 +92,6 @@ public class SearchCommand : CommandBase
             Console.WriteLine($"File name: `{image.FileName}` Path: `{image.RelationalFilePath}`");
         }
 
-        return 0;
+        return Success;
     }
 }

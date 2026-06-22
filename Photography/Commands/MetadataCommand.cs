@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
 using Domain.entities;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands;
 
@@ -23,13 +24,13 @@ public class MetadataCommand : CommandBase
 
     protected override string Name => "metadata";
     protected override string Description => "";
-    private static List<string> aliases => ["md", "meta"];
+    private static List<string> Aliases => ["md", "meta"];
 
 
     protected override void Configure(Command command)
     {
         base.Configure(command);
-        AddAliases(aliases);
+        AddAliases(Aliases);
 
         Command createCommand = new Command("create", "Create metadata")
         {
@@ -69,7 +70,6 @@ public class MetadataCommand : CommandBase
             Arguments =
             {
                 new Argument<string>(MetadataKey)
-                
             }
         };
         deleteCommand.SetAction(DeleteMetadata);
@@ -87,7 +87,7 @@ public class MetadataCommand : CommandBase
 
         Console.WriteLine(project);
 
-        return 0;
+        return Success;
     }
 
     private int CreateMetadata(ParseResult parseResult)
@@ -99,18 +99,17 @@ public class MetadataCommand : CommandBase
 
         if (metadataKey == null || displayName == null)
         {
-            Console.WriteLine("Metadatakey and or displayname cannot be null");
-            return -1;
+            return InvalidInput("Metadatakey and or displayname cannot be null");
         }
 
         _projectMetadataService.CreateMetadata(metadataKey, metadataType, displayName, description);
 
-        return 0;
+        return Success;
     }
 
     private int EditMetadata(ParseResult parseResult)
     {
-        string metadataKey = parseResult.GetValue<string>(MetadataKey);
+        string? metadataKey = parseResult.GetValue<string>(MetadataKey);
 
 
         string? displayName = parseResult.GetValue<string>(MetaDisplayName);
@@ -119,10 +118,9 @@ public class MetadataCommand : CommandBase
 
         Metadata? metadata = _projectMetadataService.GetMetadata(metadataKey);
 
-        if (metadata == null)
+        if (metadataKey is null || metadata is null)
         {
-            Console.WriteLine("Given metadata ID is invalid or cannot be found");
-            return -1;
+            return InvalidInput("Metadatakey is null or invalid");
         }
 
         metadata.DisplayName = displayName ?? metadata.DisplayName;
@@ -133,27 +131,40 @@ public class MetadataCommand : CommandBase
 
         Console.WriteLine("Updated metadata in the database");
 
-        return 0;
+        return Success;
     }
 
     private int DeleteMetadata(ParseResult parseResult)
     {
         string metadataKey = parseResult.GetValue<string>(MetadataKey);
 
-        Console.WriteLine("Are you sure that you want to delete the metadata with its connection to the projects?");
-        Console.WriteLine("This is NOT a reversable action [Y/N]");
-
-        string? input = Console.ReadLine();
-
-        if (!string.Equals(input, "y", StringComparison.OrdinalIgnoreCase) &&
-            !string.Equals(input, "yes", StringComparison.OrdinalIgnoreCase))
+        if (metadataKey is null)
         {
-            Console.WriteLine("Cancelled.");
-            return 0;
+            return InvalidInput("Metadatakey cannot be null");
         }
 
-        _projectMetadataService.DeleteMetadata(metadataKey);
 
-        return 0;
+        Console.WriteLine("Are you sure that you want to delete the metadata with its connection to the projects?");
+        Console.WriteLine("This is an irreversible action [Y/N]");
+
+
+        ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
+
+        switch (consoleKeyInfo.Key)
+        {
+            case ConsoleKey.Y:
+            {
+                Console.WriteLine("Deleting...");
+                _projectMetadataService.DeleteMetadata(metadataKey);
+                return Success;
+            }
+            
+            case ConsoleKey.N:
+                Console.WriteLine("Cancelled.");
+                return Success;
+            default:
+                Console.WriteLine("Invalid input");
+                return ExitCodes.InvalidInput;
+        }
     }
 }

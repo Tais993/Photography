@@ -3,6 +3,7 @@ using Application.interfaces.services;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using static Cli.Commands.CommandOptions;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands;
 
@@ -48,20 +49,24 @@ public class CopyCommand : CommandBase
         Project? project = _projectService.ResolveProject(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
+        if (project is null)
+        {
+            return InvalidInput("No valid project was given or resolved.");
+        }
+        
         string destinationFolder = parseResult.GetValue<string>(_destinationFolder)!;
         destinationFolder = _projectFolderService.ResolveFolder(project!, destinationFolder);
 
         
-        SelectionSession selectionSession = _imageSelectionService.GetSessionImages(project);
+        SelectionSession selectionSession = _imageSelectionService.GetOrStartSession(project);
 
+        
         List<int> imageIds = selectionSession.ImageIds;
         IEnumerable<string> imagePaths = _copyService.ImageIdsToRelativePaths(imageIds.ToArray());
         
         _copyService.CopyFiles(imagePaths, project.Path, destinationFolder);
         _imageSelectionService.ClearSession(project);
         
-        return 0;
+        return Success;
     }
-
-
 }

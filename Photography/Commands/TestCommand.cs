@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
+using Domain.entities;
 
 namespace Cli.Commands;
 
@@ -24,11 +25,10 @@ public class TestCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        var project = _projectService.ResolveProject(Directory.GetCurrentDirectory());
-
-
+        Project? project = _projectService.ResolveProject(Directory.GetCurrentDirectory());
+        
         Console.WriteLine(project);
 
-        return 0;
+        return ExitCodes.Success;
     }
 }

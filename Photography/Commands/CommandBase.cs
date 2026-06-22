@@ -31,6 +31,12 @@ public abstract class CommandBase : ICommand
         }
     }
 
+    public static int InvalidInput(string warningText)
+    {
+        Console.WriteLine(warningText);
+        return ExitCodes.InvalidInput;
+    }
+
     /// <summary>
     ///     This method can be used for configuring anything outside of the name, description and aliases.
     ///     While the command is getting build this method gets called with the command.

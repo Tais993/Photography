@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands;
 
@@ -46,10 +47,10 @@ public class ApplicationResetCommand : CommandBase
                 _applicationResetService.ResetApplicationData(dryRun);
                 break;
             }
-            case ConsoleKey.N: Console.WriteLine("Cancelled."); return 0;
-            default: Console.WriteLine("Invalid input"); return 1;
+            case ConsoleKey.N: Console.WriteLine("Cancelled."); return Success;
+            default: Console.WriteLine("Invalid input"); return ExitCodes.InvalidInput;
         }
 
-        return 0;
+        return Success;
     }
 }
