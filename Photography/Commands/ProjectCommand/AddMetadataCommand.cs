@@ -28,7 +28,7 @@ public class AddMetadataCommand : CommandBase
     {
         base.Configure(command);
 
-        command.Options.Add(new Option<string>(MetadataKeyName)
+        command.Arguments.Add(new Argument<string>(MetadataKeyName)
         {
             Description = "The key of the metadata"
         });
