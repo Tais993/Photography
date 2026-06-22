@@ -18,6 +18,7 @@ public static class CommandFactory
             provider.GetRequiredService<ProjectCommand>().Build(),
             provider.GetRequiredService<CopyCommand>().Build(),
             provider.GetRequiredService<SelectCommand>().Build(),
+            provider.GetRequiredService<ApplicationResetCommand>().Build(),
         };
 
         return rootCommand;

@@ -15,5 +15,6 @@ public static class CommandRegistrationService
         services.AddTransient<ProjectCommand>();
         services.AddTransient<CopyCommand>();
         services.AddTransient<SelectCommand>();
+        services.AddTransient<ApplicationResetCommand>();
     }
 }
