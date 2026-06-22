@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Cli.Commands;
+using Cli.Commands.MetadataCommand;
 using Cli.Commands.ProjectCommand;
 using Microsoft.Extensions.DependencyInjection;
 
