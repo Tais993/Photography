@@ -3,7 +3,7 @@ using Application.interfaces.services;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 
-namespace Application.services;
+namespace Application.services.project;
 
 /// <summary>
 /// The project services handles with everything project related.

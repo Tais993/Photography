@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static Application.Constants;
 
-namespace Application.services;
+namespace Application.services.project;
 
 public class ProjectInitialisingService : IProjectInitialisingService
 {

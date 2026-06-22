@@ -48,4 +48,5 @@ public interface IProjectService
     /// </summary>
     /// <returns></returns>
     public List<Project> GetAllProjects();
+
 }

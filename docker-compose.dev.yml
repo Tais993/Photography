@@ -1,0 +1,17 @@
+﻿services:
+  database:
+    container_name: photography-database-dev
+
+    environment:
+      POSTGRES_DB: photography_dev
+      POSTGRES_USER: photography
+      POSTGRES_PASSWORD: photography
+
+    ports:
+      - "5434:5432"
+
+    volumes:
+      - photography-database-dev-data:/var/lib/postgresql/data
+
+volumes:
+  photography-database-dev-data:
