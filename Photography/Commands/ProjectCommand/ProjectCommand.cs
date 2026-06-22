@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands.ProjectCommand;
 
@@ -42,6 +43,6 @@ public class ProjectCommand : CommandBase
     {
         // Console.WriteLine(project);
 
-        return 0;
+        return Success;
     }
 }

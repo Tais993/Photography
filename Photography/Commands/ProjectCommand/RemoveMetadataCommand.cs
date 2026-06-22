@@ -2,6 +2,7 @@
 using Application.interfaces.services;
 using Domain.entities;
 using static Cli.Commands.CommandOptions;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands.ProjectCommand;
 
@@ -40,15 +41,19 @@ public class RemoveMetadataCommand : CommandBase
 
         Metadata? metadata = ResolveMetadata(parseResult);
 
+        if (projectId == 0)
+        {
+            return InvalidInput("No valid project was given or resolved.");
+        }
+        
         if (metadata == null)
         {
-            Console.WriteLine("No valid metadata-key was given");
-            return 2;
+            return InvalidInput("No valid metadata-key was given.");
         }
 
         _projectMetadataService.RemoveMetadataFromProject(projectId, metadata.MetadataKey);
-
-        return 0;
+        
+        return Success;
     }
 
     public Metadata? ResolveMetadata(ParseResult parseResult)

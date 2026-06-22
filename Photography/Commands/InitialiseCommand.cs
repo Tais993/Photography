@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
 using Microsoft.Extensions.Logging;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands;
 
@@ -39,6 +40,6 @@ public class InitialiseCommand : CommandBase
 
         _projectInitialisingService.InitialiseFolder(consoleDirectory);
 
-        return 0;
+        return Success;
     }
 }

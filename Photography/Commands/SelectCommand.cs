@@ -4,6 +4,7 @@ using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
 using static Cli.Commands.CommandOptions;
+using static Cli.ExitCodes;
 
 namespace Cli.Commands;
 
@@ -66,8 +67,7 @@ public class SelectCommand : CommandBase
 
         if (project is null)
         {
-            Console.WriteLine("No project found");
-            return 1;
+            return InvalidInput("No valid project was given or resolved.");
         }
 
         string? fileName = GetFileName(parseResult);
@@ -75,8 +75,7 @@ public class SelectCommand : CommandBase
 
         if (fileName == null && fileNumber == null)
         {
-            Console.WriteLine("No file name was given.");
-            return 1;
+            return InvalidInput("No file name or file number was given.");
         }
 
         string? fileType = parseResult.GetValue<string>(_fileType);
@@ -97,10 +96,10 @@ public class SelectCommand : CommandBase
         foreach (Image image in images)
         {
             _logger.LogInformation("Adding image to selection: {ImageFileName}", image.FileName);
-            _imageSelectionService.AddImageToSelection((int)selectionSession.Id, (int)image.Id);
+            _imageSelectionService.AddImageToSelection((int) selectionSession.Id!, (int) image.Id!);
         }
 
-        return 0;
+        return Success;
     }
 
     private string? GetFileName(ParseResult parseResult)
