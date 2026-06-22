@@ -36,6 +36,16 @@ public class Files : IFiles
         return Path.GetDirectoryName(path);
     }
 
+    public DirectoryInfo? GetParentDirectory(string path)
+    {
+        return Directory.GetParent(path);
+    }
+
+    public string GetFullPath(string path)
+    {
+        return Path.GetFullPath(path);
+    }
+
     public string GetRelativePath(string relativeTo, string path)
     {
         return Path.GetRelativePath(relativeTo, path);
