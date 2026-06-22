@@ -1,7 +1,7 @@
 ﻿using Application;
 using Application.interfaces.infrastructure;
 using Application.interfaces.services;
-using Application.services;
+using Application.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
