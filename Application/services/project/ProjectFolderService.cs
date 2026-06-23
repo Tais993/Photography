@@ -1,6 +1,7 @@
 ﻿using Application.interfaces.infrastructure;
-using Application.interfaces.services;
+using Application.interfaces.services.project;
 using Domain.entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static Application.Constants;
 
@@ -10,19 +11,18 @@ public class ProjectFolderService : IProjectFolderService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectMetadataService _projectMetadataService;
-    private readonly IFiles _files;
     private readonly ILogger<ProjectFolderService> _logger;
+    private readonly IConfiguration _configuration;
+    private readonly IFiles _files;
 
-    public ProjectFolderService(
-        IProjectRepository projectRepository,
-        IProjectMetadataService projectMetadataService,
-        IFiles files,
-        ILogger<ProjectFolderService> logger)
+    public ProjectFolderService(IProjectRepository projectRepository, IProjectMetadataService projectMetadataService,
+        IFiles files, ILogger<ProjectFolderService> logger, IConfiguration configuration)
     {
         _projectRepository = projectRepository;
         _projectMetadataService = projectMetadataService;
         _files = files;
         _logger = logger;
+        _configuration = configuration;
     }
 
     public ProjectFolder? GetFolder(int projectId, ProjectFolderRole role)
@@ -67,18 +67,17 @@ public class ProjectFolderService : IProjectFolderService
         throw new InvalidOperationException(
             $"Required folder metadata is missing for project {projectId}, role {role}.");
     }
-    
+
     public string ResolveFolder(Project project, string destinationFolder)
     {
-        if (project.Id is null 
-            || !Enum.TryParse(destinationFolder, true, out ProjectFolderRole folderRole))
+        if (project.Id is null || !Enum.TryParse(destinationFolder, true, out ProjectFolderRole folderRole))
         {
             return destinationFolder;
         }
 
         return GetRequiredFolderName((int)project.Id, folderRole);
     }
-    
+
     public List<ProjectFolder> GetExistingProjectFolders(int projectId)
     {
         return Enum.GetValues<ProjectFolderRole>()
@@ -97,7 +96,62 @@ public class ProjectFolderService : IProjectFolderService
     {
         return GetRequiredFolder(projectId, role).FolderName;
     }
-    
+
+    public void CreateRequiredFolders(Project project)
+    {
+        if (project.Id is null)
+        {
+            _logger.LogWarning("Could not create required folders because project id was null");
+            throw new ArgumentNullException(nameof(project.Id));
+        }
+
+        _logger.LogInformation("Creating required folders for project: {ProjectId}", project.Id);
+
+        _files.FolderCreate(project.Path);
+
+        foreach (ProjectFolderRole role in Enum.GetValues<ProjectFolderRole>())
+        {
+            CreateRequiredFolder(project, role);
+        }
+    }
+
+    private void CreateRequiredFolder(Project project, ProjectFolderRole role)
+    {
+        if (project.Id is null)
+        {
+            throw new ArgumentNullException(nameof(project.Id));
+        }
+
+        string folderName = GetDefaultFolderName(role);
+        string folderPath = _files.Combine(project.Path, folderName);
+        string metadataKey = ToMetadataKey(role);
+
+        _files.FolderCreate(folderPath);
+
+        if (_projectMetadataService.GetProjectMetadata(project.Id.Value, metadataKey) is null)
+        {
+            _projectMetadataService.AddMetadataToProject(
+                project.Id.Value, metadataKey, folderName
+            );
+        }
+
+        _logger.LogInformation(
+            "Created required folder for project {ProjectId}, role {FolderRole}, folder {FolderName}",
+            project.Id, role, folderName);
+    }
+
+    private string GetDefaultFolderName(ProjectFolderRole role)
+    {
+        string? folderName = _configuration
+            .GetSection(FolderNamesConfigKey)
+            .GetSection(role.ToString())
+            .GetChildren()
+            .Select(child => child.Value?.Trim())
+            .FirstOrDefault(value => !string.IsNullOrWhiteSpace(value));
+
+        return folderName ?? role.ToString();
+    }
+
 
     private static string ToMetadataKey(ProjectFolderRole role)
     {

@@ -12,6 +12,7 @@ public class Constants
     
     public const string ConfigImageViewerMode = "ImageViewer:Mode";
     public const string ConfigImageViewerPath = "ImageViewer:ImageViewerPath";
+    public const string ConfigProjectFolder = "DefaultProjectFolder";
     
     public const string CollectionMetadataType = "Collection";
     public const string CollectionsConfigKey = "Collections";
