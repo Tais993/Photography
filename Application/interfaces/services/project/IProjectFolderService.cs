@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.interfaces.services;
+namespace Application.interfaces.services.project;
 
 public interface IProjectFolderService
 {
@@ -21,4 +21,6 @@ public interface IProjectFolderService
     
     string GetRequiredFolderPath(int projectId, ProjectFolderRole role);
     string GetRequiredFolderName(int projectId, ProjectFolderRole role);
+
+    void CreateRequiredFolders(Project project);
 }
