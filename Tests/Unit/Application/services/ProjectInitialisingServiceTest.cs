@@ -18,6 +18,7 @@ public class ProjectInitialisingServiceTest
     private Mock<IImageRepository> _imageRepository = null!;
     private Mock<IProjectMetadataService> _projectMetadataService = null!;
     private Mock<ICollectionMetadataService> _collectionMetadataService = null!;
+    private Mock<IProjectInfoFileService> _projectInfoFileService = null!;
     private Mock<IFiles> _files = null!;
     private Mock<ILogger<ProjectInitialisingService>> _logger = null!;
     private ProjectInitialisingService _service = null!;
@@ -29,6 +30,7 @@ public class ProjectInitialisingServiceTest
         _imageRepository = new Mock<IImageRepository>();
         _projectMetadataService = new Mock<IProjectMetadataService>();
         _collectionMetadataService = new Mock<ICollectionMetadataService>();
+        _projectInfoFileService = new Mock<IProjectInfoFileService>();
         _files = new Mock<IFiles>();
         _logger = new Mock<ILogger<ProjectInitialisingService>>();
 
@@ -36,6 +38,7 @@ public class ProjectInitialisingServiceTest
             _projectRepository.Object,
             _imageRepository.Object,
             _projectMetadataService.Object,
+            _projectInfoFileService.Object,
             CreateConfiguration(),
             _logger.Object,
             _files.Object,
@@ -47,16 +50,12 @@ public class ProjectInitialisingServiceTest
     public void InitialiseFolder_ProjectFolder_InitialisesProject()
     {
         const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(projectDirectory))
             .Returns("2024-07-04-Merijn");
 
-        _files.Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectDirectory))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(projectDirectory))
@@ -83,23 +82,25 @@ public class ProjectInitialisingServiceTest
             p.ParentProjectId == null
         )), Times.Once);
 
-        _files.Verify(f => f.WriteAllText("2", projectInfoPath), Times.Once);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 2 &&
+            p.Name == "Merijn" &&
+            p.Path == projectDirectory &&
+            p.EventDate == new DateOnly(2024, 7, 4) &&
+            p.ParentProjectId == null
+        )), Times.Once);
     }
 
     [Test]
     public void InitialiseFolder_ProjectFolder_SingleDigitMonthAndDay_InitialisesProject()
     {
         const string projectDirectory = @"C:\2024-7-4-Merijn";
-        const string projectInfoPath = @"C:\2024-7-4-Merijn\project.info";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(projectDirectory))
             .Returns("2024-7-4-Merijn");
 
-        _files.Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectDirectory))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(projectDirectory))
@@ -124,23 +125,24 @@ public class ProjectInitialisingServiceTest
             p.EventDate == new DateOnly(2024, 7, 4)
         )), Times.Once);
 
-        _files.Verify(f => f.WriteAllText("2", projectInfoPath), Times.Once);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 2 &&
+            p.Name == "Merijn" &&
+            p.Path == projectDirectory &&
+            p.EventDate == new DateOnly(2024, 7, 4)
+        )), Times.Once);
     }
 
     [Test]
     public void InitialiseFolder_ProjectFolder_WithSpacesInName_InitialisesProject()
     {
         const string projectDirectory = @"C:\2024-07-04-Merijn gymnasium";
-        const string projectInfoPath = @"C:\2024-07-04-Merijn gymnasium\project.info";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(projectDirectory))
             .Returns("2024-07-04-Merijn gymnasium");
 
-        _files.Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectDirectory))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(projectDirectory))
@@ -165,34 +167,35 @@ public class ProjectInitialisingServiceTest
             p.EventDate == new DateOnly(2024, 7, 4)
         )), Times.Once);
 
-        _files.Verify(f => f.WriteAllText("2", projectInfoPath), Times.Once);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 2 &&
+            p.Name == "Merijn gymnasium" &&
+            p.Path == projectDirectory &&
+            p.EventDate == new DateOnly(2024, 7, 4)
+        )), Times.Once);
     }
 
     [Test]
     public void InitialiseFolder_AlreadyInitialisedProject_DoesNotInsertAgain()
     {
         const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(projectDirectory))
             .Returns("2024-07-04-Merijn");
 
-        _files.Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectDirectory))
             .Returns(true);
 
-        _files.Setup(f => f.ReadAllText(projectInfoPath))
-            .Returns("2");
+        _projectInfoFileService.Setup(s => s.ReadProjectId(projectDirectory))
+            .Returns(2);
 
         // Execution
         _service.InitialiseFolder(projectDirectory);
 
         // Asserts
         _projectRepository.Verify(r => r.Insert(It.IsAny<Project>()), Times.Never);
-        _files.Verify(f => f.WriteAllText(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.IsAny<Project>()), Times.Never);
         _files.Verify(f => f.GetDirectories(It.IsAny<string>()), Times.Never);
     }
 
@@ -201,7 +204,6 @@ public class ProjectInitialisingServiceTest
     {
         const string collectionPath = @"C:\.Merijn";
         const string projectPath = @"C:\.Merijn\2024-07-04-Merijn";
-        const string projectInfoPath = @"C:\.Merijn\2024-07-04-Merijn\project.info";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(collectionPath))
@@ -210,10 +212,7 @@ public class ProjectInitialisingServiceTest
         _files.Setup(f => f.GetPathEnd(projectPath))
             .Returns("2024-07-04-Merijn");
 
-        _files.Setup(f => f.Combine(projectPath, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectPath))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(collectionPath))
@@ -246,7 +245,13 @@ public class ProjectInitialisingServiceTest
             p.ParentProjectId == null
         )), Times.Once);
 
-        _files.Verify(f => f.WriteAllText("2", projectInfoPath), Times.Once);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 2 &&
+            p.Name == "Merijn" &&
+            p.Path == projectPath &&
+            p.EventDate == new DateOnly(2024, 7, 4) &&
+            p.ParentProjectId == null
+        )), Times.Once);
     }
 
     [Test]
@@ -254,7 +259,6 @@ public class ProjectInitialisingServiceTest
     {
         const string collectionPath = @"C:\.Merijn";
         const string projectPath = @"C:\.Merijn\2024-07-04-Merijn";
-        const string projectInfoPath = @"C:\.Merijn\2024-07-04-Merijn\project.info";
 
         CollectionMetadataConfiguration collectionMetadataConfiguration = new()
         {
@@ -269,10 +273,7 @@ public class ProjectInitialisingServiceTest
         _files.Setup(f => f.GetPathEnd(projectPath))
             .Returns("2024-07-04-Merijn");
 
-        _files.Setup(f => f.Combine(projectPath, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectPath))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(collectionPath))
@@ -353,10 +354,7 @@ public class ProjectInitialisingServiceTest
     public void InitialiseProjectFolder_WithSubProjectFolder_InitialisesSubProjectAutomatically()
     {
         const string parentProjectDirectory = @"C:\2024-07-04-Merijn";
-        const string parentProjectInfoPath = @"C:\2024-07-04-Merijn\project.info";
-
         const string subProjectDirectory = @"C:\2024-07-04-Merijn\.Ceremony";
-        const string subProjectInfoPath = @"C:\2024-07-04-Merijn\.Ceremony\project.info";
 
         // Mocks
         _files.Setup(f => f.GetPathEnd(parentProjectDirectory))
@@ -365,16 +363,10 @@ public class ProjectInitialisingServiceTest
         _files.Setup(f => f.GetPathEnd(subProjectDirectory))
             .Returns(".Ceremony");
 
-        _files.Setup(f => f.Combine(parentProjectDirectory, Constants.ProjectInfoFile))
-            .Returns(parentProjectInfoPath);
-
-        _files.Setup(f => f.Combine(subProjectDirectory, Constants.ProjectInfoFile))
-            .Returns(subProjectInfoPath);
-
-        _files.Setup(f => f.Exists(parentProjectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(parentProjectDirectory))
             .Returns(false);
 
-        _files.Setup(f => f.Exists(subProjectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(subProjectDirectory))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(parentProjectDirectory))
@@ -414,15 +406,25 @@ public class ProjectInitialisingServiceTest
             p.ParentProjectId == 10
         )), Times.Once);
 
-        _files.Verify(f => f.WriteAllText("10", parentProjectInfoPath), Times.Once);
-        _files.Verify(f => f.WriteAllText("11", subProjectInfoPath), Times.Once);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 10 &&
+            p.Name == "Merijn" &&
+            p.Path == parentProjectDirectory &&
+            p.ParentProjectId == null
+        )), Times.Once);
+
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 11 &&
+            p.Name == "Ceremony" &&
+            p.Path == subProjectDirectory &&
+            p.ParentProjectId == 10
+        )), Times.Once);
     }
 
     [Test]
     public void InitialiseProject_ProjectFolderWithSubFolders_InitialisesProject()
     {
         const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
         const string projectSubFolder = @"C:\2024-07-04-Merijn\Empty";
 
         // Mocks
@@ -432,10 +434,7 @@ public class ProjectInitialisingServiceTest
         _files.Setup(f => f.GetPathEnd(projectSubFolder))
             .Returns("Empty");
 
-        _files.Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectDirectory))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(projectDirectory))
@@ -465,14 +464,17 @@ public class ProjectInitialisingServiceTest
             p.ParentProjectId == null
         )), Times.Once);
 
-        _files.Verify(f => f.WriteAllText("2", projectInfoPath), Times.Once);
+        _projectInfoFileService.Verify(s => s.WriteProjectInfoFile(It.Is<Project>(p =>
+            p.Id == 2 &&
+            p.Name == "Merijn" &&
+            p.Path == projectDirectory
+        )), Times.Once);
     }
 
     [Test]
     public void InitialiseProject_ProjectFolderWithConfiguredFolder_AddsFolderMetadata()
     {
         const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string projectInfoPath = @"C:\2024-07-04-Merijn\project.info";
         const string originalsDirectory = @"C:\2024-07-04-Merijn\Originals";
 
         // Mocks
@@ -482,10 +484,7 @@ public class ProjectInitialisingServiceTest
         _files.Setup(f => f.GetPathEnd(originalsDirectory))
             .Returns("Originals");
 
-        _files.Setup(f => f.Combine(projectDirectory, Constants.ProjectInfoFile))
-            .Returns(projectInfoPath);
-
-        _files.Setup(f => f.Exists(projectInfoPath))
+        _projectInfoFileService.Setup(s => s.HasProjectInfoFile(projectDirectory))
             .Returns(false);
 
         _files.Setup(f => f.GetDirectories(projectDirectory))

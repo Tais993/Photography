@@ -3,13 +3,11 @@ using Application.interfaces.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using static Application.Constants;
 
 namespace Application.services.project;
 
 /// <summary>
-/// The project services handles with everything project related.
-/// Initializing and resolving the most predominant functions.
+/// The project service handles creating and retrieving projects.
 /// </summary>
 public class ProjectService : IProjectService
 {
@@ -17,16 +15,17 @@ public class ProjectService : IProjectService
     private readonly IConfiguration _configuration;
     private readonly ILogger<ProjectService> _logger;
     private readonly IProjectFolderService _projectFolderService;
+    private readonly IProjectInfoFileService _projectInfoFileService;
     private readonly IFiles _files;
 
-
-    public ProjectService(IProjectRepository projectRepository, ILogger<ProjectService> logger, IFiles files, IProjectFolderService projectFolderService, IConfiguration configuration)
+    public ProjectService(IProjectRepository projectRepository, ILogger<ProjectService> logger, IFiles files, IProjectFolderService projectFolderService, IConfiguration configuration, IProjectInfoFileService projectInfoFileService)
     {
         _projectRepository = projectRepository;
         _logger = logger;
         _files = files;
         _projectFolderService = projectFolderService;
         _configuration = configuration;
+        _projectInfoFileService = projectInfoFileService;
     }
     
     public int GetProjectCount()
@@ -42,26 +41,36 @@ public class ProjectService : IProjectService
 
     public Project CreateProject(string name, DateOnly date)
     {
-        string? defaultProjectFolder = _configuration.GetValue<string>(ConfigProjectFolder);
+        ValidateProjectName(name);
 
-        if (defaultProjectFolder is null)
+        string? defaultProjectFolder = _configuration.GetValue<string>(Constants.ConfigProjectFolder);
+
+        if (string.IsNullOrWhiteSpace(defaultProjectFolder))
         {
             throw new InvalidOperationException("Default project folder is not set.");
         }
         
         string projectPath = _files.Combine(defaultProjectFolder, ToProjectPath(name, date));
+
+        if (_files.Exists(projectPath))
+        {
+            throw new InvalidOperationException($"Project folder already exists: {projectPath}");
+        }
         
-        Project project = new(name, projectPath, date);
+        Project project = new(name.Trim(), projectPath, date);
         project = _projectRepository.Insert(project);
 
         _projectFolderService.CreateRequiredFolders(project);
-        WriteProjectInfoFile(project);
-        
+        _projectInfoFileService.WriteProjectInfoFile(project);
+
         return project;
     }
 
     public Project CreateSubProject(int parentProjectId, string name)
     {
+        string projectName = ToSubProjectName(name);
+        ValidateProjectName(projectName);
+
         Project? parentProject = GetProjectById(parentProjectId);
 
         if (parentProject is null)
@@ -69,36 +78,43 @@ public class ProjectService : IProjectService
             throw new InvalidOperationException($"Parent project with id {parentProjectId} was not found.");
         }
         
-        string projectPath = _files.Combine(parentProject.Path, ToSubProjectPath(name));
+        string projectPath = _files.Combine(parentProject.Path, ToSubProjectPath(projectName));
+
+        if (_files.Exists(projectPath))
+        {
+            throw new InvalidOperationException($"Subproject folder already exists: {projectPath}");
+        }
         
-        Project project = new(name, projectPath, parentProject.EventDate, parentProjectId);
+        Project project = new(projectName, projectPath, parentProject.EventDate, parentProjectId);
         project = _projectRepository.Insert(project);
 
         _projectFolderService.CreateRequiredFolders(project);
-        WriteProjectInfoFile(project);
-            
+        _projectInfoFileService.WriteProjectInfoFile(project);
+
         return project;
     }
-    
-    private void WriteProjectInfoFile(Project project)
-    {
-        if (project.Id is null)
-        {
-            throw new ArgumentNullException(nameof(project.Id));
-        }
 
-        string projectInfoPath = _files.Combine(project.Path, ProjectInfoFile);
-        _files.WriteAllText(project.Id.Value.ToString(), projectInfoPath);
+    private void ValidateProjectName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Project name cannot be empty.", nameof(name));
+        }
     }
 
     private string ToProjectPath(string name, DateOnly date)
     {
-        return date.ToString("yyyy-MM-dd") + "-" + name;
+        return date.ToString("yyyy-MM-dd") + "-" + name.Trim();
+    }
+
+    private string ToSubProjectName(string name)
+    {
+        return name.Trim();;
     }
 
     private string ToSubProjectPath(string name)
     {
-        return "." + name;
+        return "." + ToSubProjectName(name);
     }
     
     public Project? GetProjectById(int projectId)
