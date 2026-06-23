@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using Application.interfaces.services;
+using Application.interfaces.services.project;
 using Microsoft.Extensions.Logging;
 using static Cli.ExitCodes;
 

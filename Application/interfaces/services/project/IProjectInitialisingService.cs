@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Domain.entities;
 
-namespace Application.interfaces.services;
+namespace Application.interfaces.services.project;
 
 public interface IProjectInitialisingService
 {
