@@ -12,8 +12,8 @@ public static class ImageViewerExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        string? mode = configuration[ImageViewerMode] ?? "default";
-        string? path = configuration[ImageViewerPath];
+        string? mode = configuration[ConfigImageViewerMode] ?? "default";
+        string? path = configuration[ConfigImageViewerPath];
 
 
         switch (mode.ToLowerInvariant())

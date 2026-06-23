@@ -18,7 +18,7 @@ public class IrfanViewGateway : IIrfanviewGateway
         ImageViewerGatewayHelper imageViewerGatewayHelper)
     {
         _imageViewerGatewayHelper = imageViewerGatewayHelper;
-        _irfanViewPath = configuration.GetValue<string>(Constants.ImageViewerPath);
+        _irfanViewPath = configuration.GetValue<string>(Constants.ConfigImageViewerPath);
         _logger = logger;
     }
 

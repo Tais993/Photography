@@ -23,7 +23,7 @@ public class ImageGlassGateway : IImageGlassGateway
         ImageViewerGatewayHelper imageViewerGatewayHelper)
     {
         _imageViewerGatewayHelper = imageViewerGatewayHelper;
-        _imageGlassPath = configuration.GetValue<string>(Constants.ImageViewerPath);
+        _imageGlassPath = configuration.GetValue<string>(Constants.ConfigImageViewerPath);
         _logger = logger;
     }
 
