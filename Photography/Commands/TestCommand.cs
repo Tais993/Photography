@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using Application.interfaces.services;
+using Application.interfaces.services.project;
 using Domain.entities;
 
 namespace Cli.Commands;
@@ -7,10 +7,12 @@ namespace Cli.Commands;
 public class TestCommand : CommandBase
 {
     private readonly IProjectResolverService _projectResolverService;
-
-    public TestCommand(IProjectResolverService projectResolverService)
+    private readonly IProjectService _projectService;
+    
+    public TestCommand(IProjectResolverService projectResolverService, IProjectService projectService)
     {
         _projectResolverService = projectResolverService;
+        _projectService = projectService;
     }
 
 
@@ -25,10 +27,17 @@ public class TestCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
-        Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory());
         
-        Console.WriteLine(project);
+        Project? resolvedProject = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory());
+        Console.WriteLine(resolvedProject);
 
+        Project createdProject = _projectService.CreateProject("Temproary stuffz", new DateOnly(2026, 06, 24));
+        Console.WriteLine(createdProject);
+
+        Project createdSubProject = _projectService.CreateSubProject((int) createdProject.Id!, "Hour 1 of the event");
+        Console.WriteLine(createdSubProject);
+        
+        
         return ExitCodes.Success;
     }
 }
