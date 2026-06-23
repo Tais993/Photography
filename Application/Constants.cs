@@ -10,9 +10,8 @@ public class Constants
     
     public const string ProjectInfoFile = "project.info";
     
-    public const string ImageViewerMode = "ImageViewer:Mode";
-    public const string ImageViewerPath = "ImageViewer:ImageViewerPath";
-    
+    public const string ConfigImageViewerMode = "ImageViewer:Mode";
+    public const string ConfigImageViewerPath = "ImageViewer:ImageViewerPath";
     
     public const string CollectionMetadataType = "Collection";
     public const string CollectionsConfigKey = "Collections";
