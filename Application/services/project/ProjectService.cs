@@ -3,6 +3,7 @@ using Application.interfaces.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static Application.Constants;
 
 namespace Application.services.project;
 
@@ -41,7 +42,7 @@ public class ProjectService : IProjectService
 
     public Project CreateProject(string name, DateOnly date)
     {
-        string? defaultProjectFolder = _configuration.GetValue<string>(Constants.ConfigProjectFolder);
+        string? defaultProjectFolder = _configuration.GetValue<string>(ConfigProjectFolder);
 
         if (defaultProjectFolder is null)
         {
@@ -54,7 +55,8 @@ public class ProjectService : IProjectService
         project = _projectRepository.Insert(project);
 
         _projectFolderService.CreateRequiredFolders(project);
-
+        WriteProjectInfoFile(project);
+        
         return project;
     }
 
@@ -73,8 +75,20 @@ public class ProjectService : IProjectService
         project = _projectRepository.Insert(project);
 
         _projectFolderService.CreateRequiredFolders(project);
-
+        WriteProjectInfoFile(project);
+            
         return project;
+    }
+    
+    private void WriteProjectInfoFile(Project project)
+    {
+        if (project.Id is null)
+        {
+            throw new ArgumentNullException(nameof(project.Id));
+        }
+
+        string projectInfoPath = _files.Combine(project.Path, ProjectInfoFile);
+        _files.WriteAllText(project.Id.Value.ToString(), projectInfoPath);
     }
 
     private string ToProjectPath(string name, DateOnly date)
