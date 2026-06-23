@@ -1,6 +1,8 @@
 ﻿using Application.interfaces.infrastructure;
+using Application.interfaces.services.project;
 using Application.services.project;
 using Domain.entities;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -12,6 +14,10 @@ public class ProjectServiceTest
 {
     private Mock<IProjectRepository> _projectRepository = null!;
     private Mock<ILogger<ProjectService>> _logger = null!;
+    private Mock<IFiles> _files = null!;
+    private Mock<IProjectFolderService> _projectFolderService = null!;
+    private IConfiguration _configuration = null!;
+
     private ProjectService _projectService = null!;
 
     [SetUp]
@@ -19,10 +25,22 @@ public class ProjectServiceTest
     {
         _projectRepository = new Mock<IProjectRepository>();
         _logger = new Mock<ILogger<ProjectService>>();
+        _files = new Mock<IFiles>();
+        _projectFolderService = new Mock<IProjectFolderService>();
+
+        _configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                // Add config values here if your ProjectService needs them
+            })
+            .Build();
 
         _projectService = new ProjectService(
             _projectRepository.Object,
-            _logger.Object
+            _logger.Object,
+            _files.Object,
+            _projectFolderService.Object,
+            _configuration
         );
     }
 

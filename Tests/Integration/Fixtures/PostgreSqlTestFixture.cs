@@ -31,7 +31,7 @@ public class PostgreSqlTestFixture
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["ConnectionStrings:Default"] = ConnectionString,
-                [Constants.ImageViewerMode] = "disabled"
+                [Constants.ConfigImageViewerMode] = "disabled"
             })
             .Build();
 

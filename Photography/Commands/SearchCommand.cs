@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
+using Application.interfaces.services.project;
 using Domain.entities;
 using Domain.entities.search;
 using static Cli.Commands.CommandOptions;
