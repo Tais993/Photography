@@ -23,6 +23,7 @@ public interface IProjectService
     /// <param name="date"></param>
     /// <returns></returns>
     public Project CreateProject(string name, DateOnly date);
+    public Project CreateSubProject(int parentProjectId, string name);
     
     /// <summary>
     ///     Returns the given project based on its ID.

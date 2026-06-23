@@ -58,11 +58,35 @@ public class ProjectService : IProjectService
         return project;
     }
 
+    public Project CreateSubProject(int parentProjectId, string name)
+    {
+        Project? parentProject = GetProjectById(parentProjectId);
+
+        if (parentProject is null)
+        {
+            throw new InvalidOperationException($"Parent project with id {parentProjectId} was not found.");
+        }
+        
+        string projectPath = _files.Combine(parentProject.Path, ToSubProjectPath(name));
+        
+        Project project = new(name, projectPath, parentProject.EventDate, parentProjectId);
+        project = _projectRepository.Insert(project);
+
+        _projectFolderService.CreateRequiredFolders(project);
+
+        return project;
+    }
+
     private string ToProjectPath(string name, DateOnly date)
     {
         return date.ToString("yyyy-MM-dd") + "-" + name;
     }
 
+    private string ToSubProjectPath(string name)
+    {
+        return "." + name;
+    }
+    
     public Project? GetProjectById(int projectId)
     {
         _logger.LogDebug("Getting project by id: {ProjectId}", projectId);
