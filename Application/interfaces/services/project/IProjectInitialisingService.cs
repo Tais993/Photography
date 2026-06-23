@@ -22,9 +22,4 @@ public interface IProjectInitialisingService
     /// 
     /// </summary>
     public void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject);
-    
-    
-    
-    public void CreateProjectFolder();
-    public void UpdateProjectFolder();
 }

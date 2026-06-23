@@ -12,27 +12,26 @@ namespace Application.services.project;
 public class ProjectInitialisingService : IProjectInitialisingService
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly IImageRepository _imageRepository;
     private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IProjectScanningService _projectScanningService;
     private readonly IProjectInfoFileService _projectInfoFileService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ProjectInitialisingService> _logger;
     private readonly IFiles _files;
     private readonly ICollectionMetadataService _collectionMetadataService;
 
-    public ProjectInitialisingService(IProjectRepository projectRepository, IImageRepository imageRepository,
-        IProjectMetadataService projectMetadataService, IProjectInfoFileService projectInfoFileService,
-        IConfiguration configuration, ILogger<ProjectInitialisingService> logger,
-        IFiles files, ICollectionMetadataService collectionMetadataService)
+    public ProjectInitialisingService(IProjectRepository projectRepository, IProjectMetadataService projectMetadataService, 
+        IProjectInfoFileService projectInfoFileService, IConfiguration configuration, ILogger<ProjectInitialisingService> logger,
+        IFiles files, ICollectionMetadataService collectionMetadataService, IProjectScanningService projectScanningService)
     {
         _projectRepository = projectRepository;
-        _imageRepository = imageRepository;
         _projectMetadataService = projectMetadataService;
         _projectInfoFileService = projectInfoFileService;
         _configuration = configuration;
         _logger = logger;
         _files = files;
         _collectionMetadataService = collectionMetadataService;
+        _projectScanningService = projectScanningService;
     }
 
     
@@ -109,7 +108,6 @@ public class ProjectInitialisingService : IProjectInitialisingService
         CollectionMetadataConfiguration? collectionMetadataConfiguration)
     {
         _logger.LogInformation("Initialising project folder: {FolderName}", projectDirectory);
-        string projectInfoPath = _files.Combine(projectDirectory, ProjectInfoFile);
 
         if (_projectInfoFileService.HasProjectInfoFile(projectDirectory))
         {
@@ -159,22 +157,13 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
             if (matchingFolderNames.Length == 0)
             {
-                _logger.LogDebug(
-                    "No folder found for role {FolderRole} in project {ProjectId}",
-                    folderRole,
-                    project.Id);
-
+                _logger.LogDebug("No folder found for role {FolderRole} in project {ProjectId}", folderRole, project.Id);
                 continue;
             }
 
             if (matchingFolderNames.Length > 1)
             {
-                _logger.LogWarning(
-                    "Multiple folders found for role {FolderRole} in project {ProjectId}: {FolderNames}",
-                    folderRole,
-                    project.Id,
-                    string.Join(", ", matchingFolderNames));
-
+                _logger.LogWarning("Multiple folders found for role {FolderRole} in project {ProjectId}: {FolderNames}", folderRole, project.Id, string.Join(", ", matchingFolderNames));
                 continue;
             }
 
@@ -183,11 +172,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
                 metadataKey,
                 matchingFolderNames[0]);
 
-            _logger.LogInformation(
-                "Mapped project folder role {FolderRole} to folder {FolderName} for project {ProjectId}",
-                folderRole,
-                matchingFolderNames[0],
-                project.Id);
+            _logger.LogInformation("Mapped project folder role {FolderRole} to folder {FolderName} for project {ProjectId}", folderRole, matchingFolderNames[0], project.Id);
         }
     }
 
@@ -262,54 +247,10 @@ public class ProjectInitialisingService : IProjectInitialisingService
             else
             {
                 _logger.LogDebug("Initialising project sub-folder's images: {FolderName}", pathEnd);
-                InitializeImages(projectDirectory, subDirectory, project.Id!.Value);
+                _projectScanningService.ScanProjectSubFolder(projectDirectory, subDirectory, project.Id!.Value);
             }
         }
     }
-
-
-    /// <summary>
-    /// This method expects a project's subfolder already.
-    /// </summary>
-    /// <param name="projectDirectory">The project root directory.</param>
-    /// <param name="projectSubDirectory">A subfolder from within a project that contains images.</param>
-    /// <param name="projectId">The project id.</param>
-    public void InitializeImages(string projectDirectory, string projectSubDirectory, int projectId)
-    {
-        string[] files = _files.GetFiles(projectSubDirectory);
-        _logger.LogDebug("Initialising {Count} images for project: {ProjectId}, folder: {FolderName}", files.Length, projectId, projectSubDirectory);
-
-        foreach (string filePath in files)
-        {
-            string fileExtension = _files.GetFileExtension(filePath);
-            string fileName = _files.GetFileName(filePath).Replace(fileExtension, "");
-            string relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
-
-            Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
-
-            _imageRepository.Insert(image);
-            _logger.LogTrace("Inserted image file: {RelativeFilePath}", relativeFilePath);
-        }
-
-        _logger.LogDebug("Finished initialising {Count} images for project: {ProjectId}, folder: {FolderName}", files.Length, projectId, projectSubDirectory);
-    }
-
-    
-    
-    public void CreateProjectFolder()
-    {
-        _logger.LogWarning("CreateProjectFolder is not implemented");
-        throw new NotImplementedException();
-    }
-
-    public void UpdateProjectFolder()
-    {
-        _logger.LogWarning("UpdateProjectFolder is not implemented");
-        throw new NotImplementedException();
-    }
-
-
-
 
 
     private static Project ToProject(string subdirectory, Match match)
