@@ -14,22 +14,21 @@ public class ProjectInitialisingService : IProjectInitialisingService
     private readonly IProjectRepository _projectRepository;
     private readonly IImageRepository _imageRepository;
     private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IProjectInfoFileService _projectInfoFileService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<ProjectInitialisingService> _logger;
     private readonly IFiles _files;
     private readonly ICollectionMetadataService _collectionMetadataService;
 
-    public ProjectInitialisingService(
-        IProjectRepository projectRepository,
-        IImageRepository imageRepository,
-        IProjectMetadataService projectMetadataService,
-        IConfiguration configuration,
-        ILogger<ProjectInitialisingService> logger,
+    public ProjectInitialisingService(IProjectRepository projectRepository, IImageRepository imageRepository,
+        IProjectMetadataService projectMetadataService, IProjectInfoFileService projectInfoFileService,
+        IConfiguration configuration, ILogger<ProjectInitialisingService> logger,
         IFiles files, ICollectionMetadataService collectionMetadataService)
     {
         _projectRepository = projectRepository;
         _imageRepository = imageRepository;
         _projectMetadataService = projectMetadataService;
+        _projectInfoFileService = projectInfoFileService;
         _configuration = configuration;
         _logger = logger;
         _files = files;
@@ -106,18 +105,15 @@ public class ProjectInitialisingService : IProjectInitialisingService
         InitialiseProjectFolder(projectDirectory, match, parentProject, null);
     }
 
-    private void InitialiseProjectFolder(
-        string projectDirectory,
-        Match match,
-        Project? parentProject,
+    private void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject, 
         CollectionMetadataConfiguration? collectionMetadataConfiguration)
     {
         _logger.LogInformation("Initialising project folder: {FolderName}", projectDirectory);
         string projectInfoPath = _files.Combine(projectDirectory, ProjectInfoFile);
 
-        if (_files.Exists(projectInfoPath))
+        if (_projectInfoFileService.HasProjectInfoFile(projectDirectory))
         {
-            string existingProjectId = _files.ReadAllText(projectInfoPath);
+            int? existingProjectId = _projectInfoFileService.ReadProjectId(projectDirectory);
             _logger.LogInformation("Project already initialised, existing project info file found, id: {ProjectId}", existingProjectId);
             return;
         }
@@ -129,8 +125,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         project = _projectRepository.Insert(project);
         _logger.LogInformation("Created project: {ProjectId}, name: {ProjectName}", project.Id, project.Name);
 
-        _files.WriteAllText(project.Id + "", projectInfoPath);
-        _logger.LogInformation("Wrote project info file: {ProjectInfoPath}", projectInfoPath);
+        _projectInfoFileService.WriteProjectInfoFile(project);
 
         InitialiseProjectFolderMetadata(projectDirectory, project);
         InitialiseProjectCollectionMetadata(project, collectionMetadataConfiguration);

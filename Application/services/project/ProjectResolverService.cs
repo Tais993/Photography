@@ -8,15 +8,17 @@ namespace Application.services.project;
 public class ProjectResolverService : IProjectResolverService
 {
     private readonly IProjectRepository _projectRepository;
-    private readonly ILogger<ProjectService> _logger;
-    private readonly IFiles _files;
+    private readonly IProjectInfoFileService _projectInfoFileService;
+    private readonly ILogger<ProjectResolverService> _logger;
 
 
-    public ProjectResolverService(IProjectRepository projectRepository, IFiles files,
-        ILogger<ProjectService> logger)
+    public ProjectResolverService(
+        IProjectRepository projectRepository,
+        IProjectInfoFileService projectInfoFileService,
+        ILogger<ProjectResolverService> logger)
     {
         _projectRepository = projectRepository;
-        _files = files;
+        _projectInfoFileService = projectInfoFileService;
         _logger = logger;
     }
 
@@ -30,31 +32,17 @@ public class ProjectResolverService : IProjectResolverService
 
         _logger.LogDebug("Resolving project id for directory: {Directory}", directory);
 
-        string? projectInfoPath = ResolveProjectInfoPath(directory);
+        int? projectId = _projectInfoFileService.ResolveProjectId(directory);
 
-        if (projectInfoPath is null)
+        if (projectId is null)
         {
             _logger.LogWarning("Project info file was not found for directory: {Directory}", directory);
             return 0;
         }
 
-        string projectInfoContent = _files.ReadAllText(projectInfoPath);
+        _logger.LogDebug("Resolved project id: {ProjectId}", projectId);
 
-        if (!int.TryParse(projectInfoContent, out int projectId))
-        {
-            _logger.LogWarning(
-                "Project info file does not contain a valid project id: {ProjectInfoPath}",
-                projectInfoPath);
-
-            return 0;
-        }
-
-        _logger.LogDebug(
-            "Project info file found: {ProjectInfoPath}, id: {Id}",
-            projectInfoPath,
-            projectId);
-
-        return projectId;
+        return projectId.Value;
     }
 
     public Project? ResolveProject(string directory, int possibleEmptyProjectId = 0)
@@ -63,35 +51,14 @@ public class ProjectResolverService : IProjectResolverService
         _logger.LogDebug("Resolving project: {ProjectId}", projectId);
 
         if (projectId == 0) return null;
-        return _projectRepository.GetById(projectId);
-    }
 
-    /// <summary>
-    ///     To figure out the project path, it will go through the current and all parent folders till it finds one.
-    /// </summary>
-    /// <param name="directory"></param>
-    /// <returns></returns>
-    private string? ResolveProjectInfoPath(string directory)
-    {
-        string? currentDirectory = _files.GetFullPath(directory);
+        Project? project = _projectRepository.GetById(projectId);
 
-        while (currentDirectory is not null)
+        if (project is null)
         {
-            string projectInfoPath = _files.Combine(
-                currentDirectory,
-                Constants.ProjectInfoFile);
-
-            if (_files.Exists(projectInfoPath))
-            {
-                return projectInfoPath;
-            }
-
-            DirectoryInfo? parentDirectory = _files.GetParentDirectory(currentDirectory);
-            if (parentDirectory is null) return null;
-
-            currentDirectory = parentDirectory?.FullName;
+            _logger.LogWarning("Project info file points to a project that does not exist: {ProjectId}", projectId);
         }
 
-        return null;
+        return project;
     }
 }
