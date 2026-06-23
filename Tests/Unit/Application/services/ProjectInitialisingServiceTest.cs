@@ -15,8 +15,8 @@ namespace Tests.Unit.Application.services;
 public class ProjectInitialisingServiceTest
 {
     private Mock<IProjectRepository> _projectRepository = null!;
-    private Mock<IImageRepository> _imageRepository = null!;
     private Mock<IProjectMetadataService> _projectMetadataService = null!;
+    private Mock<IProjectScanningService> _projectScanningService = null!;
     private Mock<ICollectionMetadataService> _collectionMetadataService = null!;
     private Mock<IProjectInfoFileService> _projectInfoFileService = null!;
     private Mock<IFiles> _files = null!;
@@ -27,8 +27,8 @@ public class ProjectInitialisingServiceTest
     public void SetUp()
     {
         _projectRepository = new Mock<IProjectRepository>();
-        _imageRepository = new Mock<IImageRepository>();
         _projectMetadataService = new Mock<IProjectMetadataService>();
+        _projectScanningService = new Mock<IProjectScanningService>();
         _collectionMetadataService = new Mock<ICollectionMetadataService>();
         _projectInfoFileService = new Mock<IProjectInfoFileService>();
         _files = new Mock<IFiles>();
@@ -36,13 +36,13 @@ public class ProjectInitialisingServiceTest
 
         _service = new ProjectInitialisingService(
             _projectRepository.Object,
-            _imageRepository.Object,
             _projectMetadataService.Object,
             _projectInfoFileService.Object,
             CreateConfiguration(),
             _logger.Object,
             _files.Object,
-            _collectionMetadataService.Object
+            _collectionMetadataService.Object,
+            _projectScanningService.Object
         );
     }
 
@@ -511,62 +511,6 @@ public class ProjectInitialisingServiceTest
             $"{Constants.FolderMetadataKeyPrefix}originals",
             "Originals"
         ), Times.Once);
-    }
-
-    [Test]
-    public void InitializeImages_InsertsImagesWithRelativePaths()
-    {
-        const string projectDirectory = @"C:\2024-07-04-Merijn";
-        const string originalsDirectory = @"C:\2024-07-04-Merijn\Originals";
-        const int projectId = 2;
-
-        const string filePath = @"C:\2024-07-04-Merijn\Originals\DSC_1234.NEF";
-
-        // Mocks
-        _files.Setup(f => f.GetFiles(originalsDirectory))
-            .Returns([filePath]);
-
-        _files.Setup(f => f.GetFileExtension(filePath))
-            .Returns(".NEF");
-
-        _files.Setup(f => f.GetFileName(filePath))
-            .Returns("DSC_1234.NEF");
-
-        _files.Setup(f => f.GetRelativePath(projectDirectory, filePath))
-            .Returns(@"Originals\DSC_1234.NEF");
-
-        // Execution
-        _service.InitializeImages(projectDirectory, originalsDirectory, projectId);
-
-        // Asserts
-        _imageRepository.Verify(r => r.Insert(It.Is<Image>(i =>
-            i.ProjectId == projectId &&
-            i.FileName == "DSC_1234" &&
-            i.FileType == ".NEF" &&
-            i.RelationalFilePath == @"Originals\DSC_1234.NEF"
-        )), Times.Once);
-    }
-
-    [Test]
-    public void CreateProjectFolder()
-    {
-        // Mocks
-
-        // Execution & Assert
-        Assert.Throws<NotImplementedException>(() => _service.CreateProjectFolder());
-        
-        // Asserts
-    }
-
-    [Test]
-    public void UpdateProjectFolder()
-    {
-        // Mocks
-
-        // Execution & Assert
-        Assert.Throws<NotImplementedException>(() => _service.UpdateProjectFolder());
-        
-        // Asserts
     }
 
     private static IConfiguration CreateConfiguration()
