@@ -23,6 +23,7 @@ public class DatabaseResetService : IDatabaseResetService
                                   DROP TABLE IF EXISTS selection_session_image CASCADE;
                                   DROP TABLE IF EXISTS selection_session CASCADE;
                                   DROP TABLE IF EXISTS project_metadata CASCADE;
+                                  DROP TABLE IF EXISTS image_metadata CASCADE;
                                   DROP TABLE IF EXISTS metadata CASCADE;
                                   DROP TABLE IF EXISTS image CASCADE;
                                   DROP TABLE IF EXISTS project CASCADE;
