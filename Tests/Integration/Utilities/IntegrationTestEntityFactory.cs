@@ -48,6 +48,35 @@ public static class IntegrationTestEntityFactory
             displayName,
             description);
     }
+    
+    public static ImageMetadata CreateImageMetadata(
+        int imageId,
+        string metadataKey = "event_type",
+        string metadataValue = "Concert",
+        string metadataType = "string",
+        string displayName = "Event Type",
+        string description = "The type of photography event.")
+    {
+        return new ImageMetadata(
+            imageId,
+            metadataValue,
+            metadataKey,
+            metadataType,
+            displayName,
+            description);
+    }
+    
+    public static ImageMetadata CreateImageMetadata(
+        int imageId,
+        Metadata metadata,
+        string metadataValue = "Concert")
+    {
+        return new ImageMetadata(
+            imageId,
+            metadata,
+            metadataValue);
+    }
+
 
     public static ProjectMetadata CreateProjectMetadata(
         int projectId,
