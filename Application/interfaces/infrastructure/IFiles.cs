@@ -125,7 +125,8 @@ public interface IFiles
     ///     Deletes an empty directory from the given path
     /// </summary>
     /// <param name="path"></param>
-    void FolderDelete(string path);
+    /// <param name="recursive"></param>
+    void FolderDelete(string path, bool recursive = false);
 
 
     /// <summary>

@@ -86,9 +86,9 @@ public class Files : IFiles
         Directory.CreateDirectory(path);
     }
 
-    public void FolderDelete(string path)
+    public void FolderDelete(string path, bool recursive = false)
     {
-        Directory.Delete(path);
+        Directory.Delete(path, recursive);
     }
 
     public void CopyFile(string path, string newPath)
