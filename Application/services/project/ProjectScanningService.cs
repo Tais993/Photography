@@ -2,25 +2,25 @@
 using Application.interfaces.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
+using static Application.Constants;
 
 namespace Application.services.project;
 
 public class ProjectScanningService : IProjectScanningService
 {
     private readonly IImageRepository _imageRepository;
+    private readonly IProjectRepository _projectRepository;
     private readonly IFiles _files;
     private readonly ILogger<ProjectScanningService> _logger;
 
-    public ProjectScanningService(
-        IImageRepository imageRepository,
-        IFiles files,
-        ILogger<ProjectScanningService> logger)
+    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files, ILogger<ProjectScanningService> logger)
     {
         _imageRepository = imageRepository;
+        _projectRepository = projectRepository;
         _files = files;
         _logger = logger;
     }
-    
+
     public void ScanProject(Project project)
     {
         if (project.Id is null)
@@ -29,54 +29,131 @@ public class ProjectScanningService : IProjectScanningService
             throw new ArgumentNullException(nameof(project.Id));
         }
 
-        ScanProjectSubFolders(project.Path, project.Id.Value);
+        _logger.LogInformation("Scanning project: {ProjectId}", project.Id);
+
+        DeleteMissingImages(project);
+        ScanProjectFolders(project);
+        ScanSubProjects(project);
+
+        _logger.LogInformation("Finished scanning project: {ProjectId}", project.Id);
     }
 
-    
-    public void ScanProjectSubFolders(string projectDirectory, int projectId)
+    private void ScanProjectFolders(Project project)
     {
-        if (projectId == null || projectId == 0)
-        {
-            _logger.LogWarning("Could not scan project subfolders because project id was null");
-            throw new ArgumentNullException(nameof(projectId));
-        }
+        string[] subDirectories = _files.GetDirectories(project.Path);
+        _logger.LogDebug("Scanning {Count} project subdirectories for project: {ProjectId}", subDirectories.Length, project.Id);
 
-        string[] subDirectories = _files.GetDirectories(projectDirectory);
-
-        _logger.LogDebug("Scanning {Count} project subdirectories for project: {ProjectId}", subDirectories.Length, projectId);
+        HashSet<string> existingImagePaths = _imageRepository.GetAllByProjectId(project.Id!.Value)
+            .Select(image => image.RelationalFilePath)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         foreach (string subDirectory in subDirectories)
         {
-            ScanProjectSubFolder(projectDirectory, subDirectory, projectId);
+            string folderName = _files.GetPathEnd(subDirectory);
+
+            if (IsSubProjectFolder(folderName))
+            {
+                _logger.LogDebug("Skipping subproject folder while scanning project images: {FolderName}", folderName);
+                continue;
+            }
+
+            ScanProjectFolder(project, subDirectory, existingImagePaths);
         }
+
+        _logger.LogInformation("Finished scanning project folders for project: {ProjectId}", project.Id);
     }
 
-
-    public void ScanProjectSubFolder(string projectDirectory, string projectSubDirectory, int projectId)
+    private void ScanProjectFolder(Project project, string projectFolder, HashSet<string> existingImagePaths)
     {
-        string[] files = _files.GetFiles(projectSubDirectory);
+        string[] files = _files.GetFiles(projectFolder);
 
-        _logger.LogDebug("Scanning {Count} images for project: {ProjectId}, folder: {FolderName}", files.Length, projectId, projectSubDirectory);
+        _logger.LogDebug("Scanning {Count} files for project: {ProjectId}, folder: {FolderName}", files.Length, project.Id, projectFolder);
 
         foreach (string filePath in files)
         {
-            InsertImage(projectDirectory, filePath, projectId);
+            if (!IsImageFile(filePath))
+            {
+                _logger.LogTrace("Skipping non-image file: {FilePath}", filePath);
+                continue;
+            }
+
+            string relativeFilePath = _files.GetRelativePath(project.Path, filePath);
+
+            if (existingImagePaths.Contains(relativeFilePath))
+            {
+                _logger.LogTrace("Image already exists in database: {RelativeFilePath}", relativeFilePath);
+                continue;
+            }
+
+            InsertImage(project, filePath);
+            existingImagePaths.Add(relativeFilePath);
         }
 
-        _logger.LogDebug(
-            "Finished scanning {Count} images for project: {ProjectId}, folder: {FolderName}", files.Length, projectId, projectSubDirectory);
+        _logger.LogInformation("Finished scanning folder for project: {ProjectId}", project.Id);
     }
 
-    private void InsertImage(string projectDirectory, string filePath, int projectId)
+    private void ScanSubProjects(Project project)
+    {
+        List<Project> subProjects = _projectRepository.GetAllByParentProjectId(project.Id!.Value);
+        _logger.LogDebug("Scanning {Count} subprojects for project: {ProjectId}", subProjects.Count, project.Id);
+
+        foreach (Project subProject in subProjects)
+        {
+            ScanProject(subProject);
+        }
+    }
+
+    private void DeleteMissingImages(Project project)
+    {
+        List<Image> images = _imageRepository.GetAllByProjectId(project.Id!.Value);
+
+        _logger.LogDebug("Checking {Count} existing images for project: {ProjectId}", images.Count, project.Id);
+
+        foreach (Image image in images)
+        {
+            string fullPath = _files.Combine(project.Path, image.RelationalFilePath);
+
+            if (_files.Exists(fullPath))
+            {
+                continue;
+            }
+
+            if (image.Id is null)
+            {
+                _logger.LogWarning("Could not delete image because image id was null: {RelativeFilePath}", image.RelationalFilePath);
+                continue;
+            }
+
+            _imageRepository.DeleteById(image.Id.Value);
+
+            _logger.LogInformation("Deleted image because it was not found on the filesystem: {RelativeFilePath}", image.RelationalFilePath);
+        }
+
+        _logger.LogInformation("Finished checking missing images for project: {ProjectId}", project.Id);
+    }
+
+    private void InsertImage(Project project, string filePath)
     {
         string fileExtension = _files.GetFileExtension(filePath);
-        string fileName = _files.GetFileName(filePath).Replace(fileExtension, "");
-        string relativeFilePath = _files.GetRelativePath(projectDirectory, filePath);
+        string fileName = _files.GetFileNameWithoutExtension(filePath);
+        string relativeFilePath = _files.GetRelativePath(project.Path, filePath);
 
-        Image image = new Image(projectId, fileName, fileExtension, relativeFilePath);
-
+        Image image = new Image(project.Id!.Value, fileName, fileExtension, relativeFilePath);
         _imageRepository.Insert(image);
 
-        _logger.LogTrace("Inserted image file: {RelativeFilePath}", relativeFilePath);
+        _logger.LogInformation("Inserted new image file: {RelativeFilePath}", relativeFilePath);
+    }
+
+    private bool IsImageFile(string filePath)
+    {
+        string fileExtension = _files.GetFileExtension(filePath);
+
+        return ImageFileTypes.Contains(fileExtension)
+               || RawFileTypes.Contains(fileExtension);
+    }
+
+    private static bool IsSubProjectFolder(string folderName)
+    {
+        return SubProjectNameRegex.Match(folderName).Success;
     }
 }

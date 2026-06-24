@@ -61,7 +61,12 @@ public class ProjectInitialisingService : IProjectInitialisingService
         }
         else if (ProjectNameRegex.Match(pathEnd) is { Success: true } match)
         {
-            InitialiseProjectFolder(folderDirectory, match, null, collectionMetadataConfiguration);
+            Project? project = InitialiseProjectFolder(folderDirectory, match, null, collectionMetadataConfiguration);
+
+            if (project is not null)
+            {
+                _projectScanningService.ScanProject(project);
+            }
         }
         else
         {
@@ -101,33 +106,70 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
     public void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject = null)
     {
-        InitialiseProjectFolder(projectDirectory, match, parentProject, null);
+        Project? project = InitialiseProjectFolder(projectDirectory, match, parentProject, null);
+
+        if (project is not null)
+        {
+            _projectScanningService.ScanProject(project);
+        }
     }
 
-    private void InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject, 
-        CollectionMetadataConfiguration? collectionMetadataConfiguration)
+    private Project? InitialiseProjectFolder(string projectDirectory, Match match, Project? parentProject, CollectionMetadataConfiguration? collectionMetadataConfiguration)
     {
         _logger.LogInformation("Initialising project folder: {FolderName}", projectDirectory);
 
+        Project? project;
+
         if (_projectInfoFileService.HasProjectInfoFile(projectDirectory))
         {
-            int? existingProjectId = _projectInfoFileService.ReadProjectId(projectDirectory);
-            _logger.LogInformation("Project already initialised, existing project info file found, id: {ProjectId}", existingProjectId);
-            return;
+            project = GetExistingProject(projectDirectory);
+
+            if (project is null)
+            {
+                return null;
+            }
+
+            _logger.LogInformation("Project already initialised, existing project info file found, id: {ProjectId}", project.Id);
+        }
+        else
+        {
+            project = parentProject is null
+                ? ToProject(projectDirectory, match)
+                : ToSubProject(projectDirectory, match, parentProject);
+
+            project = _projectRepository.Insert(project);
+            _logger.LogInformation("Created project: {ProjectId}, name: {ProjectName}", project.Id, project.Name);
+
+            _projectInfoFileService.WriteProjectInfoFile(project);
+
+            InitialiseProjectFolderMetadata(projectDirectory, project);
+            InitialiseProjectCollectionMetadata(project, collectionMetadataConfiguration);
         }
 
-        Project project = parentProject is null
-            ? ToProject(projectDirectory, match)
-            : ToSubProject(projectDirectory, match, parentProject);
-
-        project = _projectRepository.Insert(project);
-        _logger.LogInformation("Created project: {ProjectId}, name: {ProjectName}", project.Id, project.Name);
-
-        _projectInfoFileService.WriteProjectInfoFile(project);
-
-        InitialiseProjectFolderMetadata(projectDirectory, project);
-        InitialiseProjectCollectionMetadata(project, collectionMetadataConfiguration);
         InitialiseProjectSubFolders(projectDirectory, project, collectionMetadataConfiguration);
+
+        return project;
+    }
+
+    private Project? GetExistingProject(string projectDirectory)
+    {
+        int? existingProjectId = _projectInfoFileService.ReadProjectId(projectDirectory);
+
+        if (existingProjectId is null)
+        {
+            _logger.LogWarning("Project info file did not contain a valid project id: {ProjectDirectory}", projectDirectory);
+            return null;
+        }
+
+        Project? project = _projectRepository.GetById(existingProjectId.Value);
+
+        if (project is null)
+        {
+            _logger.LogWarning("Project info file points to a project that does not exist: {ProjectId}", existingProjectId);
+            return null;
+        }
+
+        return project;
     }
 
     private void InitialiseProjectFolderMetadata(string projectDirectory, Project project)
@@ -239,24 +281,23 @@ public class ProjectInitialisingService : IProjectInitialisingService
         {
             string pathEnd = _files.GetPathEnd(subDirectory);
 
-            if (SubProjectNameRegex.Match(pathEnd) is { Success: true } subProjectMatch)
+            if (SubProjectNameRegex.Match(pathEnd) is not { Success: true } subProjectMatch)
             {
-                _logger.LogDebug("Initialising project sub-project: {FolderName}", pathEnd);
-                InitialiseProjectFolder(subDirectory, subProjectMatch, project, collectionMetadataConfiguration);
+                continue;
             }
-            else
-            {
-                _logger.LogDebug("Initialising project sub-folder's images: {FolderName}", pathEnd);
-                _projectScanningService.ScanProjectSubFolder(projectDirectory, subDirectory, project.Id!.Value);
-            }
+
+            _logger.LogDebug("Initialising project sub-project: {FolderName}", pathEnd);
+
+            InitialiseProjectFolder(subDirectory, subProjectMatch, project, collectionMetadataConfiguration);
         }
     }
 
-
     private static Project ToProject(string subdirectory, Match match)
     {
-        DateOnly dateOnly = new DateOnly(int.Parse(match.Groups[1].Value),
-            int.Parse(match.Groups[2].Value), int.Parse(match.Groups[3].Value));
+        DateOnly dateOnly = new DateOnly(
+            int.Parse(match.Groups[1].Value),
+            int.Parse(match.Groups[2].Value),
+            int.Parse(match.Groups[3].Value));
 
         return new Project(match.Groups[4].Value, subdirectory, dateOnly);
     }

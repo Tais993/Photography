@@ -88,6 +88,17 @@ public class ProjectRepository : IProjectRepository
                     """, id);
     }
 
+    public List<Project> GetAllByParentProjectId(int parentProjectId)
+    {
+        _logger.LogDebug("Getting all projects with parent project id: {ParentProjectId}", parentProjectId);
+
+        return _db.QueryMultiple("""
+                                 SELECT id, name, path, event_date, parent_project_id
+                                 FROM public.project
+                                 WHERE parent_project_id = $1
+                                 """, MapProject, parentProjectId);
+    }
+
     public int GetProjectCount()
     {
         _logger.LogDebug("Getting project count");

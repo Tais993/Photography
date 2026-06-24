@@ -10,5 +10,6 @@ public interface IProjectRepository
     void Update(Project project);
     void DeleteById(int id);
 
+    public List<Project> GetAllByParentProjectId(int parentProjectId);
     int GetProjectCount();
 }
