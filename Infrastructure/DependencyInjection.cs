@@ -31,6 +31,7 @@ public static class DependencyInjection
             services.AddScoped<IImageRepository, ImageRepository>();
             services.AddScoped<IProjectRepository, ProjectRepository>();
             services.AddScoped<IMetadataRepository, MetadataRepository>();
+            services.AddScoped<IImageMetadataRepository, ImageMetadataRepository>();
             services.AddScoped<IProjectMetadataRepository, ProjectMetadataRepository>();
             services.AddScoped<ISelectionRepository, SelectionRepository>();
             services.AddScoped<ISearchRepository, SearchRepository>();
