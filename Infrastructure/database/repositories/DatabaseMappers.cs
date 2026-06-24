@@ -26,6 +26,18 @@ public class DatabaseMappers
         );
     }
     
+    public static ImageMetadata MapImageMetadata(NpgsqlDataReader reader)
+    {
+        return new ImageMetadata(
+            (int)reader["image_id"],
+            (string)reader["metadata_key"],
+            (string)reader["metadata_value"],
+            (string)reader["metadata_type"],
+            (string)reader["display_name"],
+            (string)reader["description"]
+        );
+    }
+    
     internal static ProjectMetadata MapProjectMetadata(NpgsqlDataReader reader)
     {
         return new ProjectMetadata(
