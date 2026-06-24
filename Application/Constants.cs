@@ -13,6 +13,11 @@ public class Constants
     public const string ConfigImageViewerMode = "ImageViewer:Mode";
     public const string ConfigImageViewerPath = "ImageViewer:ImageViewerPath";
     public const string ConfigProjectFolder = "DefaultProjectFolder";
+
+    public const string ConfigThumbnailsCachePath = "Thumbnails:CachePath";
+    public const string ConfigThumbnailsDefaultSize = "Thumbnails:DefaultSize";
+    public const string ConfigThumbnailsLargeSize = "Thumbnails:LargeSize";
+    public const string ConfigThumbnailsJpegQuality = "Thumbnails:JpegQuality";
     
     public const string CollectionMetadataType = "Collection";
     public const string CollectionsConfigKey = "Collections";

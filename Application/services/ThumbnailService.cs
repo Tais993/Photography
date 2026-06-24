@@ -4,6 +4,7 @@ using Application.interfaces.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using static Application.Constants;
 using Image = Domain.entities.Image;
 
 namespace Application.services;
@@ -21,8 +22,7 @@ public class ThumbnailService : IThumbnailService
     private readonly int _largeSize;
     private readonly int _jpegQuality;
 
-    public ThumbnailService(
-        IProjectService projectService, IFiles files, IConfiguration configuration,
+    public ThumbnailService(IProjectService projectService, IFiles files, IConfiguration configuration,
         ILogger<ThumbnailService> logger, IImageService imageService, IThumbnailGenerator thumbnailGenerator)
     {
         _projectService = projectService;
@@ -32,9 +32,9 @@ public class ThumbnailService : IThumbnailService
         _imageService = imageService;
         _thumbnailGenerator = thumbnailGenerator;
 
-        _defaultSize = _configuration.GetValue<int>("Thumbnails:DefaultSize", 300);
-        _largeSize = _configuration.GetValue<int>("Thumbnails:LargeSize", 1200);
-        _jpegQuality = _configuration.GetValue<int>("Thumbnails:JpegQuality", 80);
+        _defaultSize = _configuration.GetValue<int>(ConfigThumbnailsDefaultSize, 300);
+        _largeSize = _configuration.GetValue<int>(ConfigThumbnailsLargeSize, 1200);
+        _jpegQuality = _configuration.GetValue<int>(ConfigThumbnailsJpegQuality, 80);
     }
 
     public ThumbnailResult GetThumbnail(int imageId, string size = "default")
@@ -98,14 +98,14 @@ public class ThumbnailService : IThumbnailService
     /// <returns></returns>
     private string GetThumbnailCachePath(int imageId, string size, int maxSize)
     {
-        string cacheRoot = _configuration.GetValue<string>("Thumbnails:CachePath") ??
-                           Path.Combine(AppContext.BaseDirectory, "thumbnail-cache");
+        string cacheRoot = _configuration.GetValue<string>(ConfigThumbnailsCachePath) ??
+                           _files.Combine(AppContext.BaseDirectory, "thumbnail-cache");
 
         string safeSize = size.Equals("large", StringComparison.OrdinalIgnoreCase)
             ? "large"
             : "default";
 
-        return Path.Combine(
+        return _files.Combine(
             cacheRoot,
             safeSize,
             $"{imageId}_{maxSize}_q{_jpegQuality}.jpg"

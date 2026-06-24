@@ -31,7 +31,7 @@ public class ThumbnailServiceTest
     private string _cacheDirectory = null!;
     private string _defaultCachePath = null!;
     private string _largeCachePath = null!;
-    
+
     [SetUp]
     public void SetUp()
     {
@@ -40,7 +40,7 @@ public class ThumbnailServiceTest
         _files = new Mock<IFiles>();
         _thumbnailGenerator = new Mock<IThumbnailGenerator>();
         _logger = new Mock<ILogger<ThumbnailService>>();
-        
+
         _testRoot = Path.Combine(Path.GetTempPath(), "PictureProjectTests", Guid.NewGuid().ToString());
 
         _projectPath = Path.Combine(_testRoot, "Projects", "Test");
@@ -80,6 +80,14 @@ public class ThumbnailServiceTest
             .AddInMemoryCollection(configurationValues)
             .Build();
 
+        _files
+            .Setup(files => files.Combine(_cacheRoot, "default", "5_300_q80.jpg"))
+            .Returns(_defaultCachePath);
+
+        _files
+            .Setup(files => files.Combine(_cacheRoot, "large", "5_1200_q80.jpg"))
+            .Returns(_largeCachePath);
+
         _thumbnailService = new ThumbnailService(
             _projectService.Object,
             _files.Object,
@@ -110,7 +118,7 @@ public class ThumbnailServiceTest
             10
         );
     }
-    
+
     [Test]
     public void GetThumbnail_ReturnsNotFound_WhenImageDoesNotExist()
     {
@@ -141,7 +149,7 @@ public class ThumbnailServiceTest
             Times.Never
         );
     }
-    
+
     [Test]
     public void GetThumbnail_ReturnsNotFound_WhenProjectDoesNotExist()
     {
@@ -219,7 +227,7 @@ public class ThumbnailServiceTest
             Times.Never
         );
     }
-    
+
     [Test]
     public void GetThumbnail_ReturnsExistingCachedThumbnail_WhenCacheIsValid()
     {
@@ -407,7 +415,7 @@ public class ThumbnailServiceTest
         Image image = CreateImage();
         Project project = CreateProject();
 
-        string largeCacheDirectory = @"C:" + Path.DirectorySeparatorChar + "ThumbnailCache" + Path.DirectorySeparatorChar + "large";
+        string largeCacheDirectory = Path.Combine(_cacheRoot, "large");
 
         // Mocks
         _imageService
