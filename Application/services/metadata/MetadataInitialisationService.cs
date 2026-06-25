@@ -8,14 +8,14 @@ namespace Application.services.metadata;
 
 public class MetadataInitialisationService : IMetadataInitialisationService
 {
-    private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IMetadataService _metadataService;
     private readonly IConfiguration _configuration;
     private readonly ILogger<MetadataInitialisationService> _logger;
     private readonly ICollectionMetadataService _collectionMetadataService;
 
-    public MetadataInitialisationService(IProjectMetadataService projectMetadataService, IConfiguration configuration, ILogger<MetadataInitialisationService> logger, ICollectionMetadataService collectionMetadataService)
+    public MetadataInitialisationService(IMetadataService metadataService, IConfiguration configuration, ILogger<MetadataInitialisationService> logger, ICollectionMetadataService collectionMetadataService)
     {
-        _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
         _configuration = configuration;
         _logger = logger;
         _collectionMetadataService = collectionMetadataService;
@@ -70,7 +70,7 @@ public class MetadataInitialisationService : IMetadataInitialisationService
 
     private void EnsureMetadataExists(string metadataKey, string metadataType, string displayName, string description)
     {
-        if (_projectMetadataService.GetMetadata(metadataKey) is not null)
+        if (_metadataService.GetMetadata(metadataKey) is not null)
         {
             _logger.LogDebug("Metadata already exists: {MetadataKey}", metadataKey);
             return;
@@ -78,7 +78,7 @@ public class MetadataInitialisationService : IMetadataInitialisationService
 
         _logger.LogInformation("Creating metadata: {MetadataKey}", metadataKey);
 
-        _projectMetadataService.CreateMetadata(
+        _metadataService.CreateMetadata(
             metadataKey,
             metadataType,
             displayName,

@@ -12,11 +12,11 @@ public class EditMetadataCommand : CommandBase
     private const string MetaDescription = "-description";
     private const string MetadataType = "-metadata-type";
 
-    private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IMetadataService _metadataService;
 
-    public EditMetadataCommand(IProjectMetadataService projectMetadataService)
+    public EditMetadataCommand(IMetadataService metadataService)
     {
-        _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
     }
 
     protected override string Name => "edit";
@@ -39,7 +39,7 @@ public class EditMetadataCommand : CommandBase
         string? description = parseResult.GetValue<string>(MetaDescription);
         string? metadataType = parseResult.GetValue<string>(MetadataType);
 
-        Metadata? metadata = _projectMetadataService.GetMetadata(metadataKey);
+        Metadata? metadata = _metadataService.GetMetadata(metadataKey);
 
         if (metadataKey is null || metadata is null)
         {
@@ -50,7 +50,7 @@ public class EditMetadataCommand : CommandBase
         metadata.Description = description ?? metadata.Description;
         metadata.MetadataType = metadataType ?? metadata.MetadataType;
 
-        _projectMetadataService.UpdateMetadata(metadata);
+        _metadataService.UpdateMetadata(metadata);
 
         Console.WriteLine("Updated metadata in the database");
 
