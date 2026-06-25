@@ -23,17 +23,18 @@ public static class DependencyInjection
             services.AddScoped<ILightroomService, LightroomService>();
             services.AddScoped<IImageService, ImageService>();
             
+            services.AddScoped<IMetadataService, MetadataService>();
+            services.AddScoped<IImageMetadataService, ImageMetadataService>();
+            services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
+            services.AddScoped<IMetadataInitialisationService, MetadataInitialisationService>();
+            services.AddScoped<ICollectionMetadataService, CollectionMetadataService>();
             
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<IProjectInfoFileService, ProjectInfoFileService>();
             services.AddScoped<IProjectResolverService, ProjectResolverService>();
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
-            services.AddScoped<IProjectMetadataService, ProjectMetadataService>();
             services.AddScoped<IProjectScanningService, ProjectScanningService>();
             services.AddScoped<IProjectFolderService, ProjectFolderService>();
-            
-            services.AddScoped<IMetadataInitialisationService, MetadataInitialisationService>();
-            services.AddScoped<ICollectionMetadataService, CollectionMetadataService>();
             
             
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
