@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.interfaces.services;
+namespace Application.interfaces.services.metadata;
 
 public interface ICollectionMetadataService
 {

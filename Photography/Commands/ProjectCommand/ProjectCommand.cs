@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using Application.interfaces.services.metadata;
 using Application.interfaces.services.project;
 using static Cli.ExitCodes;
 

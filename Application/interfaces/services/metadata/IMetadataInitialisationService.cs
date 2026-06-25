@@ -1,4 +1,4 @@
-﻿namespace Application.interfaces.services;
+﻿namespace Application.interfaces.services.metadata;
 
 public interface IMetadataInitialisationService
 {

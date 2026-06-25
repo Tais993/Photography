@@ -1,5 +1,5 @@
 ﻿using System.CommandLine;
-using Application.interfaces.services.project;
+using Application.interfaces.services.metadata;
 using Domain.entities;
 using static Cli.ExitCodes;
 

@@ -1,4 +1,4 @@
-﻿using Application.interfaces.services;
+﻿using Application.interfaces.services.metadata;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
