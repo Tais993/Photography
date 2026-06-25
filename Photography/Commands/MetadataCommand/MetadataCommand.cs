@@ -8,12 +8,12 @@ namespace Cli.Commands.MetadataCommand;
 
 public class MetadataCommand : CommandBase
 {
-    private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IMetadataService _metadataService;
     private readonly IProjectResolverService _projectResolverService;
 
-    public MetadataCommand(IProjectMetadataService projectMetadataService, IProjectResolverService projectResolverService)
+    public MetadataCommand(IMetadataService metadataService, IProjectResolverService projectResolverService)
     {
-        _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
         _projectResolverService = projectResolverService;
     }
 
@@ -26,9 +26,9 @@ public class MetadataCommand : CommandBase
         base.Configure(command);
         AddAliases(Aliases);
 
-        command.Subcommands.Add(new CreateMetadataCommand(_projectMetadataService).Build());
-        command.Subcommands.Add(new EditMetadataCommand(_projectMetadataService).Build());
-        command.Subcommands.Add(new DeleteMetadataCommand(_projectMetadataService).Build());
+        command.Subcommands.Add(new CreateMetadataCommand(_metadataService).Build());
+        command.Subcommands.Add(new EditMetadataCommand(_metadataService).Build());
+        command.Subcommands.Add(new DeleteMetadataCommand(_metadataService).Build());
     }
 
     public override int Run(ParseResult parseResult)

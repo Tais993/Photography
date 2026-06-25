@@ -9,13 +9,15 @@ namespace Cli.Commands.ProjectCommand;
 
 public class RemoveMetadataCommand : CommandBase
 {
+    private readonly IMetadataService _metadataService;
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectResolverService _projectResolverService;
 
-    public RemoveMetadataCommand(IProjectResolverService projectResolverService, IProjectMetadataService projectMetadataService)
+    public RemoveMetadataCommand(IProjectResolverService projectResolverService, IProjectMetadataService projectMetadataService, IMetadataService metadataService)
     {
         _projectResolverService = projectResolverService;
         _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
     }
 
     private static string MetadataKeyName => "-metadata-key";
@@ -61,6 +63,6 @@ public class RemoveMetadataCommand : CommandBase
     {
         string metadataKey = parseResult.GetValue<string>(MetadataKeyName);
 
-        return _projectMetadataService.GetMetadata(metadataKey);
+        return _metadataService.GetMetadata(metadataKey);
     }
 }

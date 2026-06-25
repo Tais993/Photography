@@ -11,11 +11,11 @@ public class CreateMetadataCommand : CommandBase
     private const string MetaDescription = "-description";
     private const string MetadataType = "-metadata-type";
 
-    private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IMetadataService _metadataService;
 
-    public CreateMetadataCommand(IProjectMetadataService projectMetadataService)
+    public CreateMetadataCommand(IMetadataService metadataService)
     {
-        _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
     }
 
     protected override string Name => "create";
@@ -47,7 +47,7 @@ public class CreateMetadataCommand : CommandBase
             return InvalidInput("Metadatakey and or displayname cannot be null");
         }
 
-        _projectMetadataService.CreateMetadata(metadataKey, metadataType, displayName, description);
+        _metadataService.CreateMetadata(metadataKey, metadataType, displayName, description);
 
         return Success;
     }

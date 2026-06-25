@@ -8,11 +8,11 @@ public class DeleteMetadataCommand : CommandBase
 {
     private const string MetadataKey = "-metadata-key";
 
-    private readonly IProjectMetadataService _projectMetadataService;
+    private readonly IMetadataService _metadataService;
 
-    public DeleteMetadataCommand(IProjectMetadataService projectMetadataService)
+    public DeleteMetadataCommand(IMetadataService metadataService)
     {
-        _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
     }
 
     protected override string Name => "delete";
@@ -42,7 +42,7 @@ public class DeleteMetadataCommand : CommandBase
             case ConsoleKey.Y:
             {
                 Console.WriteLine("Deleting...");
-                _projectMetadataService.DeleteMetadata(metadataKey);
+                _metadataService.DeleteMetadata(metadataKey);
                 return Success;
             }
 

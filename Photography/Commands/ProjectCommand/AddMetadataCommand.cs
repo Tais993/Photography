@@ -9,14 +9,15 @@ namespace Cli.Commands.ProjectCommand;
 
 public class AddMetadataCommand : CommandBase
 {
-
+    private readonly IMetadataService _metadataService;
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectResolverService _projectResolverService;
 
-    public AddMetadataCommand(IProjectResolverService projectResolverService, IProjectMetadataService projectMetadataService)
+    public AddMetadataCommand(IProjectResolverService projectResolverService, IProjectMetadataService projectMetadataService, IMetadataService metadataService)
     {
         _projectResolverService = projectResolverService;
         _projectMetadataService = projectMetadataService;
+        _metadataService = metadataService;
     }
 
     protected override string Name => "metadata-add";
@@ -70,6 +71,6 @@ public class AddMetadataCommand : CommandBase
     {
         string metadataKey = parseResult.GetValue<string>(MetadataKeyName);
 
-        return _projectMetadataService.GetMetadata(metadataKey);
+        return _metadataService.GetMetadata(metadataKey);
     }
 }
