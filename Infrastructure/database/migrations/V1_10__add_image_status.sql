@@ -1,0 +1,2 @@
+﻿ALTER TABLE image
+ADD COLUMN status VARCHAR(255);

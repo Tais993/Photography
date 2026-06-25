@@ -13,7 +13,10 @@ public class DatabaseMappers
             (string)reader["file_type"],
             (string)reader["relational_file_path"],
             (int)reader["id"]
-        );
+        )
+        {
+            ImageStatus = ImageStatusMapper.ToImageStatus(reader["status"] as string)
+        };
     }
     
     internal static Metadata MapMetadata(NpgsqlDataReader reader)

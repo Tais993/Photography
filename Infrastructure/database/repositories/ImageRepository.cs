@@ -23,7 +23,8 @@ public class ImageRepository : IImageRepository
         _logger.LogDebug("Getting image by id: {ImageId}", id);
 
         return _db.QueryOrDefault("""
-                                  SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image 
+                                  SELECT id, project_id, file_name, file_type, relational_file_path, status 
+                                  FROM public.image 
                                   WHERE id = ($1)
                                   """, MapImage, id);
     }
@@ -33,7 +34,7 @@ public class ImageRepository : IImageRepository
         _logger.LogDebug("Getting all images");
 
         List<Image> images = _db.QueryMultiple("""
-                                               SELECT id, project_id, file_name, file_type, relational_file_path 
+                                               SELECT id, project_id, file_name, file_type, relational_file_path, status 
                                                FROM public.image 
                                                """, MapImage);
 
@@ -52,7 +53,7 @@ public class ImageRepository : IImageRepository
         }
 
         List<Image> images = _db.QueryMultiple("""
-                                               SELECT id, project_id, file_name, file_type, relational_file_path
+                                               SELECT id, project_id, file_name, file_type, relational_file_path, status
                                                FROM public.image
                                                WHERE id = any($1)
                                                """, MapImage, imageIds);
@@ -67,7 +68,8 @@ public class ImageRepository : IImageRepository
         _logger.LogDebug("Getting images for project: {ProjectId}", projectId);
 
         List<Image> images = _db.QueryMultiple("""
-                                               SELECT id, project_id, file_name, file_type, relational_file_path FROM public.image
+                                               SELECT id, project_id, file_name, file_type, relational_file_path, status
+                                               FROM public.image
                                                WHERE project_id = ($1)
                                                """, MapImage, projectId);
 
@@ -91,16 +93,13 @@ public class ImageRepository : IImageRepository
     {
         _logger.LogDebug(
             "Inserting image for project: {ProjectId}, file: {FileName}{FileType}",
-            image.ProjectId,
-            image.FileName,
-            image.FileType);
+            image.ProjectId, image.FileName, image.FileType);
 
         Image insertedImage = _db.Query("""
-                                        INSERT INTO public.image(project_id, file_name, file_type, relational_file_path) 
-                                        VALUES ($1, $2, $3, $4)
+                                        INSERT INTO public.image(project_id, file_name, file_type, relational_file_path, status) 
+                                        VALUES ($1, $2, $3, $4, $5)
                                         RETURNING *
-                                        """, MapImage, image.ProjectId, image.FileName, image.FileType,
-            image.RelationalFilePath);
+                                        """, MapImage, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath, ImageStatusMapper.ToDatabaseValue(image.ImageStatus));
 
         _logger.LogTrace("Inserted image: {ImageId}", insertedImage.Id);
 
@@ -116,9 +115,10 @@ public class ImageRepository : IImageRepository
                     SET project_id = $1,
                         file_name = $2,
                         file_type = $3,
-                        relational_file_path = $4
-                    WHERE id = $5
-                    """, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath, image.Id);
+                        relational_file_path = $4,
+                        status = $5
+                    WHERE id = $6
+                    """, image.ProjectId, image.FileName, image.FileType, image.RelationalFilePath, ImageStatusMapper.ToDatabaseValue(image.ImageStatus), image.Id);
     }
 
 
