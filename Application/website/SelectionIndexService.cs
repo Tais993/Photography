@@ -55,7 +55,8 @@ public class SelectionIndexService : ISelectionIndexService
             PageNumber = request.PageNumber
         };
 
-        if (request.SelectedProjectId is null)
+        
+        if (request.SelectedProjectId is null || request.SelectedProjectId == 0)
         {
             _logger.LogDebug("Selection index requested without selected project");
             return viewModel;
@@ -63,6 +64,12 @@ public class SelectionIndexService : ISelectionIndexService
 
         Project selectedProject = _projectService.GetProjectById(request.SelectedProjectId.Value);
 
+        if (selectedProject is null)
+        {
+            _logger.LogDebug("Selection index requested invalid project");
+            return viewModel;
+        }
+        
         viewModel.SelectedProject = selectedProject;
         viewModel.ProjectImageCount = _imageService.GetProjectImageCount(request.SelectedProjectId.Value);
         viewModel.FolderOptions = _projectFolderService.GetExistingProjectFolders(request.SelectedProjectId.Value);
