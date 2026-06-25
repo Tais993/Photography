@@ -1,11 +1,11 @@
 ﻿using Application.interfaces.infrastructure;
-using Application.interfaces.services;
+using Application.interfaces.services.metadata;
 using Domain.entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static Application.Constants;
 
-namespace Application.services;
+namespace Application.services.metadata;
 
 public class CollectionMetadataService : ICollectionMetadataService
 {

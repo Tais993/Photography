@@ -3,7 +3,7 @@ using Application.interfaces.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 
-namespace Application.services.project;
+namespace Application.services.metadata;
 
 public class ProjectMetadataService : IProjectMetadataService
 {
