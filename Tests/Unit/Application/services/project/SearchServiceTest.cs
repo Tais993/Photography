@@ -5,7 +5,7 @@ using Domain.entities.search;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Tests.Unit.Application.services;
+namespace Tests.Unit.Application.services.project;
 
 [TestFixture]
 public class SearchServiceTests
