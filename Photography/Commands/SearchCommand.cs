@@ -42,6 +42,12 @@ public class SearchCommand : CommandBase
         Description = "The origin folder",
         DefaultValueFactory = _ => "Originals"
     };
+    
+    private const string StatusName = "-status";
+    private readonly Option<ImageStatus> _statusOption = new Option<ImageStatus>(StatusName)
+    {
+        Description = "The image status",
+    };
 
     public SearchCommand(ISearchService searchService, IProjectResolverService projectResolverService)
     {
@@ -61,6 +67,7 @@ public class SearchCommand : CommandBase
         command.Options.Add(_globalOption);
         command.Options.Add(_fileTypeOption);
         command.Options.Add(_originFolderOption);
+        command.Options.Add(_statusOption);
     }
 
     public override int Run(ParseResult parseResult)
@@ -69,7 +76,8 @@ public class SearchCommand : CommandBase
         bool shouldByGlobal = parseResult.GetValue<bool>(GlobalName);
         string? fileType = parseResult.GetValue<string>(FileTypeName);
         string? originFolder = parseResult.GetValue<string>(OriginFolderName);
-
+        ImageStatus? imageStatus = parseResult.GetValue<ImageStatus>(StatusName);
+        
         int? projectId = _projectResolverService.ResolveProjectId(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
 
@@ -84,6 +92,7 @@ public class SearchCommand : CommandBase
             ProjectId = projectId,
             FileType = fileType,
             FolderName = originFolder,
+            ImageStatus = imageStatus
         };
 
         List<Image> images = _searchService.SearchImages(settings).Items;
