@@ -9,16 +9,18 @@ namespace Application.services.project;
 public class ProjectScanningService : IProjectScanningService
 {
     private readonly IImageRepository _imageRepository;
+    private readonly IImageMetadataRepository _imageMetadataRepository;
     private readonly IProjectRepository _projectRepository;
     private readonly IFiles _files;
     private readonly ILogger<ProjectScanningService> _logger;
 
-    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files, ILogger<ProjectScanningService> logger)
+    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files, ILogger<ProjectScanningService> logger, IImageMetadataRepository imageMetadataRepository)
     {
         _imageRepository = imageRepository;
         _projectRepository = projectRepository;
         _files = files;
         _logger = logger;
+        _imageMetadataRepository = imageMetadataRepository;
     }
 
     public void ScanProject(Project project)
@@ -118,13 +120,8 @@ public class ProjectScanningService : IProjectScanningService
                 continue;
             }
 
-            if (image.Id is null)
-            {
-                _logger.LogWarning("Could not delete image because image id was null: {RelativeFilePath}", image.RelationalFilePath);
-                continue;
-            }
-
-            _imageRepository.DeleteById(image.Id.Value);
+            image.ImageStatus = ImageStatus.Unavailable;
+            _imageRepository.Update(image);
 
             _logger.LogInformation("Deleted image because it was not found on the filesystem: {RelativeFilePath}", image.RelationalFilePath);
         }
