@@ -8,6 +8,7 @@ public class ImageSearchSettings : SearchSettings
     public string? FileNumber { get; set; }
     public string? FolderName { get; set; }
     public string? FileType { get; set; }
+    public ImageStatus? ImageStatus { get; set; }
 
     public bool HideRawFilesWhenImageExists { get; set; }
 }

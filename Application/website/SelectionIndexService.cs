@@ -100,6 +100,7 @@ public class SelectionIndexService : ISelectionIndexService
             FileNameOrNumber = request.Search,
             FolderName = folderName,
             FileType = request.FileType,
+            ImageStatus = ImageStatus.Available,
             HideRawFilesWhenImageExists = true,
             PageSize = request.PageSize,
             PageNumber = request.PageNumber

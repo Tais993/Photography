@@ -110,6 +110,15 @@ public class SearchRepository : ISearchRepository
             whereClauses.Add($"LOWER(i.file_type) = LOWER(${parameters.Count}::text)");
         }
 
+        if (settings.ImageStatus is not null)
+        {
+            string imageStatus = ImageStatusMapper.ToDatabaseValue((ImageStatus) settings.ImageStatus);
+            
+            parameters.Add(imageStatus);
+            whereClauses.Add($"LOWER(i.status) = LOWER(${parameters.Count}::text)");
+        }
+
+        
         AddHideRawFilesFilter(settings, parameters, whereClauses);
 
         return BuildWhereSql(whereClauses);
@@ -191,7 +200,8 @@ public class SearchRepository : ISearchRepository
                                   i.project_id,
                                   i.file_name,
                                   i.file_type,
-                                  i.relational_file_path
+                                  i.relational_file_path,
+                                  i.status
                            FROM public.image i
                            {whereSql}
                            ORDER BY i.id DESC, i.file_name
