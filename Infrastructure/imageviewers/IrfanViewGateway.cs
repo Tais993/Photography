@@ -12,13 +12,13 @@ public class IrfanViewGateway : IIrfanviewGateway
     private static string[] ProcessNames => ["i_view64", "i_view32"];
     private static string[] TitleSeparators => [" - IrfanView"];
     private readonly ILogger<IrfanViewGateway> _logger;
-    private readonly string? _irfanViewPath;
+    private readonly string _irfanViewPath;
 
     public IrfanViewGateway(ILogger<IrfanViewGateway> logger, IConfiguration configuration,
         ImageViewerGatewayHelper imageViewerGatewayHelper)
     {
         _imageViewerGatewayHelper = imageViewerGatewayHelper;
-        _irfanViewPath = configuration.GetValue<string>(Constants.ConfigImageViewerPath);
+        _irfanViewPath = configuration.GetValue<string>(Constants.ConfigImageViewerPath)!;
         _logger = logger;
     }
 
@@ -36,7 +36,16 @@ public class IrfanViewGateway : IIrfanviewGateway
     public void OpenFile(string imagePath)
     {
         Process.Start(
-            _imageViewerGatewayHelper.CreateFileOpenProcess(_irfanViewPath, imagePath)
+            _imageViewerGatewayHelper.CreateDefaultFileOpenProcess(_irfanViewPath, imagePath)
         );
+    }
+
+    public void OpenFolder(string folderPath, HashSet<string> imageTypes)
+    {
+        string joinedImageTypes = string.Join(";", imageTypes.Select(type => $"*{type}"));
+
+        Process.Start(
+            _imageViewerGatewayHelper.CreateFolderOpenProcess(_irfanViewPath,
+                $"\"{folderPath}\" /filepattern=\"{joinedImageTypes}\""));
     }
 }

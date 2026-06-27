@@ -41,7 +41,7 @@ public class ImageGlassGateway : IImageGlassGateway
     public void OpenFile(string imagePath)
     {
         Process.Start(
-            _imageViewerGatewayHelper.CreateFileOpenProcess(_imageGlassPath, imagePath)
+            _imageViewerGatewayHelper.CreateDefaultFileOpenProcess(_imageGlassPath, imagePath)
         );
     }
 }

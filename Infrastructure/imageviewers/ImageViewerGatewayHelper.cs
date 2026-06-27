@@ -42,12 +42,28 @@ public class ImageViewerGatewayHelper
     /// </summary>
     /// <param name="imageViewerPath"></param>
     /// <param name="imagePath">The path of the file that should be opened.</param>
-    public ProcessStartInfo CreateFileOpenProcess(string imageViewerPath, string imagePath)
+    public ProcessStartInfo CreateDefaultFileOpenProcess(string imageViewerPath, string imagePath)
     {
         return new ProcessStartInfo
         {
             FileName = imageViewerPath,
             Arguments = $"\"{imagePath}\"",
+            UseShellExecute = true
+        };
+    }
+    
+    /// <summary>
+    /// Opens a file using the default application configured in Windows for that file type.
+    /// This expects a full argument, instead of a image path.
+    /// </summary>
+    /// <param name="imageViewerPath"></param>
+    /// <param name="argument">The path of the file that should be opened.</param>
+    public ProcessStartInfo CreateFolderOpenProcess(string imageViewerPath, string argument)
+    {
+        return new ProcessStartInfo
+        {
+            FileName = imageViewerPath,
+            Arguments = $"{argument}",
             UseShellExecute = true
         };
     }
