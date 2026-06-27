@@ -57,4 +57,15 @@ public class IrfanViewService : IImageViewerService
         _logger.LogInformation("Opening image in IrfanView: {ImagePath}", imagePath);
         _irfanViewGateway.OpenFile(imagePath);
     }
+
+    public bool CanOpenFolders()
+    {
+        return true;
+    }
+
+    public void OpenProjectFolder(string folderPath)
+    {
+        _logger.LogInformation("Opening folder in IrfanView: {FolderPath}", folderPath);
+        _irfanViewGateway.OpenFolder(folderPath, Constants.ImageFileTypes);
+    }
 }
