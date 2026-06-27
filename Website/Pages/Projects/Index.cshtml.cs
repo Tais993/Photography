@@ -23,10 +23,12 @@ public class IndexModel : PageModel
     public PaginatedResult<Project> ProjectPage = PaginatedResult<Project>.Empty;
 
     public List<Project> Projects { get; private set; } = [];
+    public int ProjectCount { get; private set; }
 
     public Project? SelectedProject { get; private set; }
 
-    public int ProjectCount { get; private set; }
+    public bool CanOpenProjectFolder { get; private set; }
+    public string ImageViewerName { get; private set; } = "";
 
     [BindProperty(SupportsGet = true)] public int? SelectedProjectId { get; set; }
 
@@ -62,11 +64,61 @@ public class IndexModel : PageModel
         ProjectCount = viewModel.ProjectCount;
         ProjectPageNumber = viewModel.ProjectPageNumber;
         ProjectPageSize = viewModel.ProjectPageSize;
+        CanOpenProjectFolder = viewModel.CanOpenProjectInImageViewer;
+        ImageViewerName = viewModel.ImageViewerName;
 
         if (SelectedProjectId is not null)
         {
             UpdateProjectCookie();
         }
+    }
+
+    public IActionResult OnGetSelectedProjectView(int projectId)
+    {
+        Project? project = _projectService.GetProjectById(projectId);
+        SelectedProject = project;
+        SelectedProjectId = projectId;
+
+        if (project is null)
+        {
+            return NotFound();
+        }
+
+        UpdateProjectCookie();
+
+        return Partial("_SelectedProjectView", CreateSelectedProjectView(project));
+    }
+
+    public IActionResult OnGetProjectView(int projectId, int selectedProjectId)
+    {
+        Project? project = _projectService.GetProjectById(projectId);
+
+        if (project is null)
+        {
+            return NotFound();
+        }
+
+        SelectedProjectId = selectedProjectId;
+        SelectedProject = project;
+
+        return Partial("_ProjectView", CreateProjectView(project));
+    }
+
+    public IActionResult OnGetOpenProjectFolder(int selectedProjectId)
+    {
+        _projectIndexService.OpenProjectFolder(selectedProjectId);
+
+        return new NoContentResult();
+    }
+
+    internal ProjectViewModel CreateProjectView(Project project)
+    {
+        return _projectIndexService.CreateProjectView(project, SelectedProjectId);
+    }
+
+    internal SelectedProjectViewModel CreateSelectedProjectView(Project project)
+    {
+        return _projectIndexService.CreateSelectedProjectView(project);
     }
 
     private int? GetLastProjectIdFromCookie()
@@ -91,41 +143,5 @@ public class IndexModel : PageModel
                 HttpOnly = true,
                 SameSite = SameSiteMode.Lax
             });
-    }
-
-    internal ProjectViewModel CreateProjectView(Project project)
-    {
-        return _projectIndexService.CreateProjectView(project, SelectedProjectId);
-    }
-
-    public IActionResult OnGetSelectedProjectView(int projectId)
-    {
-        Project? project = _projectService.GetProjectById(projectId);
-        SelectedProject = project;
-        SelectedProjectId = projectId;
-
-        if (project is null)
-        {
-            return NotFound();
-        }
-
-        UpdateProjectCookie();
-
-        return Partial("_SelectedProjectView", project);
-    }
-
-    public IActionResult OnGetProjectView(int projectId, int selectedProjectId)
-    {
-        Project? project = _projectService.GetProjectById(projectId);
-
-        if (project is null)
-        {
-            return NotFound();
-        }
-
-        SelectedProjectId = selectedProjectId;
-        SelectedProject = project;
-
-        return Partial("_ProjectView", CreateProjectView(project));
     }
 }
