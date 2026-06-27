@@ -11,17 +11,25 @@ namespace Application.website;
 public class ProjectIndexService : IProjectIndexService
 {
     private readonly IProjectService _projectService;
+    private readonly IProjectFolderService _projectFolderService;
     private readonly ISearchService _searchService;
+    private readonly IImageViewerService _imageViewerService;
     private readonly ILogger<ProjectIndexService> _logger;
+
 
     public ProjectIndexService(
         IProjectService projectService,
+        IProjectFolderService projectFolderService,
         ISearchService searchService,
+        IImageViewerService imageViewerService,
         ILogger<ProjectIndexService> logger)
     {
         _projectService = projectService;
+        _projectFolderService = projectFolderService;
         _searchService = searchService;
+        _imageViewerService = imageViewerService;
         _logger = logger;
+        _imageViewerService = imageViewerService;
     }
 
     public ProjectIndexViewModel GetProjectIndex(ProjectIndexRequest request)
@@ -54,7 +62,9 @@ public class ProjectIndexService : IProjectIndexService
             SelectedProjectId = request.SelectedProjectId,
             ProjectCount = _projectService.GetProjectCount(),
             ProjectPageNumber = projectPage.PageNumber,
-            ProjectPageSize = projectPage.PageSize
+            ProjectPageSize = projectPage.PageSize,
+            CanOpenProjectInImageViewer = _imageViewerService.IsAvailable() && _imageViewerService.CanOpenFolders(),
+            ImageViewerName = _imageViewerService.GetImageViewerName()
         };
 
         if (request.SelectedProjectId is not null)
@@ -83,5 +93,44 @@ public class ProjectIndexService : IProjectIndexService
             Path = project.Path,
             EventDate = project.EventDate
         };
+    }
+
+    public SelectedProjectViewModel CreateSelectedProjectView(Project project)
+    {
+        return new SelectedProjectViewModel()
+        {
+            Project = project,
+            CanOpenInImageViewer = _imageViewerService.IsAvailable() && _imageViewerService.CanOpenFolders(),
+            ImageViewerName = _imageViewerService.GetImageViewerName()
+        };
+    }
+
+    public void OpenProjectFolder(int projectId)
+    {
+        _logger.LogInformation("Opening project images in image viewer, project: {ProjectId}", projectId);
+
+        Project? project = _projectService.GetProjectById(projectId);
+
+        if (project is null)
+        {
+            _logger.LogWarning("Could not open project images because project was not found: {ProjectId}", projectId);
+            throw new InvalidOperationException("Project was not found.");
+        }
+
+        if (!_imageViewerService.IsAvailable() || !_imageViewerService.CanOpenFolders())
+        {
+            _logger.LogWarning("Could not open project images. Image viewer is not available, or does not support opening folders");
+            throw new InvalidOperationException("Image viewer is not available, or does not support opening folders.");
+        }
+
+
+        string folderPath = _projectFolderService.GetRequiredFolderPath(projectId, ProjectFolderRole.Originals);
+
+        _logger.LogInformation(
+            "Opening project images folder in {ImageViewerName}: {FolderPath}",
+            _imageViewerService.GetImageViewerName(),
+            folderPath);
+
+        _imageViewerService.OpenProjectFolder(folderPath);
     }
 }

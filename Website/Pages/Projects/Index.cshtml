@@ -203,7 +203,7 @@
                 }
                 else
                 {
-                    <partial name="_SelectedProjectView" model="Model.SelectedProject"/>
+                    <partial name="_SelectedProjectView" model="Model.CreateSelectedProjectView(Model.SelectedProject)"/>
                 }
             </div>
         </div>
@@ -261,6 +261,16 @@
 
             url.searchParams.set("SelectedProjectId", projectId);
             window.history.replaceState({}, "", url);
+        }
+
+        window.openProjectFolder = async function openProjectFolder(projectId) {
+            const response = await fetch(`?handler=OpenProjectFolder&selectedProjectId=${projectId}`, {
+                credentials: "same-origin"
+            });
+
+            if (!response.ok) {
+                console.error("Could not open project folder");
+            }
         }
 
         async function reloadProjectView(projectId, selectedProjectId) {
