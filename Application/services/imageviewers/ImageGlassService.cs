@@ -2,6 +2,7 @@
 using Application.interfaces.infrastructure.imageviewers;
 using Application.interfaces.services;
 using Microsoft.Extensions.Logging;
+using static Application.Constants;
 
 namespace Application.services.imageviewers;
 
@@ -54,5 +55,34 @@ public class ImageGlassService : IImageViewerService
     {
         _logger.LogInformation("Opening image in ImageGlass: {ImagePath}", imagePath);
         _imageGlassGateway.OpenFile(imagePath);
+    }
+    
+    public bool CanOpenFolders()
+    {
+        return true;
+    }
+
+    public void OpenProjectFolder(string folderPath)
+    {
+        _logger.LogInformation("Opening folder in ImageGlass: {FolderPath}", folderPath);
+
+        if (!_files.Exists(folderPath))
+        {
+            throw new DirectoryNotFoundException(folderPath);
+        }
+
+        string? firstImage = _files
+            .GetFiles(folderPath)
+            .Where(filePath => ImageFileTypes.Contains(_files.GetFileExtension(filePath)))
+            .OrderBy(image => image)
+            .FirstOrDefault();
+
+        if (firstImage is null)
+        {
+            throw new DirectoryNotFoundException("No image files found in folder");
+        }
+        
+        _logger.LogInformation("Opening folder in IrfanView: {FolderPath}", folderPath);
+        _imageGlassGateway.OpenFile(firstImage);
     }
 }

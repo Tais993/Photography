@@ -62,4 +62,14 @@ public class WindowsPhotosService : IImageViewerService
         _logger.LogInformation("Opening image in Windows Photos: {ImagePath}", imagePath);
         _windowsPhotoGateway.OpenFile(imagePath);
     }
+    
+    public bool CanOpenFolders()
+    {
+        return false;
+    }
+
+    public void OpenProjectFolder(string folderPath)
+    {
+        throw new NotSupportedException("Windows Photos does not support opening folders.");
+    }
 }
