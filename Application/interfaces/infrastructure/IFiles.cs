@@ -93,7 +93,25 @@ public interface IFiles
     /// <returns></returns>
     string[] GetFiles(string path);
 
+    /// <summary>
+    ///     Returns all files listed in the given path, with the given search pattern.
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="searchPattern"></param>
+    /// <param name="searchOption"></param>
+    /// <returns></returns>
+    public string[] GetFiles(string path, string searchPattern, SearchOption searchOption);
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="searchPattern"></param>
+    /// <param name="searchOption"></param>
+    /// <returns></returns>
+    public IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption);
+    
+    
     /// <summary>
     ///     Creates and or writes all given text onto the given path
     /// </summary>
@@ -158,5 +176,4 @@ public interface IFiles
     /// <param name="path"></param>
     /// <returns></returns>
     public DateTime GetLastWriteTimeUtc(string path);
-
 }
