@@ -41,6 +41,7 @@ public static class DependencyInjection
             services.AddScoped<IWindowsPhotoGateway, WindowsPhotoGateway>();
             services.AddScoped<IImageGlassGateway, ImageGlassGateway>();
 
+            services.AddScoped<ILogicalDriveRepository, LogicalDriveRepository>();
             services.AddScoped<IFiles, Files>();
 
             services.AddScoped<IThumbnailGenerator, MagickThumbnailGenerator>();
