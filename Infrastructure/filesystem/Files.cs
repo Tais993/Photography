@@ -66,6 +66,16 @@ public class Files : IFiles
         return Directory.GetFiles(path);
     }
 
+    public string[] GetFiles(string path, string searchPattern, SearchOption searchOption)
+    {
+        return Directory.GetFiles(path, searchPattern, searchOption);
+    }
+
+    public IEnumerable<string> EnumerateFiles(string path, string searchPattern, SearchOption searchOption)
+    {
+        return Directory.EnumerateFiles(path, searchPattern, searchOption);
+    }
+
     public void WriteAllText(string text, string path)
     {
         File.WriteAllText(path, text);
@@ -104,9 +114,8 @@ public class Files : IFiles
     public void MoveFolder(string path, string newPath)
     {
         Directory.Move(path, newPath);
-        
     }
-    
+
     public DateTime GetLastWriteTimeUtc(string path)
     {
         return File.GetLastWriteTimeUtc(path);
