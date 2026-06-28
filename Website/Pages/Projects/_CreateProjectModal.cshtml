@@ -1,0 +1,241 @@
+﻿@using Domain.entities
+@model CreateProjectModalModel
+
+<div class="modal modal-blur fade" id="create-project-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add project</h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <div asp-validation-summary="All"></div>
+                    </div>
+                }
+
+                <div class="steps mb-4">
+                        <span class="step-item @(Model.IsProjectDetailsStep ? "" : "active")">
+                            Pick drive
+                        </span>
+
+                    <span class="step-item @(Model.IsProjectDetailsStep ? "active" : "")">
+                            Project details
+                        </span>
+                </div>
+
+                @if (Model.IsProjectDetailsStep)
+                {
+                    <form method="post" asp-page-handler="CreateProject">
+                        <input type="hidden"
+                               name="CreateProjectModal.ImportDriveRootPath"
+                               value="@Model.ImportDriveRootPath"/>
+
+                        @if (Model.SelectedImportDrive is not null)
+                        {
+                            <div class="mb-4">
+                                <label class="form-label">Selected import drive</label>
+
+                                <div class="card card-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-3">
+                                                    <span class="avatar">
+                                                        <i class="ti ti-device-sd-card"></i>
+                                                    </span>
+                                            </div>
+
+                                            <div>
+                                                <div class="fw-bold">
+                                                    @Model.GetImportDriveDisplayName(Model.SelectedImportDrive)
+                                                </div>
+
+                                                <div class="text-muted">
+                                                    @Model.GetImportDriveBadges(Model.SelectedImportDrive)
+                                                </div>
+
+                                                <div class="text-muted">
+                                                    @Model.GetImportDriveStorage(Model.SelectedImportDrive)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row g-3">
+                            <div class="col-md-7">
+                                <label class="form-label" for="create-project-name">Project name</label>
+
+                                <input id="create-project-name"
+                                       name="CreateProjectModal.ProjectName"
+                                       value="@Model.ProjectName"
+                                       class="form-control"
+                                       placeholder="De Pul Concert"
+                                       required/>
+
+                                <span class="text-danger"
+                                      data-valmsg-for="CreateProjectModal.ProjectName"
+                                      data-valmsg-replace="true"></span>
+                            </div>
+
+                            <div class="col-md-5">
+                                <label class="form-label" for="create-project-date">Project date</label>
+
+                                <input id="create-project-date"
+                                       name="CreateProjectModal.ProjectDate"
+                                       value="@Model.ProjectDate?.ToString("yyyy-MM-dd")"
+                                       type="date"
+                                       class="form-control"
+                                       required/>
+
+                                <span class="text-danger"
+                                      data-valmsg-for="CreateProjectModal.ProjectDate"
+                                      data-valmsg-replace="true"></span>
+
+                                <div class="form-hint">
+                                    Today's date is used by default. Later this can be suggested from the selected
+                                    drive.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <label class="form-label">Project folder preview</label>
+
+                            <div class="card card-sm">
+                                <div class="card-body">
+                                    <code id="create-project-folder-preview">@Model.GetProjectFolderPreview()</code>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer px-0 pb-0 mt-4">
+                            <button type="submit"
+                                    class="btn btn-outline-secondary"
+                                    asp-page-handler="BackToDrive"
+                                    formnovalidate>
+                                <i class="ti ti-arrow-left me-2"></i>
+                                Back
+                            </button>
+
+                            <button type="submit" class="btn btn-primary"
+                                    onclick="showImportStarted()">
+                                <i class="ti ti-plus me-2"></i>
+                                Create project
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="SelectDrive">
+                        <div class="mb-3">
+                            <label class="form-label">Import drive</label>
+
+                            <div class="form-hint mb-3">
+                                Drives are sorted by likelihood. Only drives with a DCIM folder can be selected for now.
+                            </div>
+
+                            @if (Model.ImportDrives.Count == 0)
+                            {
+                                <div class="empty">
+                                    <div class="empty-icon">
+                                        <i class="ti ti-device-sd-card"></i>
+                                    </div>
+
+                                    <p class="empty-title">No import drives found</p>
+
+                                    <p class="empty-subtitle text-muted">
+                                        Connect a camera card or removable drive and refresh the page.
+                                    </p>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="list-group">
+                                    @foreach (LogicalDrive drive in Model.ImportDrives)
+                                    {
+                                        string driveId = Model.GetDriveInputId(drive);
+                                        bool canSelectDrive = drive.HasDcimFolder;
+
+                                        <label
+                                            class="list-group-item list-group-item-action @(canSelectDrive ? "" : "opacity-50")"
+                                            for="@driveId">
+                                            <div class="row align-items-center">
+                                                <div class="col-auto">
+                                                    <input id="@driveId"
+                                                           class="form-check-input"
+                                                           type="radio"
+                                                           name="CreateProjectModal.ImportDriveRootPath"
+                                                           value="@drive.RootPath"
+                                                           checked="@(Model.ImportDriveRootPath == drive.RootPath)"
+                                                           disabled="@(!canSelectDrive)"/>
+                                                </div>
+
+                                                <div class="col">
+                                                    <div class="fw-bold">
+                                                        @Model.GetImportDriveDisplayName(drive)
+                                                    </div>
+
+                                                    <div class="text-muted">
+                                                        @Model.GetImportDriveStorage(drive)
+                                                    </div>
+
+                                                    <div class="text-muted">
+                                                        @Model.GetImportDriveBadges(drive)
+                                                    </div>
+
+                                                    @if (!canSelectDrive)
+                                                    {
+                                                        <div class="text-muted mt-1">
+                                                            No DCIM folder found. Folder picking is not supported yet.
+                                                        </div>
+                                                    }
+                                                </div>
+
+                                                <div class="col-auto">
+                                                    @if (drive.IsRecommended)
+                                                    {
+                                                        <span class="badge bg-green-lt">
+                                                                Recommended
+                                                            </span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </label>
+                                    }
+                                </div>
+                            }
+
+                            <span class="text-danger"
+                                  data-valmsg-for="CreateProjectModal.ImportDriveRootPath"
+                                  data-valmsg-replace="true"></span>
+                        </div>
+
+                        <div class="modal-footer px-0 pb-0">
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+
+                            <button type="submit" class="btn btn-primary">
+                                Next
+                                <i class="ti ti-arrow-right ms-2"></i>
+                            </button>
+                        </div>
+                    </form>
+                }
+            </div>
+        </div>
+    </div>
+</div>

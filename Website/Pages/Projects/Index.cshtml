@@ -3,7 +3,7 @@
 @model IndexModel
 
 @{
-    ViewData["Title"] = "Projects";
+ViewData["Title"] = "Projects";
 }
 
 <div class="page-body">
@@ -21,11 +21,18 @@
                 </div>
             </div>
 
-            <div class="col-auto ms-auto">
+            <div class="col-auto ms-auto d-flex gap-2 align-items-center">
                 <span class="badge bg-blue-lt">
                     <i class="ti ti-folders me-1"></i>
                     @Model.ProjectPage.TotalItems out of @Model.ProjectCount project(s)
                 </span>
+
+                <a asp-page="./Index"
+                   asp-route-ShowCreateProjectModal="true"
+                   class="btn btn-primary">
+                    <i class="ti ti-plus me-2"></i>
+                    Add project
+                </a>
             </div>
         </div>
     </div>
@@ -40,7 +47,7 @@
                     <div class="row g-2">
                         @if (Model.SelectedProjectId is not null)
                         {
-                            <input type="hidden" asp-for="SelectedProjectId"/>
+                        <input type="hidden" asp-for="SelectedProjectId"/>
                         }
 
                         <input type="hidden" asp-for="ProjectPageNumber"/>
@@ -149,28 +156,37 @@
 
                 @if (Model.Projects.Count == 0)
                 {
-                    <div class="card-body">
-                        <div class="empty">
-                            <div class="empty-icon">
-                                <i class="ti ti-folder-off"></i>
-                            </div>
+                <div class="card-body">
+                    <div class="empty">
+                        <div class="empty-icon">
+                            <i class="ti ti-folder-off"></i>
+                        </div>
 
-                            <p class="empty-title">No projects found</p>
+                        <p class="empty-title">No projects found</p>
 
-                            <p class="empty-subtitle text-muted">
-                                Try changing your search query.
-                            </p>
+                        <p class="empty-subtitle text-muted">
+                            Add a project from an import drive or change your search query.
+                        </p>
+
+                        <div class="empty-action">
+                            <a asp-page="./Index"
+                               asp-route-ShowCreateProjectModal="true"
+                               class="btn btn-primary">
+                                <i class="ti ti-plus me-2"></i>
+                                Add project
+                            </a>
                         </div>
                     </div>
+                </div>
                 }
                 else
                 {
-                    <div class="list-group list-group-flush">
-                        @foreach (Project project in Model.Projects)
-                        {
-                            <partial name="_ProjectView" model="Model.CreateProjectView(project)"/>
-                        }
-                    </div>
+                <div class="list-group list-group-flush">
+                    @foreach (Project project in Model.Projects)
+                    {
+                    <partial name="_ProjectView" model="Model.CreateProjectView(project)"/>
+                    }
+                </div>
                 }
 
                 <partial name="_Pagination"
@@ -187,23 +203,23 @@
             <div class="card" id="selected-project-panel">
                 @if (Model.SelectedProject is null)
                 {
-                    <div class="card-body">
-                        <div class="empty">
-                            <div class="empty-icon">
-                                <i class="ti ti-click"></i>
-                            </div>
-
-                            <p class="empty-title">No project selected</p>
-
-                            <p class="empty-subtitle text-muted">
-                                Select a project from the list.
-                            </p>
+                <div class="card-body">
+                    <div class="empty">
+                        <div class="empty-icon">
+                            <i class="ti ti-click"></i>
                         </div>
+
+                        <p class="empty-title">No project selected</p>
+
+                        <p class="empty-subtitle text-muted">
+                            Select a project from the list.
+                        </p>
                     </div>
+                </div>
                 }
                 else
                 {
-                    <partial name="_SelectedProjectView" model="Model.CreateSelectedProjectView(Model.SelectedProject)"/>
+                <partial name="_SelectedProjectView" model="Model.CreateSelectedProjectView(Model.SelectedProject)"/>
                 }
             </div>
         </div>
@@ -211,25 +227,85 @@
     </div>
 </div>
 
+<div id="import-progress-card"
+     class="card shadow position-fixed top-0 end-0 m-3 d-none"
+     style="z-index: 1080; width: 360px;">
+    <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+            <div class="me-3">
+                <span id="import-progress-icon" class="avatar bg-blue-lt">
+                    <i class="ti ti-upload"></i>
+                </span>
+            </div>
+
+            <div class="flex-fill">
+                <div id="import-progress-title" class="fw-bold">
+                    Importing images
+                </div>
+
+                <div id="import-progress-text" class="text-muted small">
+                    Starting import...
+                </div>
+            </div>
+        </div>
+
+        <div class="progress progress-sm mb-2">
+            <div id="import-progress-bar"
+                 class="progress-bar"
+                 style="width: 0%"
+                 role="progressbar"
+                 aria-valuenow="0"
+                 aria-valuemin="0"
+                 aria-valuemax="100">
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between text-muted small">
+            <span id="import-progress-count">0 / 0 images</span>
+            <span id="import-progress-percentage">0%</span>
+        </div>
+    </div>
+</div>
+
+<partial name="/Pages/Projects/_CreateProjectModal.cshtml" model="Model.CreateProjectModal"/>
+
 @section Scripts {
 
-    <script>
-        let initialProjectId = "@Model.SelectedProjectId";
+<script src="~/js/create-project-modal.js"></script>
+<script src="~/js/import-progress.js"></script>
 
-        window.selectProject = async function selectProject(projectId) {
-            const panel = document.getElementById("selected-project-panel");
-            const url = new URL(window.location);
+@if (Model.ShowCreateProjectModal)
+{
+<script>
+    const createProjectModal = new bootstrap.Modal(document.getElementById("create-project-modal"));
+    createProjectModal.show();
+</script>
+}
 
-            const oldProjectId = url.searchParams.get("SelectedProjectId");
+@if (Model.ShowImportProgress && !string.IsNullOrWhiteSpace(Model.ImportProgressId.ToString()))
+{
+<script>
+    startImportProgress(@Model.ImportProgressTotalFiles, "@Model.ImportProgressId");
+</script>
+}
 
-            panel.classList.add("opacity-50");
+<script>
+    let initialProjectId = "@Model.SelectedProjectId";
 
-            const response = await fetch(`?handler=SelectedProjectView&projectId=${projectId}`, {
-                credentials: "same-origin"
-            });
+    window.selectProject = async function selectProject(projectId) {
+        const panel = document.getElementById("selected-project-panel");
+        const url = new URL(window.location);
 
-            if (!response.ok) {
-                panel.innerHTML = `
+        const oldProjectId = url.searchParams.get("SelectedProjectId");
+
+        panel.classList.add("opacity-50");
+
+        const response = await fetch(`?handler=SelectedProjectView&projectId=${projectId}`, {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            panel.innerHTML = `
                     <div class="card">
                         <div class="card-body">
                             <div class="empty">
@@ -238,60 +314,60 @@
                         </div>
                     </div>`;
 
-                panel.classList.remove("opacity-50");
-                return;
-            }
-
-            const selectedProjectInput = document.querySelector('input[name="SelectedProjectId"]');
-
-            if (selectedProjectInput) {
-                selectedProjectInput.value = projectId;
-            }
-
-            panel.innerHTML = await response.text();
             panel.classList.remove("opacity-50");
-
-            if (!oldProjectId && initialProjectId !== projectId.toString()) {
-                await reloadProjectView(initialProjectId, projectId);
-            } else if (oldProjectId && oldProjectId !== projectId.toString()) {
-                await reloadProjectView(oldProjectId, projectId);
-            }
-
-            await reloadProjectView(projectId, projectId);
-
-            url.searchParams.set("SelectedProjectId", projectId);
-            window.history.replaceState({}, "", url);
+            return;
         }
 
-        window.openProjectFolder = async function openProjectFolder(projectId) {
-            const response = await fetch(`?handler=OpenProjectFolder&selectedProjectId=${projectId}`, {
+        const selectedProjectInput = document.querySelector('input[name="SelectedProjectId"]');
+
+        if (selectedProjectInput) {
+            selectedProjectInput.value = projectId;
+        }
+
+        panel.innerHTML = await response.text();
+        panel.classList.remove("opacity-50");
+
+        if (!oldProjectId && initialProjectId !== projectId.toString()) {
+            await reloadProjectView(initialProjectId, projectId);
+        } else if (oldProjectId && oldProjectId !== projectId.toString()) {
+            await reloadProjectView(oldProjectId, projectId);
+        }
+
+        await reloadProjectView(projectId, projectId);
+
+        url.searchParams.set("SelectedProjectId", projectId);
+        window.history.replaceState({}, "", url);
+    }
+
+    window.openProjectFolder = async function openProjectFolder(projectId) {
+        const response = await fetch(`?handler=OpenProjectFolder&selectedProjectId=${projectId}`, {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            console.error("Could not open project folder");
+        }
+    }
+
+    async function reloadProjectView(projectId, selectedProjectId) {
+        const projectView = document.getElementById(`project-view-${projectId}`);
+
+        if (!projectView) {
+            return;
+        }
+
+        const response = await fetch(
+            `?handler=ProjectView&projectId=${projectId}&selectedProjectId=${selectedProjectId}`,
+            {
                 credentials: "same-origin"
-            });
-
-            if (!response.ok) {
-                console.error("Could not open project folder");
             }
+        );
+
+        if (!response.ok) {
+            return;
         }
 
-        async function reloadProjectView(projectId, selectedProjectId) {
-            const projectView = document.getElementById(`project-view-${projectId}`);
-
-            if (!projectView) {
-                return;
-            }
-
-            const response = await fetch(
-                `?handler=ProjectView&projectId=${projectId}&selectedProjectId=${selectedProjectId}`,
-                {
-                    credentials: "same-origin"
-                }
-            );
-
-            if (!response.ok) {
-                return;
-            }
-
-            projectView.outerHTML = await response.text();
-        }
-    </script>
+        projectView.outerHTML = await response.text();
+    }
+</script>
 }
