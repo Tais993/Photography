@@ -7,9 +7,9 @@ public class Constants
     public static readonly Regex ProjectNameRegex = new Regex("(\\d\\d\\d\\d)-(\\d{1,2})-(\\d{1,2})-([^.]*)");
     public static readonly Regex SubProjectNameRegex = new Regex("\\.([^.]*)");
 
-    
+
     public const string ProjectInfoFile = "project.info";
-    
+
     public const string ConfigImageViewerMode = "ImageViewer:Mode";
     public const string ConfigImageViewerPath = "ImageViewer:ImageViewerPath";
     public const string ConfigProjectFolder = "DefaultProjectFolder";
@@ -18,20 +18,50 @@ public class Constants
     public const string ConfigThumbnailsDefaultSize = "Thumbnails:DefaultSize";
     public const string ConfigThumbnailsLargeSize = "Thumbnails:LargeSize";
     public const string ConfigThumbnailsJpegQuality = "Thumbnails:JpegQuality";
-    
+
     public const string CollectionMetadataType = "Collection";
     public const string CollectionsConfigKey = "Collections";
-    
+
     public const string FolderMetadataType = "Folder";
     public const string FolderNamesConfigKey = "FolderNames";
     public const string FolderMetadataKeyPrefix = "folder.";
-    
+
     public const string OriginalsFolderMetadataKey = "folder.originals";
     public const string EditingFolderMetadataKey = "folder.editing";
     public const string FinalsFolderMetadataKey = "folder.finals";
-    
 
-    
+
+
+
+    public const string CameraDriveDcimFolderName = "DCIM";
+
+    public static readonly HashSet<string> CameraBrands = new([
+        "nikon",
+        "canon",
+        "sony",
+        "olympus",
+        "om system",
+        "fujifilm",
+        "fuji",
+        "panasonic",
+        "lumix",
+        "leica",
+        "pentax",
+        "ricoh",
+        "gopro",
+        "dji"
+    ], StringComparer.OrdinalIgnoreCase);
+
+    public static readonly HashSet<string> CameraDriveFolderNames = new([
+        "DCIM",
+        "PRIVATE",
+        "MISC",
+        "NIKON",
+        "CANON",
+        "SONY",
+        "OLYMPUS",
+        "OM SYSTEM"
+    ], StringComparer.OrdinalIgnoreCase);
 
     public static readonly string[] ImageFileTypesSql =
     [
@@ -44,7 +74,8 @@ public class Constants
     public static readonly HashSet<string> ImageFileTypes = new(
         ImageFileTypesSql,
         StringComparer.OrdinalIgnoreCase);
-    
+
+
     public static readonly string[] RawFileTypesSql =
     [
         // Adobe
@@ -127,5 +158,10 @@ public class Constants
 
     public static readonly HashSet<string> RawFileTypes = new(
         RawFileTypesSql,
+        StringComparer.OrdinalIgnoreCase);
+    
+    
+    public static readonly HashSet<string> SupportedImageOrRawFileTypes = new(
+        ImageFileTypesSql.Concat(RawFileTypesSql),
         StringComparer.OrdinalIgnoreCase);
 }

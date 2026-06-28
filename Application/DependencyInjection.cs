@@ -40,6 +40,8 @@ public static class DependencyInjection
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
             services.AddScoped<IThumbnailService, ThumbnailService>();
+
+            services.AddScoped<ICameraDriveService, CameraDriveService>();
             
             // Website services
             services.AddScoped<ISelectionIndexService, SelectionIndexService>();
