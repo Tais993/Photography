@@ -42,6 +42,7 @@ public static class DependencyInjection
             services.AddScoped<IThumbnailService, ThumbnailService>();
 
             services.AddScoped<ICameraDriveService, CameraDriveService>();
+            services.AddScoped<IProjectImportService, ProjectImportService>();
             
             // Website services
             services.AddScoped<ISelectionIndexService, SelectionIndexService>();
