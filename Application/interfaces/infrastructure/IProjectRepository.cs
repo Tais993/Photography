@@ -8,6 +8,7 @@ public interface IProjectRepository
     List<Project> GetAll();
     Project Insert(Project project);
     void Update(Project project);
+    public void UpdateStorage(Project project);
     void DeleteById(int id);
 
     public List<Project> GetAllByParentProjectId(int parentProjectId);

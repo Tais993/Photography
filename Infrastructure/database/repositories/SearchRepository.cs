@@ -226,7 +226,10 @@ public class SearchRepository : ISearchRepository
                                   p.name,
                                   p.path,
                                   p.event_date,
-                                  p.parent_project_id
+                                  p.parent_project_id,
+                                  p.storage_total_bytes, 
+                                  p.storage_local_bytes, 
+                                  p.storage_last_calculated
                            FROM public.project p
                            {whereSql}
                            ORDER BY p.event_date DESC, p.name
