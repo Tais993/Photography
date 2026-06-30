@@ -36,11 +36,12 @@ public static class DependencyInjection
             services.AddScoped<IProjectScanningService, ProjectScanningService>();
             services.AddScoped<IProjectFolderService, ProjectFolderService>();
             
+            services.AddScoped<IProjectStorageService, ProjectStorageService>();
             
             services.AddScoped<IImageSelectionService, ImageSelectionService>();
 
             services.AddScoped<IThumbnailService, ThumbnailService>();
-
+            
             services.AddScoped<ICameraDriveService, CameraDriveService>();
             services.AddScoped<IProjectImportService, ProjectImportService>();
             

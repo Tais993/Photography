@@ -176,4 +176,9 @@ public interface IFiles
     /// <param name="path"></param>
     /// <returns></returns>
     public DateTime GetLastWriteTimeUtc(string path);
+
+    public long GetFolderSize(string path);
+    public long GetLocalFolderSize(string path);
+    public long GetFileSize(string path);
+    public long GetLocalFileSize(string path);
 }
