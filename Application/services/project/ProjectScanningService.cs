@@ -8,19 +8,21 @@ namespace Application.services.project;
 
 public class ProjectScanningService : IProjectScanningService
 {
+    private readonly IProjectStorageService _projectStorage;
     private readonly IImageRepository _imageRepository;
     private readonly IImageMetadataRepository _imageMetadataRepository;
     private readonly IProjectRepository _projectRepository;
     private readonly IFiles _files;
     private readonly ILogger<ProjectScanningService> _logger;
 
-    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files, ILogger<ProjectScanningService> logger, IImageMetadataRepository imageMetadataRepository)
+    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files, ILogger<ProjectScanningService> logger, IImageMetadataRepository imageMetadataRepository, IProjectStorageService projectStorage)
     {
         _imageRepository = imageRepository;
         _projectRepository = projectRepository;
         _files = files;
         _logger = logger;
         _imageMetadataRepository = imageMetadataRepository;
+        _projectStorage = projectStorage;
     }
 
     public void ScanProject(Project project)
@@ -36,7 +38,8 @@ public class ProjectScanningService : IProjectScanningService
         DeleteMissingImages(project);
         ScanProjectFolders(project);
         ScanSubProjects(project);
-
+        _projectStorage.UpdateStorageInfo(project);
+        
         _logger.LogInformation("Finished scanning project: {ProjectId}", project.Id);
     }
 

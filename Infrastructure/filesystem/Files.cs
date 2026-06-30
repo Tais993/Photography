@@ -1,9 +1,14 @@
-﻿using Application.interfaces.infrastructure;
+﻿using System.Runtime.InteropServices;
+using Application.interfaces.infrastructure;
 
 namespace Infrastructure.filesystem;
 
 public class Files : IFiles
 {
+    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern uint GetCompressedFileSizeW(string lpFileName, out uint lpFileSizeHigh);
+
+
     public string Combine(params string[] paths)
     {
         return Path.Combine(paths);
@@ -119,5 +124,49 @@ public class Files : IFiles
     public DateTime GetLastWriteTimeUtc(string path)
     {
         return File.GetLastWriteTimeUtc(path);
+    }
+
+    public long GetFolderSize(string path)
+    {
+        return EnumerateFiles(path, "*", SearchOption.AllDirectories)
+            .Sum(GetFileSize);
+    }
+
+    public long GetLocalFolderSize(string path)
+    {
+        return EnumerateFiles(path, "*", SearchOption.AllDirectories)
+            .Sum(GetLocalFileSize);
+    }
+
+    public long GetLocalFileSize(string path)
+    {
+        return OperatingSystem.IsWindows() ? GetWindowsLocalFileSize(path) : GetUnixLocalFileSize(path);
+    }
+
+    private long GetWindowsLocalFileSize(string path)
+    {
+        uint low = GetCompressedFileSizeW(path, out uint high);
+
+        if (low == uint.MaxValue)
+        {
+            int error = Marshal.GetLastWin32Error();
+
+            if (error != 0)
+            {
+                return GetFileSize(path);
+            }
+        }
+
+        return ((long)high << 32) + low;
+    }
+
+    private long GetUnixLocalFileSize(string path)
+    {
+        return GetFileSize(path);
+    }
+
+    public long GetFileSize(string path)
+    {
+        return new FileInfo(path).Length;
     }
 }
