@@ -10,9 +10,7 @@ public class ProjectRepository : IProjectRepository
     private readonly RepositoryHelper _db;
     private readonly ILogger<ProjectRepository> _logger;
 
-    public ProjectRepository(
-        ILogger<ProjectRepository> logger,
-        RepositoryHelper db)
+    public ProjectRepository(ILogger<ProjectRepository> logger, RepositoryHelper db)
     {
         _logger = logger;
         _db = db;
@@ -23,7 +21,7 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Getting project by id: {ProjectId}", id);
 
         return _db.QueryOrDefault("""
-                                  SELECT id, name, path, event_date, parent_project_id FROM public.project 
+                                  SELECT id, name, path, event_date, parent_project_id, storage_total_bytes, storage_local_bytes, storage_last_calculated FROM public.project 
                                   WHERE id = $1
                                   """, MapProject, id);
     }
@@ -33,7 +31,7 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Getting all projects");
 
         List<Project> projects = _db.QueryMultiple("""
-                                                   SELECT id, name, path, event_date, parent_project_id FROM public.project
+                                                   SELECT id, name, path, event_date, parent_project_id, storage_total_bytes, storage_local_bytes, storage_last_calculated FROM public.project
                                                    """, MapProject);
 
         _logger.LogDebug("Found {Count} projects", projects.Count);
@@ -46,7 +44,7 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Inserting project: {ProjectName}", project.Name);
 
         Project insertedProject = _db.Query("""
-                                            INSERT INTO public.project(name, path, event_date, parent_project_id) 
+                                            INSERT INTO public.project(name, path, event_date, parent_project_id)    
                                             VALUES ($1, $2, $3, $4)
                                             RETURNING *
                                             """, MapProject, project.Name, project.Path, project.EventDate,
@@ -76,6 +74,20 @@ public class ProjectRepository : IProjectRepository
                     WHERE id = $5
                     """, project.Name, project.Path, project.EventDate, project.ParentProjectId, project.Id);
     }
+    
+    public void UpdateStorage(Project project)
+    {
+        _logger.LogDebug("Updating project storage info: {ProjectId}", project.Id);
+        
+        _db.Execute("""
+                    UPDATE public.project
+                    SET storage_total_bytes = $1,
+                        storage_local_bytes = $2,
+                        storage_last_calculated = $3
+                    WHERE id = $4
+                    """, project.StorageTotalBytes, project.StorageLocalBytes, project.StorageLastCalculated, project.Id);
+
+    }
 
 
     public void DeleteById(int id)
@@ -93,7 +105,7 @@ public class ProjectRepository : IProjectRepository
         _logger.LogDebug("Getting all projects with parent project id: {ParentProjectId}", parentProjectId);
 
         return _db.QueryMultiple("""
-                                 SELECT id, name, path, event_date, parent_project_id
+                                 SELECT id, name, path, event_date, parent_project_id, storage_total_bytes, storage_local_bytes, storage_last_calculated
                                  FROM public.project
                                  WHERE parent_project_id = $1
                                  """, MapProject, parentProjectId);
