@@ -1,4 +1,5 @@
-﻿using Application.interfaces.services;
+﻿using Application.interfaces.infrastructure;
+using Application.interfaces.services;
 using Application.interfaces.services.project;
 using Application.interfaces.website;
 using Domain.entities;
@@ -13,6 +14,7 @@ public class ProjectIndexService : IProjectIndexService
     private readonly IProjectService _projectService;
     private readonly IProjectFolderService _projectFolderService;
     private readonly ISearchService _searchService;
+    private readonly IFiles _files;
     private readonly IImageViewerService _imageViewerService;
     private readonly ILogger<ProjectIndexService> _logger;
 
@@ -22,13 +24,14 @@ public class ProjectIndexService : IProjectIndexService
         IProjectFolderService projectFolderService,
         ISearchService searchService,
         IImageViewerService imageViewerService,
-        ILogger<ProjectIndexService> logger)
+        ILogger<ProjectIndexService> logger, IFiles files)
     {
         _projectService = projectService;
         _projectFolderService = projectFolderService;
         _searchService = searchService;
         _imageViewerService = imageViewerService;
         _logger = logger;
+        _files = files;
         _imageViewerService = imageViewerService;
     }
 
@@ -135,5 +138,15 @@ public class ProjectIndexService : IProjectIndexService
             folderPath);
 
         _imageViewerService.OpenProjectFolder(folderPath);
+    }
+
+    public void OpenProjectCommandLine(int projectId)
+    {
+        _logger.LogInformation("Opening project in command line, project: {ProjectId}", projectId);
+        
+        Project? project = _projectService.GetProjectById(projectId) ?? throw new InvalidOperationException("Project was not found.");
+        string path = project.Path;
+
+        _files.OpenCommandLine(path);
     }
 }

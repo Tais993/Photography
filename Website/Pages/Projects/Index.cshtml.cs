@@ -247,6 +247,13 @@ public class IndexModel : PageModel
 
         return new NoContentResult();
     }
+    
+    public IActionResult OnGetOpenProjectCommandLine(int selectedProjectId)
+    {
+        _projectIndexService.OpenProjectCommandLine(selectedProjectId);
+
+        return new NoContentResult();
+    }
 
     internal ProjectViewModel CreateProjectView(Project project)
     {
@@ -333,6 +340,7 @@ public class IndexModel : PageModel
 
         return null;
     }
+    
 
     private void UpdateProjectCookie()
     {

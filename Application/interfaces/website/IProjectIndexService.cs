@@ -9,4 +9,5 @@ public interface IProjectIndexService
     ProjectViewModel CreateProjectView(Project project, int? selectedProjectId);
     SelectedProjectViewModel CreateSelectedProjectView(Project project);
     void OpenProjectFolder(int projectId);
+    void OpenProjectCommandLine(int projectId);
 }
