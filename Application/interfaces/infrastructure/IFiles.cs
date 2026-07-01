@@ -181,4 +181,10 @@ public interface IFiles
     public long GetLocalFolderSize(string path);
     public long GetFileSize(string path);
     public long GetLocalFileSize(string path);
+
+    /// <summary>
+    /// Opens the commandline in the given path, this _should_ work for Windows, MacOS and any Unix system.
+    /// </summary>
+    /// <param name="path"></param>
+    public void OpenCommandLine(string path);
 }

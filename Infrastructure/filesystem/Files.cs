@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Application.interfaces.infrastructure;
 
 namespace Infrastructure.filesystem;
@@ -168,5 +169,68 @@ public class Files : IFiles
     public long GetFileSize(string path)
     {
         return new FileInfo(path).Length;
+    }
+    
+    public void OpenCommandLine(string path)
+    {
+        if (OperatingSystem.IsWindows())
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = "/k",
+                WorkingDirectory = path,
+                UseShellExecute = true
+            });
+
+            return;
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "open",
+                Arguments = $"-a Terminal \"{path}\"",
+                UseShellExecute = false
+            });
+
+            return;
+        }
+
+        OpenLinuxTerminal(path);
+    }
+
+    private static void OpenLinuxTerminal(string path)
+    {
+        string[] terminals =
+        [
+            "x-terminal-emulator",
+            "gnome-terminal",
+            "konsole",
+            "xfce4-terminal",
+            "xterm"
+        ];
+
+        foreach (string terminal in terminals)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = terminal,
+                    WorkingDirectory = path,
+                    UseShellExecute = false
+                });
+
+                return;
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        throw new InvalidOperationException("No supported terminal application was found.");
     }
 }

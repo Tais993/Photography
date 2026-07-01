@@ -74,11 +74,12 @@
                 Open images in @Model.ImageViewerName
             </button>
         }
+
         <button type="button"
-                class="btn btn-primary"
-                onclick="openProjectFolder(@Model.Project.Id)">
-            <i class="ti ti-photo me-2"></i>
-            Open images in @Model.ImageViewerName
+                class="btn btn-outline-secondary"
+                onclick="openProjectCommandLine(@Model.Project.Id)">
+            <i class="ti ti-terminal-2 me-2"></i>
+            Open project in command line
         </button>
 
         <a asp-page="/Selection/Index"

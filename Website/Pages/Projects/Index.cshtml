@@ -339,16 +339,6 @@ ViewData["Title"] = "Projects";
         window.history.replaceState({}, "", url);
     }
 
-    window.openProjectFolder = async function openProjectFolder(projectId) {
-        const response = await fetch(`?handler=OpenProjectFolder&selectedProjectId=${projectId}`, {
-            credentials: "same-origin"
-        });
-
-        if (!response.ok) {
-            console.error("Could not open project folder");
-        }
-    }
-
     async function reloadProjectView(projectId, selectedProjectId) {
         const projectView = document.getElementById(`project-view-${projectId}`);
 
@@ -369,5 +359,27 @@ ViewData["Title"] = "Projects";
 
         projectView.outerHTML = await response.text();
     }
+
+
+    window.openProjectFolder = async function openProjectFolder(projectId) {
+        const response = await fetch(`?handler=OpenProjectFolder&selectedProjectId=${projectId}`, {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            console.error("Could not open project folder");
+        }
+    }
+
+
+    window.openProjectCommandLine = async function openProjectCommandLine(projectId) {
+        const response = await fetch(`?handler=OpenProjectCommandLine&selectedProjectId=${projectId}`, {
+            credentials: "same-origin"
+        });
+
+        if (!response.ok) {
+            console.error("Could not open project in command line");
+        }
+}
 </script>
 }
