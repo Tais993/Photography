@@ -91,7 +91,10 @@ public class ProjectIndexService : IProjectIndexService
             Id = project.Id,
             Name = project.Name,
             Path = project.Path,
-            EventDate = project.EventDate
+            EventDate = project.EventDate,
+
+            StorageTotalBytes = project.StorageTotalBytes,
+            StorageLocalBytes = project.StorageLocalBytes
         };
     }
 
