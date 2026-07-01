@@ -229,7 +229,7 @@ public class SearchServiceTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(result.PageNumber, Is.EqualTo(1));
-            Assert.That(result.PageSize, Is.EqualTo(20));
+            Assert.That(result.PageSize, Is.EqualTo(24));
         }
     }
 

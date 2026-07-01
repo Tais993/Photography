@@ -9,7 +9,7 @@ namespace Application.services;
 public class SearchService : ISearchService
 {
     private const int DefaultPageNumber = 1;
-    private const int DefaultPageSize = 20;
+    private const int DefaultPageSize = 24;
     private const int MaxPageSize = 200;
 
     private readonly ISearchRepository _searchRepository;
