@@ -1,7 +1,7 @@
 ﻿using Domain.entities;
 using Domain.entities.search;
 
-namespace Application.interfaces.infrastructure;
+namespace Application.interfaces.infrastructure.repositories;
 
 public interface ISearchRepository
 {

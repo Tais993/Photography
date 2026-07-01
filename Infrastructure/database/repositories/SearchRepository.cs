@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.repositories;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;

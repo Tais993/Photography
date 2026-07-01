@@ -1,5 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.repositories;
 using Application.interfaces.services.metadata;
 using Application.interfaces.services.project;
 using Domain.entities;

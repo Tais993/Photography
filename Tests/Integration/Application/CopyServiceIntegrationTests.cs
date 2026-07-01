@@ -1,4 +1,5 @@
 ﻿using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.repositories;
 using Application.interfaces.services;
 using Domain.entities;
 using Microsoft.Extensions.DependencyInjection;

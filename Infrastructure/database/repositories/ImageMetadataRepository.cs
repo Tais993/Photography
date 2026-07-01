@@ -1,4 +1,5 @@
 ﻿using Application.interfaces.infrastructure;
+using Application.interfaces.infrastructure.repositories;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using static Infrastructure.database.repositories.DatabaseMappers;

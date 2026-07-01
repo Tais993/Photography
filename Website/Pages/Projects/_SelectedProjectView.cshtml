@@ -74,6 +74,12 @@
                 Open images in @Model.ImageViewerName
             </button>
         }
+        <button type="button"
+                class="btn btn-primary"
+                onclick="openProjectFolder(@Model.Project.Id)">
+            <i class="ti ti-photo me-2"></i>
+            Open images in @Model.ImageViewerName
+        </button>
 
         <a asp-page="/Selection/Index"
            asp-route-SelectedProjectId="@Model.Project.Id"

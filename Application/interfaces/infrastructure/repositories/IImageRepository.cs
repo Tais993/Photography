@@ -1,6 +1,6 @@
 ﻿using Domain.entities;
 
-namespace Application.interfaces.infrastructure;
+namespace Application.interfaces.infrastructure.repositories;
 
 public interface IImageRepository
 {
