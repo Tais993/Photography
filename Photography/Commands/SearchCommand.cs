@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
 using Application.interfaces.services.project;
+using Application.services.project;
 using Domain.entities;
 using Domain.entities.search;
 using static Cli.Commands.CommandOptions;
@@ -11,6 +12,7 @@ namespace Cli.Commands;
 public class SearchCommand : CommandBase
 {
     private readonly ISearchService _searchService;
+    private readonly ProjectUpdateService _projectUpdateService;
     private readonly IProjectResolverService _projectResolverService;
  
     private const string QueryName = "query";
@@ -49,10 +51,11 @@ public class SearchCommand : CommandBase
         Description = "The image status",
     };
 
-    public SearchCommand(ISearchService searchService, IProjectResolverService projectResolverService)
+    public SearchCommand(ISearchService searchService, IProjectResolverService projectResolverService, ProjectUpdateService projectUpdateService)
     {
         _searchService = searchService;
         this._projectResolverService = projectResolverService;
+        _projectUpdateService = projectUpdateService;
     }
 
     protected override string Name => "search";
@@ -72,6 +75,9 @@ public class SearchCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
+        _projectUpdateService.UpdateProjectByPath(Directory.GetCurrentDirectory());
+        
+        
         string? fileName = parseResult.GetValue<string>(QueryName);
         bool shouldByGlobal = parseResult.GetValue<bool>(GlobalName);
         string? fileType = parseResult.GetValue<string>(FileTypeName);

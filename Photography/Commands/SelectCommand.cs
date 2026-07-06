@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
 using Application.interfaces.services.project;
+using Application.services.project;
 using Domain.entities;
 using Domain.entities.search;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ namespace Cli.Commands;
 
 public class SelectCommand : CommandBase
 {
+    private readonly ProjectUpdateService _projectUpdateService;
     private readonly ISearchService _searchService;
     private readonly IProjectResolverService _projectResolverService;
     private readonly IImageSelectionService _imageSelectionService;
@@ -20,7 +22,7 @@ public class SelectCommand : CommandBase
 
 
     public SelectCommand(ISearchService searchService, IImageSelectionService imageSelectionService,
-        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService)
+        IImageViewerService imageViewer, ILogger<SelectCommand> logger, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService, ProjectUpdateService projectUpdateService)
     {
         _searchService = searchService;
         _imageSelectionService = imageSelectionService;
@@ -28,6 +30,7 @@ public class SelectCommand : CommandBase
         _logger = logger;
         _projectFolderService = projectFolderService;
         _projectResolverService = projectResolverService;
+        _projectUpdateService = projectUpdateService;
     }
 
     protected override string Name => "select";
@@ -65,7 +68,9 @@ public class SelectCommand : CommandBase
     {
         Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
-
+        _projectUpdateService.UpdateProject(project);
+        
+        
         if (project is null)
         {
             return InvalidInput("No valid project was given or resolved.");
