@@ -16,7 +16,8 @@ public class ProjectScanningService : IProjectScanningService
     private readonly IFiles _files;
     private readonly ILogger<ProjectScanningService> _logger;
 
-    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files, ILogger<ProjectScanningService> logger, IImageMetadataRepository imageMetadataRepository, IProjectStorageService projectStorage)
+    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files,
+        ILogger<ProjectScanningService> logger, IImageMetadataRepository imageMetadataRepository, IProjectStorageService projectStorage)
     {
         _imageRepository = imageRepository;
         _projectRepository = projectRepository;
@@ -26,7 +27,7 @@ public class ProjectScanningService : IProjectScanningService
         _projectStorage = projectStorage;
     }
 
-    public void ScanProject(Project project)
+    public void ScanProject(Project project, bool recursive = true, bool checkExistingImages = true)
     {
         if (project.Id is null)
         {
@@ -36,11 +37,18 @@ public class ProjectScanningService : IProjectScanningService
 
         _logger.LogInformation("Scanning project: {ProjectId}", project.Id);
 
-        DeleteMissingImages(project);
+        if (recursive)
+        {
+            ScanSubProjects(project);
+        }
+
+        if (checkExistingImages)
+        {
+            DeleteMissingImages(project);
+        }
+
         ScanProjectFolders(project);
-        ScanSubProjects(project);
-        _projectStorage.UpdateStorageInfo(project);
-        
+
         _logger.LogInformation("Finished scanning project: {ProjectId}", project.Id);
     }
 
@@ -149,8 +157,7 @@ public class ProjectScanningService : IProjectScanningService
     {
         string fileExtension = _files.GetFileExtension(filePath);
 
-        return ImageFileTypes.Contains(fileExtension)
-               || RawFileTypes.Contains(fileExtension);
+        return ImageFileTypes.Contains(fileExtension) || RawFileTypes.Contains(fileExtension);
     }
 
     private static bool IsSubProjectFolder(string folderName)
