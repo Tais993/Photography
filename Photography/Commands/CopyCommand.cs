@@ -60,10 +60,15 @@ public class CopyCommand : CommandBase
 
         
         SelectionSession selectionSession = _imageSelectionService.GetOrStartSession(project);
+        selectionSession = _imageSelectionService.GetSessionImages(project);
 
+        if (selectionSession.ImageIds.Count == 0)
+        {
+            Console.WriteLine("No images selected, or no images found.");
+            return Failure;
+        }
         
-        List<int> imageIds = selectionSession.ImageIds;
-        IEnumerable<string> imagePaths = _copyService.ImageIdsToRelativePaths(imageIds.ToArray());
+        IEnumerable<string> imagePaths = _copyService.ImageIdsToRelativePaths(selectionSession.ImageIds.ToArray());
         
         _copyService.CopyFiles(imagePaths, project.Path, destinationFolder);
         _imageSelectionService.ClearSession(project);
