@@ -68,6 +68,17 @@ public class ProjectMetadataService : IProjectMetadataService
         _projectMetadataRepository.Insert(projectMetadata);
     }
 
+    public void UpdateMetadataForProject(int projectId, string metadataKey, string? value)
+    {
+        value ??= string.Empty;
+
+        _logger.LogInformation("Updating metadata for project: {ProjectId}, key: {MetadataKey}", projectId, metadataKey);
+        
+        ProjectMetadata projectMetadata = new ProjectMetadata(projectId, metadataKey, value);
+
+        _projectMetadataRepository.Upsert(projectMetadata);
+    }
+
     public void RemoveMetadataFromProject(int projectId, string metadataKey)
     {
         _logger.LogInformation("Removing metadata from project: {ProjectId}, metadata key: {MetadataKey}", projectId, metadataKey);

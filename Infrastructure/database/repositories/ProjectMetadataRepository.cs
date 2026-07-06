@@ -50,6 +50,21 @@ public class ProjectMetadataRepository : IProjectMetadataRepository
                     """, entity.ProjectId, entity.MetadataKey, entity.MetadataValue);
     }
 
+    public void Upsert(ProjectMetadata entity)
+    {
+        _logger.LogDebug(
+            "Upserting project metadata, project: {ProjectId}, metadata key: {MetadataKey}",
+            entity.ProjectId,
+            entity.MetadataKey);
+
+        _db.Execute("""
+                    INSERT INTO public.project_metadata(project_id, metadata_key, metadata_value)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (project_id, metadata_key)
+                    DO UPDATE SET metadata_value = EXCLUDED.metadata_value;
+                    """, entity.ProjectId, entity.MetadataKey, entity.MetadataValue);
+    }
+    
     public void Update(ProjectMetadata entity)
     {
         _logger.LogDebug("Updating project metadata, project: {ProjectId}, metadata key: {MetadataKey}", entity.ProjectId, entity.MetadataKey);
