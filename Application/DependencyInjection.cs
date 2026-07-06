@@ -33,6 +33,7 @@ public static class DependencyInjection
             services.AddScoped<IProjectInfoFileService, ProjectInfoFileService>();
             services.AddScoped<IProjectResolverService, ProjectResolverService>();
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
+            services.AddScoped<ProjectUpdateService>();
             services.AddScoped<IProjectScanningService, ProjectScanningService>();
             services.AddScoped<IProjectFolderService, ProjectFolderService>();
             
