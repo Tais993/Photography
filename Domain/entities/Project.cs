@@ -22,7 +22,7 @@ public class Project
 
     public int? Id { get; }
     public string Name { get; set; }
-    public string Path { get; }
+    public string Path { get; set; }
     public DateOnly EventDate { get; }
     public int? ParentProjectId { get; }
     public long? StorageTotalBytes { get; set; }
