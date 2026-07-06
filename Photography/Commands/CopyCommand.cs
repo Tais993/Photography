@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using Application.interfaces.services;
 using Application.interfaces.services.project;
+using Application.services.project;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using static Cli.Commands.CommandOptions;
@@ -12,19 +13,21 @@ public class CopyCommand : CommandBase
 {
 
     private readonly IImageSelectionService _imageSelectionService;
+    private readonly ProjectUpdateService _projectUpdateService;
     private readonly ILogger<CopyCommand> _logger;
     private readonly IProjectResolverService _projectResolverService;
     private readonly ICopyService _copyService;
     private readonly IProjectFolderService _projectFolderService;
 
 
-    public CopyCommand(ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService)
+    public CopyCommand(ICopyService copyService, ILogger<CopyCommand> logger, IImageSelectionService imageSelectionService, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService, ProjectUpdateService projectUpdateService)
     {
         _copyService = copyService;
         _logger = logger;
         _imageSelectionService = imageSelectionService;
         _projectFolderService = projectFolderService;
         _projectResolverService = projectResolverService;
+        _projectUpdateService = projectUpdateService;
     }
 
     protected override string Name => "copy";
@@ -49,12 +52,12 @@ public class CopyCommand : CommandBase
     {
         Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
-
+        
         if (project is null)
         {
             return InvalidInput("No valid project was given or resolved.");
         }
-        
+
         string destinationFolder = parseResult.GetValue<string>(_destinationFolder)!;
         destinationFolder = _projectFolderService.ResolveFolder(project!, destinationFolder);
 
@@ -73,6 +76,7 @@ public class CopyCommand : CommandBase
         _copyService.CopyFiles(imagePaths, project.Path, destinationFolder);
         _imageSelectionService.ClearSession(project);
         
+        _projectUpdateService.UpdateProject(project);
         return Success;
     }
 }

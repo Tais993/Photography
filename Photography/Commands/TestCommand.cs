@@ -35,7 +35,7 @@ public class TestCommand : CommandBase
 
         // Project createdProject = _projectService.CreateProject("Temproary stuffz", new DateOnly(2026, 06, 24));
         // Console.WriteLine(createdProject);
-        //
+        
         // Project createdSubProject = _projectService.CreateSubProject((int) createdProject.Id!, "Hour 1 of the event");
         // Console.WriteLine(createdSubProject);
         
