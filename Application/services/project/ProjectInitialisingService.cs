@@ -15,24 +15,24 @@ public class ProjectInitialisingService : IProjectInitialisingService
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectScanningService _projectScanningService;
+    private readonly IProjectFolderService _projectFolderService;
     private readonly IProjectInfoFileService _projectInfoFileService;
-    private readonly IConfiguration _configuration;
     private readonly ILogger<ProjectInitialisingService> _logger;
     private readonly IFiles _files;
     private readonly ICollectionMetadataService _collectionMetadataService;
 
     public ProjectInitialisingService(IProjectRepository projectRepository, IProjectMetadataService projectMetadataService, 
-        IProjectInfoFileService projectInfoFileService, IConfiguration configuration, ILogger<ProjectInitialisingService> logger,
-        IFiles files, ICollectionMetadataService collectionMetadataService, IProjectScanningService projectScanningService)
+        IProjectInfoFileService projectInfoFileService, ILogger<ProjectInitialisingService> logger, IFiles files, 
+        ICollectionMetadataService collectionMetadataService, IProjectScanningService projectScanningService, IProjectFolderService projectFolderService)
     {
         _projectRepository = projectRepository;
         _projectMetadataService = projectMetadataService;
         _projectInfoFileService = projectInfoFileService;
-        _configuration = configuration;
         _logger = logger;
         _files = files;
         _collectionMetadataService = collectionMetadataService;
         _projectScanningService = projectScanningService;
+        _projectFolderService = projectFolderService;
     }
 
     
@@ -143,7 +143,8 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
             _projectInfoFileService.WriteProjectInfoFile(project);
 
-            InitialiseProjectFolderMetadata(projectDirectory, project);
+            // project folder metadata initialisation
+            _projectFolderService.UpdateProjectFolderMetadata(project);
             InitialiseProjectCollectionMetadata(project, collectionMetadataConfiguration);
         }
 
@@ -173,52 +174,6 @@ public class ProjectInitialisingService : IProjectInitialisingService
         return project;
     }
 
-    private void InitialiseProjectFolderMetadata(string projectDirectory, Project project)
-    {
-        if (project.Id is null)
-        {
-            _logger.LogWarning("Could not initialise project folder metadata because project id was null");
-            throw new ArgumentNullException(nameof(project.Id));
-        }
-
-        Dictionary<string, string[]> folderNamesByRole = GetConfiguredFolderNames();
-
-        if (folderNamesByRole.Count == 0)
-        {
-            _logger.LogDebug("No configured folder names found for project folder mapping");
-            return;
-        }
-
-        string[] folderNames = _files.GetDirectories(projectDirectory)
-            .Select(directory => _files.GetPathEnd(directory))
-            .ToArray();
-
-        foreach ((string folderRole, string[] possibleFolderNames) in folderNamesByRole)
-        {
-            string[] matchingFolderNames = CompareFolderNames(folderNames, possibleFolderNames);
-            string metadataKey = ToFolderMetadataKey(folderRole);
-
-            if (matchingFolderNames.Length == 0)
-            {
-                _logger.LogDebug("No folder found for role {FolderRole} in project {ProjectId}", folderRole, project.Id);
-                continue;
-            }
-
-            if (matchingFolderNames.Length > 1)
-            {
-                _logger.LogWarning("Multiple folders found for role {FolderRole} in project {ProjectId}: {FolderNames}", folderRole, project.Id, string.Join(", ", matchingFolderNames));
-                continue;
-            }
-
-            _projectMetadataService.AddMetadataToProject(
-                project.Id.Value,
-                metadataKey,
-                matchingFolderNames[0]);
-
-            _logger.LogInformation("Mapped project folder role {FolderRole} to folder {FolderName} for project {ProjectId}", folderRole, matchingFolderNames[0], project.Id);
-        }
-    }
-
     private void InitialiseProjectCollectionMetadata(Project project, CollectionMetadataConfiguration? collectionMetadataConfiguration)
     {
         if (collectionMetadataConfiguration is null)
@@ -244,33 +199,6 @@ public class ProjectInitialisingService : IProjectInitialisingService
             collectionMetadataConfiguration.MetadataValue);
         
         _logger.LogInformation("Added collection metadata {MetadataKey} to project {ProjectId}", collectionMetadataConfiguration.MetadataKey, project.Id);
-    }
-
-    private Dictionary<string, string[]> GetConfiguredFolderNames()
-    {
-        return _configuration
-            .GetSection(FolderNamesConfigKey)
-            .GetChildren()
-            .ToDictionary(
-                section => section.Key,
-                section => section.GetChildren()
-                    .Select(child => child.Value)
-                    .Where(value => !string.IsNullOrWhiteSpace(value))
-                    .Select(value => value!)
-                    .ToArray());
-    }
-
-    public static string[] CompareFolderNames(string[] folderNames, string[] possibleFolderNames)
-    {
-        return folderNames
-            .Where(folderName => possibleFolderNames.Contains(folderName, StringComparer.OrdinalIgnoreCase))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-    }
-
-    public static string ToFolderMetadataKey(string folderRole)
-    {
-        return FolderMetadataKeyPrefix + folderRole.ToLowerInvariant();
     }
 
     private void InitialiseProjectSubFolders(string projectDirectory, Project project, CollectionMetadataConfiguration? collectionMetadataConfiguration)
