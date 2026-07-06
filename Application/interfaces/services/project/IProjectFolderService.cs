@@ -23,4 +23,7 @@ public interface IProjectFolderService
     string GetRequiredFolderName(int projectId, ProjectFolderRole role);
 
     void CreateRequiredFolders(Project project);
+    
+    
+    void UpdateProjectFolderMetadata(Project project);
 }

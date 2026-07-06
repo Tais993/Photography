@@ -165,4 +165,76 @@ public class ProjectFolderService : IProjectFolderService
             _ => throw new ArgumentOutOfRangeException(nameof(role), role, null)
         };
     }
+    
+    
+        public void UpdateProjectFolderMetadata(Project project)
+    {
+        if (project.Id is null)
+        {
+            _logger.LogWarning("Could not initialise project folder metadata because project id was null");
+            throw new ArgumentNullException(nameof(project.Id));
+        }
+        
+
+        Dictionary<string, string[]> folderNamesByRole = GetConfiguredFolderNames();
+
+        if (folderNamesByRole.Count == 0)
+        {
+            _logger.LogDebug("No configured folder names found for project folder mapping");
+            return;
+        }
+
+        string[] folderNames = _files.GetDirectories(project.Path)
+            .Select(directory => _files.GetPathEnd(directory))
+            .ToArray();
+
+        foreach ((string folderRole, string[] possibleFolderNames) in folderNamesByRole)
+        {
+            string[] matchingFolderNames = CompareFolderNames(folderNames, possibleFolderNames);
+            string metadataKey = ToFolderMetadataKey(folderRole);
+
+            if (matchingFolderNames.Length == 0)
+            {
+                _logger.LogDebug("No folder found for role {FolderRole} in project {ProjectId}", folderRole, project.Id);
+                continue;
+            }
+
+            if (matchingFolderNames.Length > 1)
+            {
+                _logger.LogWarning("Multiple folders found for role {FolderRole} in project {ProjectId}: {FolderNames}", folderRole, project.Id, string.Join(", ", matchingFolderNames));
+                continue;
+            }
+
+            _projectMetadataService.UpdateMetadataForProject(project.Id.Value, metadataKey, matchingFolderNames[0]);
+
+            _logger.LogInformation("Mapped project folder role {FolderRole} to folder {FolderName} for project {ProjectId}", folderRole, matchingFolderNames[0], project.Id);
+        }
+    }
+    
+    private Dictionary<string, string[]> GetConfiguredFolderNames()
+    {
+        return _configuration
+            .GetSection(FolderNamesConfigKey)
+            .GetChildren()
+            .ToDictionary(
+                section => section.Key,
+                section => section.GetChildren()
+                    .Select(child => child.Value)
+                    .Where(value => !string.IsNullOrWhiteSpace(value))
+                    .Select(value => value!)
+                    .ToArray());
+    }
+    
+    public static string[] CompareFolderNames(string[] folderNames, string[] possibleFolderNames)
+    {
+        return folderNames
+            .Where(folderName => possibleFolderNames.Contains(folderName, StringComparer.OrdinalIgnoreCase))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+    }
+
+    public static string ToFolderMetadataKey(string folderRole)
+    {
+        return FolderMetadataKeyPrefix + folderRole.ToLowerInvariant();
+    }
 }
