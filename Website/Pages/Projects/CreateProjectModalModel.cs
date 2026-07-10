@@ -1,4 +1,5 @@
 ﻿using Domain.entities;
+using static Domain.utilities.ByteSizeFormatter;
 
 namespace Website.Pages.Projects;
 
@@ -15,28 +16,6 @@ public class CreateProjectModalModel
     
     public string ProjectPath { get; set; } = "";
     
-
-    public string GetImportDriveDisplayName(LogicalDrive drive)
-    {
-        string displayName = drive.RootPath;
-
-        if (!string.IsNullOrWhiteSpace(drive.VolumeLabel))
-        {
-            displayName += $" - {drive.VolumeLabel}";
-        }
-
-        return displayName;
-    }
-
-    public string GetImportDriveBadges(LogicalDrive drive)
-    {
-        List<string> badges = [];
-
-        if (drive.IsRecommended) badges.Add("Recommended");
-        if (drive.HasDcimFolder) badges.Add("DCIM");
-
-        return string.Join(" · ", badges);
-    }
 
     public string GetImportDriveStorage(LogicalDrive drive)
     {
@@ -60,27 +39,5 @@ public class CreateProjectModalModel
         }
 
         return ProjectDate.Value.ToString("yyyy-MM-dd") + "-" + ProjectName;
-    }
-
-    // Replace with humanizer dependency?
-    private static string FormatBytes(long bytes)
-    {
-        if (bytes <= 0)
-        {
-            return "unknown size";
-        }
-
-        string[] sizes = ["B", "KB", "MB", "GB", "TB"];
-
-        double size = bytes;
-        int order = 0;
-
-        while (size >= 1024 && order < sizes.Length - 1)
-        {
-            order++;
-            size /= 1024;
-        }
-
-        return $"{size:0.#} {sizes[order]}";
     }
 }

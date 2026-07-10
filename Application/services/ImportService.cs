@@ -26,6 +26,7 @@ public class ProjectImportService : IProjectImportService
     {
         Guid importId = Guid.NewGuid();
 
+        _logger.LogInformation("Starting import for project {ProjectId}", request.ProjectId);
         ProgressByImportId[importId] = new ProjectImportProgress()
         {
             ImportId = importId,
@@ -34,6 +35,7 @@ public class ProjectImportService : IProjectImportService
             FilesImported = 0
         };
 
+        _logger.LogDebug("Starting import in background");
         _ = Task.Run(() => Import(importId, request));
 
         return importId;
@@ -50,6 +52,7 @@ public class ProjectImportService : IProjectImportService
     {
         try
         {
+            _logger.LogDebug("Importing images into project {ProjectId}", request.ProjectId);
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
             IProjectFolderService projectFolderService =
                 scope.ServiceProvider.GetRequiredService<IProjectFolderService>();

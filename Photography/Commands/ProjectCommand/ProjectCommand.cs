@@ -1,21 +1,38 @@
 ﻿using System.CommandLine;
+using Application.interfaces.services;
 using Application.interfaces.services.metadata;
 using Application.interfaces.services.project;
+using Application.interfaces.website;
+using Microsoft.Extensions.Logging;
 using static Cli.ExitCodes;
 
 namespace Cli.Commands.ProjectCommand;
 
 public class ProjectCommand : CommandBase
 {
+    private readonly IProjectService _projectService;
+    private readonly IProjectImportService _projectImportService;
+    private readonly IProjectIndexService _projectIndexService;
+    private readonly ICameraDriveService _cameraDriveService;
+
     private readonly IMetadataService _metadataService;
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectResolverService _projectResolverService;
 
-    public ProjectCommand(IProjectMetadataService projectMetadataService, IProjectResolverService projectResolverService, IMetadataService metadataService)
+    private readonly ILogger<CreateProjectCommand> _logger;
+
+    public ProjectCommand(IProjectMetadataService projectMetadataService, IProjectResolverService projectResolverService, IMetadataService metadataService, 
+        IProjectService projectService, IProjectImportService projectImportService, IProjectIndexService projectIndexService, ICameraDriveService cameraDriveService,
+        ILogger<CreateProjectCommand> logger)
     {
         _projectMetadataService = projectMetadataService;
         _projectResolverService = projectResolverService;
         _metadataService = metadataService;
+        _projectService = projectService;
+        _projectImportService = projectImportService;
+        _projectIndexService = projectIndexService;
+        _cameraDriveService = cameraDriveService;
+        _logger = logger;
     }
 
 
@@ -37,8 +54,12 @@ public class ProjectCommand : CommandBase
         // command.Subcommands.Add(createCommand);
         // command.Subcommands.Add(editCommand);
         // command.Subcommands.Add(deleteCommand);
-        command.Subcommands.Add(new AddMetadataCommand(_projectResolverService, _projectMetadataService, _metadataService).Build());
-        command.Subcommands.Add(new RemoveMetadataCommand(_projectResolverService, _projectMetadataService, _metadataService).Build());
+        command.Subcommands.Add(new AddMetadataCommand(_projectResolverService, _projectMetadataService, _metadataService)
+            .Build());
+        command.Subcommands.Add(new RemoveMetadataCommand(_projectResolverService, _projectMetadataService, _metadataService)
+            .Build());
+        command.Subcommands.Add(new CreateProjectCommand(_projectService, _projectImportService, _projectIndexService,
+            _cameraDriveService, _logger).Build());
         // command.Subcommands.Add(verifyCommand);
     }
 

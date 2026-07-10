@@ -17,4 +17,27 @@ public class LogicalDrive
     public bool HasCameraBrand { get; set; }
     public bool HasCameraFolder { get; set; }
     public bool IsRecommended { get; set; }
+    
+    
+    public string GetImportDriveBadges()
+    {
+        List<string> badges = [];
+
+        if (IsRecommended) badges.Add("Recommended");
+        if (HasDcimFolder) badges.Add("DCIM");
+
+        return string.Join(" · ", badges);
+    }
+
+    public string GetDisplayName()
+    {
+        string displayName = RootPath;
+
+        if (!string.IsNullOrWhiteSpace(VolumeLabel))
+        {
+            displayName += $" - {VolumeLabel}";
+        }
+
+        return displayName;
+    }
 }
