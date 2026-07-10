@@ -36,7 +36,7 @@ public class ProjectUpdateService : IProjectUpdateService
         
         if (resolveProject is not null)
         {
-            UpdateProject(resolveProject);
+            UpdateProject(resolveProject, projectPath);
         }
         else
         {
@@ -60,12 +60,13 @@ public class ProjectUpdateService : IProjectUpdateService
         if (projectPath is not null && project.Path != projectPath)
         {
             project.Path = projectPath;
-        } 
-        
+            _projectRepository.Update(project);
+        }
+
         _projectFolderService.UpdateProjectFolderMetadata(project);
         _projectStorageService.UpdateStorageInfo(project);
 
-        _projectFileScanningService.ScanProject(project);
+        _projectFileScanningService.ScanProject(project, checkExistingImages: true);
         _projectRepository.GetAllByParentProjectId((int)project.Id!).ForEach(UpdateProject);
     }
 }
