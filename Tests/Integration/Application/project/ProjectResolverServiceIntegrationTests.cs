@@ -6,7 +6,7 @@ using Tests.Integration.Fixtures;
 using static Application.Constants;
 using static Tests.Integration.Utilities.IntegrationTestEntityFactory;
 
-namespace Tests.Integration.Application;
+namespace Tests.Integration.Application.project;
 
 public class ProjectResolverServiceIntegrationTests : FileSystemIntegrationTestBase
 {
