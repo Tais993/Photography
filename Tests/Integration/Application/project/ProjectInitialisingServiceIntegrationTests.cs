@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.Integration.Fixtures;
 using static Application.Constants;
 
-namespace Tests.Integration.Application;
+namespace Tests.Integration.Application.project;
 
 public class ProjectInitialisingServiceIntegrationTests : StandardProjectIntegrationTestBase
 {
