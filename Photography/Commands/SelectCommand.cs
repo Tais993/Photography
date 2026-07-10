@@ -66,6 +66,9 @@ public class SelectCommand : CommandBase
 
     public override int Run(ParseResult parseResult)
     {
+        string? fileName = GetFileNameFromImageViewerOrOptions(parseResult);
+        
+        
         Project? project = _projectResolverService.ResolveProject(Directory.GetCurrentDirectory(),
             parseResult.GetValue(ProjectOption));
         _projectUpdateService.UpdateProject(project);
@@ -76,9 +79,7 @@ public class SelectCommand : CommandBase
             return InvalidInput("No valid project was given or resolved.");
         }
 
-        string? fileName = GetFileName(parseResult);
         string? fileNumber = parseResult.GetValue<string>(_fileNumber);
-
         if (fileName == null && fileNumber == null)
         {
             return InvalidInput("No file name or file number was given.");
@@ -108,7 +109,7 @@ public class SelectCommand : CommandBase
         return Success;
     }
 
-    private string? GetFileName(ParseResult parseResult)
+    private string? GetFileNameFromImageViewerOrOptions(ParseResult parseResult)
     {
         string? fileName;
 
