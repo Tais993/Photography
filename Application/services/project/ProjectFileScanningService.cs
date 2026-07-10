@@ -27,7 +27,7 @@ public class ProjectFileScanningService : IProjectFileScanningService
         _projectStorage = projectStorage;
     }
 
-    public void ScanProject(Project project, bool recursive = true, bool checkExistingImages = true)
+    public void ScanProject(Project project, bool recursive = true, bool checkExistingImages = false)
     {
         if (project.Id is null)
         {
