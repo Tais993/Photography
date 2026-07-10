@@ -7,17 +7,17 @@ using static Application.Constants;
 
 namespace Application.services.project;
 
-public class ProjectScanningService : IProjectScanningService
+public class ProjectFileScanningService : IProjectFileScanningService
 {
     private readonly IProjectStorageService _projectStorage;
     private readonly IImageRepository _imageRepository;
     private readonly IImageMetadataRepository _imageMetadataRepository;
     private readonly IProjectRepository _projectRepository;
     private readonly IFiles _files;
-    private readonly ILogger<ProjectScanningService> _logger;
+    private readonly ILogger<ProjectFileScanningService> _logger;
 
-    public ProjectScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files,
-        ILogger<ProjectScanningService> logger, IImageMetadataRepository imageMetadataRepository, IProjectStorageService projectStorage)
+    public ProjectFileScanningService(IImageRepository imageRepository, IProjectRepository projectRepository, IFiles files,
+        ILogger<ProjectFileScanningService> logger, IImageMetadataRepository imageMetadataRepository, IProjectStorageService projectStorage)
     {
         _imageRepository = imageRepository;
         _projectRepository = projectRepository;

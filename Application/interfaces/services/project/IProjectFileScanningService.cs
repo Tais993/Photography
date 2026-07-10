@@ -2,7 +2,7 @@
 
 namespace Application.interfaces.services.project;
 
-public interface IProjectScanningService
+public interface IProjectFileScanningService
 {
     /// <summary>
     /// Scans a given project, this is automatically recursive and also checks all subprojects

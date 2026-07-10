@@ -14,7 +14,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 {
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectMetadataService _projectMetadataService;
-    private readonly IProjectScanningService _projectScanningService;
+    private readonly IProjectFileScanningService _projectFileScanningService;
     private readonly IProjectFolderService _projectFolderService;
     private readonly IProjectInfoFileService _projectInfoFileService;
     private readonly ILogger<ProjectInitialisingService> _logger;
@@ -23,7 +23,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
     public ProjectInitialisingService(IProjectRepository projectRepository, IProjectMetadataService projectMetadataService, 
         IProjectInfoFileService projectInfoFileService, ILogger<ProjectInitialisingService> logger, IFiles files, 
-        ICollectionMetadataService collectionMetadataService, IProjectScanningService projectScanningService, IProjectFolderService projectFolderService)
+        ICollectionMetadataService collectionMetadataService, IProjectFileScanningService projectFileScanningService, IProjectFolderService projectFolderService)
     {
         _projectRepository = projectRepository;
         _projectMetadataService = projectMetadataService;
@@ -31,7 +31,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
         _logger = logger;
         _files = files;
         _collectionMetadataService = collectionMetadataService;
-        _projectScanningService = projectScanningService;
+        _projectFileScanningService = projectFileScanningService;
         _projectFolderService = projectFolderService;
     }
 
@@ -66,7 +66,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
             if (project is not null)
             {
-                _projectScanningService.ScanProject(project);
+                _projectFileScanningService.ScanProject(project);
             }
         }
         else
@@ -111,7 +111,7 @@ public class ProjectInitialisingService : IProjectInitialisingService
 
         if (project is not null)
         {
-            _projectScanningService.ScanProject(project);
+            _projectFileScanningService.ScanProject(project);
         }
     }
 

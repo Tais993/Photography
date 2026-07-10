@@ -34,7 +34,7 @@ public static class DependencyInjection
             services.AddScoped<IProjectResolverService, ProjectResolverService>();
             services.AddScoped<IProjectInitialisingService, ProjectInitialisingService>();
             services.AddScoped<ProjectUpdateService>();
-            services.AddScoped<IProjectScanningService, ProjectScanningService>();
+            services.AddScoped<IProjectFileScanningService, ProjectFileScanningService>();
             services.AddScoped<IProjectFolderService, ProjectFolderService>();
             
             services.AddScoped<IProjectStorageService, ProjectStorageService>();

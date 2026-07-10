@@ -8,13 +8,13 @@ public class TestCommand : CommandBase
 {
     private readonly IProjectResolverService _projectResolverService;
     private readonly IProjectService _projectService;
-    private readonly IProjectScanningService _projectScanningService;
+    private readonly IProjectFileScanningService _projectFileScanningService;
     
-    public TestCommand(IProjectResolverService projectResolverService, IProjectService projectService, IProjectScanningService projectScanningService)
+    public TestCommand(IProjectResolverService projectResolverService, IProjectService projectService, IProjectFileScanningService projectFileScanningService)
     {
         _projectResolverService = projectResolverService;
         _projectService = projectService;
-        _projectScanningService = projectScanningService;
+        _projectFileScanningService = projectFileScanningService;
     }
 
 
@@ -39,7 +39,7 @@ public class TestCommand : CommandBase
         // Project createdSubProject = _projectService.CreateSubProject((int) createdProject.Id!, "Hour 1 of the event");
         // Console.WriteLine(createdSubProject);
         
-        _projectScanningService.ScanProject(resolvedProject);
+        _projectFileScanningService.ScanProject(resolvedProject);
         
         return ExitCodes.Success;
     }

@@ -12,17 +12,17 @@ namespace Application.services.project;
 public class ProjectUpdateService : IProjectUpdateService
 {
     
-    private readonly IProjectScanningService _projectScanningService;
+    private readonly IProjectFileScanningService _projectFileScanningService;
     private readonly IProjectStorageService _projectStorageService;
     private readonly IProjectFolderService _projectFolderService;
     private readonly IProjectRepository _projectRepository;
     private readonly IProjectResolverService _projectResolverService;
     private readonly ILogger<ProjectUpdateService> _logger;
 
-    public ProjectUpdateService(IProjectScanningService projectScanningService, IProjectStorageService projectStorageService,
+    public ProjectUpdateService(IProjectFileScanningService projectFileScanningService, IProjectStorageService projectStorageService,
         IProjectRepository projectRepository, ILogger<ProjectUpdateService> logger, IProjectFolderService projectFolderService, IProjectResolverService projectResolverService)
     {
-        _projectScanningService = projectScanningService;
+        _projectFileScanningService = projectFileScanningService;
         _projectStorageService = projectStorageService;
         _projectRepository = projectRepository;
         _logger = logger;
@@ -65,7 +65,7 @@ public class ProjectUpdateService : IProjectUpdateService
         _projectFolderService.UpdateProjectFolderMetadata(project);
         _projectStorageService.UpdateStorageInfo(project);
 
-        _projectScanningService.ScanProject(project);
+        _projectFileScanningService.ScanProject(project);
         _projectRepository.GetAllByParentProjectId((int)project.Id!).ForEach(UpdateProject);
     }
 }
