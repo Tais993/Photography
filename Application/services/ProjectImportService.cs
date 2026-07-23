@@ -27,7 +27,8 @@ public class ProjectImportService : IProjectImportService
         Guid importId = Guid.NewGuid();
 
         _logger.LogInformation("Starting import for project {ProjectId}", request.ProjectId);
-        ProgressByImportId[importId] = new ProjectImportProgress()
+
+        ProgressByImportId[importId] = new ProjectImportProgress
         {
             ImportId = importId,
             ProjectId = request.ProjectId,
@@ -44,7 +45,6 @@ public class ProjectImportService : IProjectImportService
     public ProjectImportProgress? GetProgress(Guid importId)
     {
         ProgressByImportId.TryGetValue(importId, out ProjectImportProgress? progress);
-
         return progress;
     }
 
@@ -53,54 +53,60 @@ public class ProjectImportService : IProjectImportService
         try
         {
             _logger.LogDebug("Importing images into project {ProjectId}", request.ProjectId);
+
             using IServiceScope scope = _serviceScopeFactory.CreateScope();
+
             IProjectFolderService projectFolderService =
                 scope.ServiceProvider.GetRequiredService<IProjectFolderService>();
             IProjectService projectService =
                 scope.ServiceProvider.GetRequiredService<IProjectService>();
             IImageRepository imageRepository =
                 scope.ServiceProvider.GetRequiredService<IImageRepository>();
-            IThumbnailService thumbnailService =
-                scope.ServiceProvider.GetRequiredService<IThumbnailService>();
             IFiles files =
                 scope.ServiceProvider.GetRequiredService<IFiles>();
 
-            
-            string projectPath = projectService.GetProjectById(request.ProjectId)?.Path ??
-                                 throw new Exception("Project not found");
+            string projectPath = projectService.GetProjectById(request.ProjectId)?.Path
+                                 ?? throw new Exception("Project not found");
 
             string originalsFolderPath = projectFolderService.GetRequiredFolderPath(
                 request.ProjectId,
-                ProjectFolderRole.Originals);
+                ProjectFolderRole.Originals
+            );
 
-            _logger.LogInformation("Importing {Count} images into project {ProjectId}", request.FilePaths.Count,
-                request.ProjectId);
+            _logger.LogInformation(
+                "Importing {Count} images into project {ProjectId}",
+                request.FilePaths.Count,
+                request.ProjectId
+            );
 
             for (int i = 0; i < request.FilePaths.Count; i++)
             {
                 string sourceFile = request.FilePaths[i];
-                string targetFile = files.Combine(originalsFolderPath, files.GetFileName(sourceFile));
+                string fileName = files.GetFileName(sourceFile);
+                string targetFile = files.Combine(originalsFolderPath, fileName);
 
                 _logger.LogDebug("Importing image {SourceFile} to {TargetFile}", sourceFile, targetFile);
 
-                
                 files.CopyFile(sourceFile, targetFile);
 
                 Image image = CreateImage(request.ProjectId, projectPath, targetFile, files);
-                Image insertedImage = imageRepository.Insert(image);
+                imageRepository.Insert(image);
 
                 if (request.RemoveSourceFilesAfterImport)
                 {
-                    files.DeleteFile(sourceFile);
+                    TryDeleteSourceFile(files, sourceFile);
                 }
 
-                
-                UpdateProgress(importId, i + 1, files.GetFileName(sourceFile));
+                UpdateProgress(importId, i + 1, fileName);
             }
 
             CompleteProgress(importId);
-            
-            _logger.LogInformation("Finished importing {Count} images into project {ProjectId}", request.FilePaths.Count, request.ProjectId);
+
+            _logger.LogInformation(
+                "Finished importing {Count} images into project {ProjectId}",
+                request.FilePaths.Count,
+                request.ProjectId
+            );
         }
         catch (Exception ex)
         {
@@ -108,9 +114,23 @@ public class ProjectImportService : IProjectImportService
             FailProgress(importId, ex.Message);
         }
     }
-    
-    
-    
+
+    private void TryDeleteSourceFile(IFiles files, string sourceFile)
+    {
+        try
+        {
+            files.DeleteFile(sourceFile);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(
+                ex,
+                "Imported source file could not be deleted: {SourceFile}",
+                sourceFile
+            );
+        }
+    }
+
     private static void UpdateProgress(Guid importId, int filesImported, string currentFile)
     {
         if (!ProgressByImportId.TryGetValue(importId, out ProjectImportProgress? progress))
@@ -121,7 +141,7 @@ public class ProjectImportService : IProjectImportService
         progress.FilesImported = filesImported;
         progress.CurrentFile = currentFile;
     }
-    
+
     private static void CompleteProgress(Guid importId)
     {
         if (!ProgressByImportId.TryGetValue(importId, out ProjectImportProgress? progress))
@@ -133,7 +153,7 @@ public class ProjectImportService : IProjectImportService
         progress.CurrentFile = null;
         progress.IsCompleted = true;
     }
-    
+
     private static void FailProgress(Guid importId, string errorMessage)
     {
         if (!ProgressByImportId.TryGetValue(importId, out ProjectImportProgress? progress))
@@ -145,7 +165,6 @@ public class ProjectImportService : IProjectImportService
         progress.ErrorMessage = errorMessage;
         progress.CurrentFile = null;
     }
-    
 
     private static Image CreateImage(int projectId, string projectPath, string targetFile, IFiles files)
     {
@@ -153,7 +172,7 @@ public class ProjectImportService : IProjectImportService
             projectId: projectId,
             fileName: files.GetFileNameWithoutExtension(targetFile),
             fileType: files.GetFileExtension(targetFile),
-            relationalFilePath: files.GetRelativePath(projectPath, targetFile
-            ));
+            relationalFilePath: files.GetRelativePath(projectPath, targetFile)
+        );
     }
 }
