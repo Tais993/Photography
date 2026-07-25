@@ -19,11 +19,12 @@ public class ProjectCommand : CommandBase
     private readonly IProjectMetadataService _projectMetadataService;
     private readonly IProjectResolverService _projectResolverService;
 
-    private readonly ILogger<CreateProjectCommand> _logger;
+    private readonly ILogger<CreateProjectCommand> _loggerCreateProjectCommand;
+    private readonly ILogger<ImportCommand> _loggerImportCommand;
 
     public ProjectCommand(IProjectMetadataService projectMetadataService, IProjectResolverService projectResolverService, IMetadataService metadataService, 
         IProjectService projectService, IProjectImportService projectImportService, IProjectIndexService projectIndexService, ICameraDriveService cameraDriveService,
-        ILogger<CreateProjectCommand> logger)
+        ILogger<CreateProjectCommand> loggerCreateProjectCommand, ILogger<ImportCommand> loggerImportCommand)
     {
         _projectMetadataService = projectMetadataService;
         _projectResolverService = projectResolverService;
@@ -32,7 +33,8 @@ public class ProjectCommand : CommandBase
         _projectImportService = projectImportService;
         _projectIndexService = projectIndexService;
         _cameraDriveService = cameraDriveService;
-        _logger = logger;
+        _loggerCreateProjectCommand = loggerCreateProjectCommand;
+        _loggerImportCommand = loggerImportCommand;
     }
 
 
@@ -59,7 +61,8 @@ public class ProjectCommand : CommandBase
         command.Subcommands.Add(new RemoveMetadataCommand(_projectResolverService, _projectMetadataService, _metadataService)
             .Build());
         command.Subcommands.Add(new CreateProjectCommand(_projectService, _projectImportService, _projectIndexService,
-            _cameraDriveService, _logger).Build());
+            _cameraDriveService, _loggerCreateProjectCommand).Build());
+        command.Subcommands.Add(new ImportCommand(_projectImportService, _projectResolverService, _projectService, _cameraDriveService, _loggerImportCommand).Build());
         // command.Subcommands.Add(verifyCommand);
     }
 
