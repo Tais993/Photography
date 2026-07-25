@@ -6,7 +6,7 @@ using Cli.utils;
 using Domain.entities;
 using Microsoft.Extensions.Logging;
 using static Cli.ExitCodes;
-using static Domain.utilities.ByteSizeFormatter;
+using static Cli.utils.CameraDriveSelector;
 
 namespace Cli.Commands.ProjectCommand;
 
@@ -65,7 +65,6 @@ public class CreateProjectCommand : CommandBase
 
         if (!VerifyPhotoDate(firstPhotoDate))
         {
-            
             // ask date
         }
 
@@ -83,19 +82,16 @@ public class CreateProjectCommand : CommandBase
         _logger.LogDebug("Found {Count} files to import", files.Count);
 
         Project project = _projectService.CreateProject(projectName, firstPhotoDate);
-        
+
         _logger.LogDebug("Should start import for project {ProjectId}", project.Id);
-        Guid importId = _projectImportService.StartImport(new ProjectImportRequest()
+        importId = _projectImportService.StartImport(new ProjectImportRequest()
         {
             FilePaths = files,
             ProjectId = (int)project.Id!,
             RemoveSourceFilesAfterImport = true
         });
 
-        PrepareImportProgress(importId, files);
-
-    while (true)
-    {
+        _progressBar = new ProgressBar();
         while (true)
         {
             int result = UpdateProgress();
@@ -109,21 +105,7 @@ public class CreateProjectCommand : CommandBase
         }
     }
 
-    Console.WriteLine();
-    Console.WriteLine("Import completed successfully.");
-
-    return Success;
-        
-        return Failure;
-    }
-
-    private void PrepareImportProgress(Guid importId, List<string> files)
-    {
-        this.importId = importId;
-        this._progressBar = new ProgressBar();
-    }
-
-     private int UpdateProgress()
+    private int UpdateProgress()
     {
         ProjectImportProgress? progress =
             _projectImportService.GetProgress(importId);
@@ -155,7 +137,7 @@ public class CreateProjectCommand : CommandBase
         Thread.Sleep(100);
         return -1;
     }
-    
+
     private static bool ConfirmProjectCreation(string projectName, DateOnly? firstPhotoDate, LogicalDrive pickedDrive)
     {
         Console.WriteLine(
@@ -194,47 +176,6 @@ public class CreateProjectCommand : CommandBase
         }
     }
 
-    private static bool TryGetPickedDrive(Dictionary<int, LogicalDrive> importDriveOptions, out LogicalDrive pickedDrive)
-    {
-        pickedDrive = null!;
-
-        Console.Write("Select drive: ");
-
-        string? input = Console.ReadLine()?.Trim();
-
-        if (!int.TryParse(input, out int selectedNumber) ||
-            !importDriveOptions.TryGetValue(selectedNumber, out LogicalDrive? drive))
-        {
-            Console.WriteLine("Invalid drive selection.");
-            return false;
-        }
-
-        pickedDrive = drive;
-        return true;
-    }
-
-    private static void DisplayImportDrives(Dictionary<int, LogicalDrive> importDriveOptions)
-    {
-        Console.WriteLine("Found camera/import drives:");
-        Console.WriteLine();
-
-        foreach ((int number, LogicalDrive drive) in importDriveOptions)
-        {
-            // TODO disable non DCIM drives 
-            string importDriveBadges = drive.GetImportDriveBadges();
-
-            Console.WriteLine($"  [{number}] {drive.GetDisplayName()}");
-
-            if (!string.IsNullOrEmpty(importDriveBadges))
-            {
-                Console.WriteLine($"      {importDriveBadges}");
-            }
-
-            Console.WriteLine($"      {FormatBytes(drive.TotalSize)} total · {FormatBytes(drive.TotalFreeSpace)} free");
-            Console.WriteLine($"      Import folder: {drive.ImageFolderPath}");
-            Console.WriteLine();
-        }
-    }
 
     private string GetProjectName()
     {
