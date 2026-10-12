@@ -12,7 +12,7 @@ This project was created for my own photography workflow, where projects often c
 
 == Status
 
-This project is under active development.
+This project is under inactive development, school requires me to focus on another project.
 
 The current version focuses on the core workflow:
 
